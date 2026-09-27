@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl" id="app-root">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Dollar C - Supreme Enterprise Platform</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -45,13 +45,22 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    body {
+    html, body {
       background-color: var(--c-bg-main);
       color: var(--c-text-main);
-      padding-bottom: 95px;
-      overflow-x: hidden;
-      min-height: 100vh;
-      line-height: 1.5;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Main Scrollable Viewport Area */
+    .app-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      padding-bottom: 110px;
+      -webkit-overflow-scrolling: touch;
     }
 
     .hidden { display: none !important; }
@@ -60,16 +69,12 @@
     .flex-row { display: flex; flex-direction: row; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .flex-center { display: flex; justify-content: center; align-items: center; }
-    .flex-wrap { display: flex; flex-wrap: wrap; }
-    .gap-1 { gap: 4px; }
     .gap-2 { gap: 8px; }
     .gap-3 { gap: 12px; }
     .gap-4 { gap: 16px; }
-    .mt-1 { margin-top: 4px; }
     .mt-2 { margin-top: 8px; }
     .mt-3 { margin-top: 12px; }
     .mt-4 { margin-top: 16px; }
-    .mb-1 { margin-bottom: 4px; }
     .mb-2 { margin-bottom: 8px; }
     .mb-3 { margin-bottom: 12px; }
     .mb-4 { margin-bottom: 16px; }
@@ -78,8 +83,6 @@
     .p-4 { padding: 16px; }
     .w-full { width: 100%; }
     .text-center { text-align: center; }
-    .text-right { text-align: right; }
-    .text-left { text-align: left; }
     .text-c { color: var(--c-primary); }
     .text-danger { color: var(--c-danger); }
     .text-warn { color: var(--c-warn); }
@@ -94,24 +97,23 @@
     .font-black { font-weight: 900; }
 
     .app-header {
-      background: rgba(17, 26, 45, 0.85);
+      background: rgba(17, 26, 45, 0.9);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      padding: 14px 18px;
-      position: sticky;
-      top: 0;
+      padding: 12px 16px;
       z-index: 60;
       border-bottom: 1px solid var(--c-border);
       box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
     }
 
     .user-avatar {
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       border-radius: var(--radius-full);
       background: linear-gradient(135deg, var(--c-primary), #0284c7);
       color: #fff;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 800;
       box-shadow: 0 4px 14px var(--c-primary-alpha);
       border: 2px solid rgba(255, 255, 255, 0.1);
@@ -120,10 +122,10 @@
     .balance-pill {
       background: var(--c-primary-alpha);
       color: var(--c-primary);
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: var(--radius-full);
       font-weight: 800;
-      font-size: 14px;
+      font-size: 13px;
       border: 1px solid var(--c-primary-glow);
       display: inline-flex;
       align-items: center;
@@ -132,157 +134,106 @@
 
     .view-container {
       display: none;
-      padding: 16px;
-      animation: viewSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: viewSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .view-container.active {
       display: block;
     }
     @keyframes viewSlide {
-      from {
-        opacity: 0;
-        transform: translateY(18px) scale(0.98);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
+      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .card {
       background: var(--c-bg-surface);
       border-radius: var(--radius-md);
-      padding: 18px;
-      margin-bottom: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
       border: 1px solid var(--c-border);
       box-shadow: var(--shadow-sm);
-      transition: var(--trans-fast);
     }
     .card-elevated {
       background: var(--c-bg-surface-elevated);
       border: 1px solid var(--c-border-light);
     }
     .card-header {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
       color: var(--c-text-main);
       border-bottom: 1px solid var(--c-border);
-      padding-bottom: 10px;
+      padding-bottom: 8px;
     }
 
     .balance-master {
       background: linear-gradient(135deg, #063d2e, #0c2b22 60%, #0d1e34);
       text-align: center;
-      padding: 30px 18px;
+      padding: 24px 16px;
       border-radius: var(--radius-lg);
       position: relative;
       overflow: hidden;
       border: 1px solid var(--c-primary);
       box-shadow: 0 12px 35px var(--c-primary-alpha);
-      margin-bottom: 20px;
-    }
-    .balance-master::after {
-      content: "";
-      position: absolute;
-      width: 250px;
-      height: 250px;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
-      top: -100px;
-      left: -80px;
-      pointer-events: none;
+      margin-bottom: 16px;
     }
     .balance-master h1 {
-      font-size: 46px;
+      font-size: 40px;
       font-weight: 900;
-      margin: 8px 0;
-      letter-spacing: -1.5px;
+      margin: 6px 0;
+      letter-spacing: -1px;
       color: #ffffff;
       text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
 
-    .input-group {
-      margin-bottom: 14px;
-    }
-    .input-label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 13px;
-      color: var(--c-text-muted);
-      font-weight: 600;
-    }
+    .input-group { margin-bottom: 12px; }
+    .input-label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--c-text-muted); font-weight: 600; }
     input, textarea, select {
       width: 100%;
-      padding: 14px 16px;
-      background: rgba(7, 13, 23, 0.7);
+      padding: 12px 14px;
+      background: rgba(7, 13, 23, 0.8);
       border: 1px solid var(--c-border);
       color: #fff;
       border-radius: var(--radius-sm);
       outline: none;
-      transition: var(--trans-fast);
       font-size: 14px;
     }
     input:focus, textarea:focus, select:focus {
       border-color: var(--c-primary);
       box-shadow: 0 0 0 3px var(--c-primary-alpha);
     }
-    select option {
-      background: var(--c-bg-surface);
-      color: #fff;
-    }
+    select option { background: var(--c-bg-surface); color: #fff; }
 
     .btn {
       background: var(--c-primary);
       color: #fff;
       border: none;
-      padding: 14px 20px;
+      padding: 12px 18px;
       border-radius: var(--radius-sm);
       font-weight: 800;
       font-size: 14px;
       cursor: pointer;
       width: 100%;
-      transition: var(--trans-fast);
       display: inline-flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
-    .btn:active {
-      transform: scale(0.97);
-      opacity: 0.9;
-    }
+    .btn:active { transform: scale(0.97); opacity: 0.9; }
     .btn-danger { background: var(--c-danger); }
-    .btn-danger:active { background: #dc2626; }
     .btn-warn { background: var(--c-warn); color: #000; }
-    .btn-outline {
-      background: transparent;
-      border: 2px solid var(--c-primary);
-      color: var(--c-primary);
-    }
-    .btn-outline:active { background: var(--c-primary-alpha); }
-    .btn-sm {
-      padding: 8px 14px;
-      font-size: 12px;
-      width: auto;
-      border-radius: 6px;
-    }
+    .btn-outline { background: transparent; border: 2px solid var(--c-primary); color: var(--c-primary); }
+    .btn-sm { padding: 8px 12px; font-size: 12px; width: auto; border-radius: 6px; }
 
     .list-item {
       background: rgba(7, 13, 23, 0.45);
       border: 1px solid var(--c-border);
-      padding: 14px 16px;
+      padding: 12px 14px;
       border-radius: var(--radius-sm);
       margin-bottom: 10px;
-      transition: var(--trans-fast);
-    }
-    .list-item:hover {
-      border-color: rgba(255, 255, 255, 0.15);
-      background: rgba(7, 13, 23, 0.7);
     }
     .badge {
       display: inline-flex;
@@ -299,7 +250,7 @@
 
     .empty-state {
       text-align: center;
-      padding: 40px 16px;
+      padding: 30px 16px;
       color: var(--c-text-muted);
       border: 2px dashed var(--c-border);
       border-radius: var(--radius-md);
@@ -311,40 +262,31 @@
       inset: 0;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
       z-index: 1000;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 18px;
+      padding: 16px;
       opacity: 0;
       pointer-events: none;
       transition: var(--trans-normal);
     }
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
     .modal-content {
       background: var(--c-bg-surface);
       width: 100%;
-      max-width: 440px;
+      max-width: 420px;
       border-radius: var(--radius-lg);
-      padding: 24px;
-      transform: translateY(30px) scale(0.96);
-      transition: var(--trans-normal);
+      padding: 20px;
       border: 1px solid var(--c-border);
       box-shadow: var(--shadow-lg);
       max-height: 85vh;
       overflow-y: auto;
     }
-    .modal-overlay.active .modal-content {
-      transform: translateY(0) scale(1);
-    }
 
     .toast-container {
       position: fixed;
-      top: 18px;
+      top: 16px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 9999;
@@ -352,82 +294,69 @@
       flex-direction: column;
       gap: 8px;
       width: 90%;
-      max-width: 380px;
+      max-width: 360px;
       pointer-events: none;
     }
     .toast {
       background: var(--c-bg-surface-elevated);
       color: #fff;
-      padding: 14px 18px;
+      padding: 12px 16px;
       border-radius: var(--radius-sm);
       box-shadow: var(--shadow-lg);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       font-weight: 600;
       font-size: 13px;
-      border-left: 4px solid var(--c-primary);
-      animation: toastShow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      border-right: 4px solid var(--c-primary);
     }
-    .toast.error { border-left-color: var(--c-danger); }
-    .toast.warn { border-left-color: var(--c-warn); }
-    .toast.fade-out { animation: toastHide 0.3s ease forwards; }
-    @keyframes toastShow {
-      from { opacity: 0; transform: translateY(-20px) scale(0.9); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    @keyframes toastHide {
-      from { opacity: 1; transform: translateY(0) scale(1); }
-      to { opacity: 0; transform: translateY(-20px) scale(0.9); }
-    }
+    .toast.error { border-right-color: var(--c-danger); }
+    .toast.warn { border-right-color: var(--c-warn); }
 
     .admin-subnav, .ads-subnav {
       display: flex;
       background: rgba(0, 0, 0, 0.4);
       border-radius: var(--radius-sm);
       padding: 4px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       overflow-x: auto;
       gap: 4px;
     }
     .admin-tab-btn, .ads-tab-btn {
       flex: 1;
       text-align: center;
-      padding: 10px 8px;
+      padding: 8px;
       font-size: 12px;
       font-weight: 700;
       color: var(--c-text-muted);
       cursor: pointer;
       border-radius: 6px;
-      transition: var(--trans-fast);
-      white-space: nowrap;
       background: transparent;
       border: none;
+      white-space: nowrap;
     }
     .admin-tab-btn.active, .ads-tab-btn.active {
       background: var(--c-primary);
       color: #fff;
     }
-    .admin-panel-section, .ads-panel-section {
-      display: none;
-    }
-    .admin-panel-section.active, .ads-panel-section.active {
-      display: block;
-    }
+    .admin-panel-section, .ads-panel-section { display: none; }
+    .admin-panel-section.active, .ads-panel-section.active { display: block; }
 
+    /* Bottom Navigation Bar Locked Safely to Viewport Bottom */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(17, 26, 45, 0.95);
+      background: rgba(17, 26, 45, 0.98);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-top: 1px solid var(--c-border);
       display: flex;
       justify-content: space-around;
-      padding: 10px 0 20px;
+      padding: 8px 0 env(safe-area-inset-bottom, 14px) 0;
       z-index: 500;
+      flex-shrink: 0;
     }
     .nav-btn {
       background: none;
@@ -439,27 +368,11 @@
       font-size: 11px;
       gap: 4px;
       cursor: pointer;
-      transition: var(--trans-fast);
       font-weight: 700;
       flex: 1;
     }
-    .nav-btn.active {
-      color: var(--c-primary);
-      transform: translateY(-2px);
-    }
-    .nav-btn svg {
-      width: 22px;
-      height: 22px;
-      fill: currentColor;
-    }
-
-    [dir="rtl"] .app-header { flex-direction: row; }
-    [dir="rtl"] .flex-between { flex-direction: row; }
-    [dir="rtl"] .toast { border-left: none; border-right: 4px solid var(--c-primary); }
-    [dir="rtl"] .toast.error { border-right-color: var(--c-danger); }
-    [dir="rtl"] .toast.warn { border-right-color: var(--c-warn); }
-    [dir="rtl"] input, [dir="rtl"] textarea, [dir="rtl"] select { text-align: right; }
-    [dir="ltr"] input, [dir="ltr"] textarea, [dir="ltr"] select { text-align: left; }
+    .nav-btn.active { color: var(--c-primary); }
+    .nav-btn svg { width: 22px; height: 22px; fill: currentColor; }
   </style>
 </head>
 <body>
@@ -482,117 +395,149 @@
     </div>
   </header>
 
-  <main id="view-earn" class="view-container active">
-    <div class="balance-master">
-      <div class="text-muted text-xs font-bold" data-i18n="hero_balance_title">الرصيد المتاح القابل للسحب</div>
-      <h1><span id="main-balance-val">0.00</span> <span style="color: #6ee7b7;">₵</span></h1>
-      <div class="text-xs font-bold" style="color: #a7f3d0; background: rgba(0,0,0,0.25); display: inline-block; padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08);">
-        ≈ <span id="main-balance-usdt">0.000</span> USDT
-      </div>
-    </div>
-
-    <div class="flex-between mb-3">
-      <h3 class="font-bold text-base flex flex-center gap-2">
-        <span>⚡</span> <span data-i18n="tasks_available_header">المهام المتاحة للإنجاز</span>
-      </h3>
-      <select id="filter-task-category" style="width: auto; padding: 6px 12px; margin: 0;" onchange="Engine.renderTasks()">
-        <option value="all" data-i18n="filter_all">جميع المهام</option>
-        <option value="telegram" data-i18n="filter_tg">قنوات تلغرام</option>
-        <option value="twitter" data-i18n="filter_twitter">تويتر (X)</option>
-        <option value="ad" data-i18n="filter_ads">مشاهدة إعلانات</option>
-        <option value="custom" data-i18n="filter_custom">مهام خاصة</option>
-      </select>
-    </div>
-
-    <div id="tasks-feed-container"></div>
-  </main>
-
-  <main id="view-ads" class="view-container">
-    <div class="ads-subnav">
-      <button class="ads-tab-btn active" onclick="Engine.switchAdsSubSection('ads-create-sec', this)">إنشاء إعلان جديد</button>
-      <button class="ads-tab-btn" onclick="Engine.switchAdsSubSection('ads-manage-sec', this)">حملاتي ومراجعة إثباتاتي 📋</button>
-    </div>
-
-    <div id="ads-create-sec" class="ads-panel-section active">
-      <div class="card">
-        <div class="card-header text-c">
-          <span>📢</span> <span data-i18n="create_ad_header">إنشاء مهمة أو حملة جديدة</span>
+  <div class="app-scroll-area">
+    <main id="view-earn" class="view-container active">
+      <div class="balance-master">
+        <div class="text-muted text-xs font-bold" data-i18n="hero_balance_title">الرصيد المتاح القابل للسحب</div>
+        <h1><span id="main-balance-val">0.00</span> <span style="color: #6ee7b7;">₵</span></h1>
+        <div class="text-xs font-bold" style="color: #a7f3d0; background: rgba(0,0,0,0.25); display: inline-block; padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08);">
+          ≈ <span id="main-balance-usdt">0.000</span> USDT
         </div>
-        <p class="text-xs text-muted mb-3" data-i18n="create_ad_subtitle">
-          زوّد أعضاء قناتك أو روّج لرابطك بين آلاف المستخدمين. تخصم المنصة نسبة 25% كعمولة تشغيلية للمنصة.
-        </p>
+      </div>
 
-        <div class="p-3 mb-3" style="background: rgba(245, 158, 11, 0.1); border: 1px dashed var(--c-warn); border-radius: var(--radius-sm);">
-          <p class="text-xs text-warn font-bold" data-i18n="tg_channel_notice">
-            تنبيه إلزامي لأصحاب القنوات: إذا اخترت قسم "اشتراك في قناة تلغرام"، يجب عليك رفع البوت (@Ta7oiilbot) مشرفاً في قناتك بكافة الصلاحيات؛ ليتمكن من كشف اشتراك الأعضاء ومنع الغش!
+      <div class="flex-between mb-3">
+        <h3 class="font-bold text-base flex flex-center gap-2">
+          <span>⚡</span> <span data-i18n="tasks_available_header">المهام المتاحة للإنجاز</span>
+        </h3>
+        <select id="filter-task-category" style="width: auto; padding: 6px 12px; margin: 0;" onchange="Engine.renderTasks()">
+          <option value="all" data-i18n="filter_all">جميع المهام</option>
+          <option value="telegram" data-i18n="filter_tg">قنوات تلغرام</option>
+          <option value="twitter" data-i18n="filter_twitter">تويتر (X)</option>
+          <option value="ad" data-i18n="filter_ads">مشاهدة إعلانات</option>
+          <option value="custom" data-i18n="filter_custom">مهام خاصة</option>
+        </select>
+      </div>
+
+      <div id="tasks-feed-container"></div>
+    </main>
+
+    <main id="view-ads" class="view-container">
+      <div class="ads-subnav">
+        <button class="ads-tab-btn active" onclick="Engine.switchAdsSubSection('ads-create-sec', this)">إنشاء إعلان جديد</button>
+        <button class="ads-tab-btn" onclick="Engine.switchAdsSubSection('ads-manage-sec', this)">حملاتي ومراجعة إثباتاتي 📋</button>
+      </div>
+
+      <div id="ads-create-sec" class="ads-panel-section active">
+        <div class="card">
+          <div class="card-header text-c">
+            <span>📢</span> <span data-i18n="create_ad_header">إنشاء مهمة أو حملة جديدة</span>
+          </div>
+          <p class="text-xs text-muted mb-3" data-i18n="create_ad_subtitle">
+            زوّد أعضاء قناتك أو روّج لرابطك بين آلاف المستخدمين. تخصم المنصة نسبة 25% كعمولة تشغيلية للمنصة.
           </p>
-        </div>
 
-        <div class="input-group">
-          <label class="input-label" data-i18n="form_ad_title">عنوان المهمة</label>
-          <input type="text" id="form-ad-title" placeholder="مثال: اشترك في قناة الأخبار الرسمية">
-        </div>
+          <div class="p-3 mb-3" style="background: rgba(245, 158, 11, 0.1); border: 1px dashed var(--c-warn); border-radius: var(--radius-sm);">
+            <p class="text-xs text-warn font-bold" data-i18n="tg_channel_notice">
+              تنبيه إلزامي لأصحاب القنوات: إذا اخترت قسم "اشتراك في قناة تلغرام"، يجب عليك رفع البوت (@Ta7oiilbot) مشرفاً في قناتك بكافة الصلاحيات؛ ليتمكن من كشف اشتراك الأعضاء ومنع الغش!
+            </p>
+          </div>
 
-        <div class="input-group">
-          <label class="input-label" data-i18n="form_ad_link">الرابط المستهدف أو رابط القناة / التغريدة</label>
-          <input type="text" id="form-ad-link" placeholder="https://t.me/your_channel أو رابط التغريدة">
-        </div>
+          <div class="input-group">
+            <label class="input-label" data-i18n="form_ad_title">عنوان المهمة</label>
+            <input type="text" id="form-ad-title" placeholder="مثال: اشترك في قناة الأخبار الرسمية">
+          </div>
 
-        <div class="input-group">
-          <label class="input-label" data-i18n="form_ad_category">قسم المهمة</label>
-          <select id="form-ad-category" onchange="Engine.onAdCategoryChange()">
-            <option value="telegram">اشتراك في قناة تلغرام (تحقق آلي بالبوت المشرف)</option>
-            <option value="twitter">تويتر / X (لايك، ريتويت، متابعة - إثبات سكرين شوت)</option>
-            <option value="ad">مشاهدة إعلان وزيارة رابط</option>
-            <option value="custom">مهمة مخصصة مع إثبات</option>
-          </select>
-        </div>
+          <div class="input-group">
+            <label class="input-label" data-i18n="form_ad_link">الرابط المستهدف أو رابط القناة / التغريدة</label>
+            <input type="text" id="form-ad-link" placeholder="https://t.me/your_channel أو رابط التغريدة">
+          </div>
 
+          <div class="input-group">
+            <label class="input-label" data-i18n="form_ad_category">قسم المهمة</label>
+            <select id="form-ad-category" onchange="Engine.onAdCategoryChange()">
+              <option value="telegram">اشتراك في قناة تلغرام (تحقق آلي بالبوت المشرف)</option>
+              <option value="twitter">تويتر / X (لايك، ريتويت، متابعة - إثبات سكرين شوت)</option>
+              <option value="ad">مشاهدة إعلان وزيارة رابط</option>
+              <option value="custom">مهمة مخصصة مع إثبات</option>
+            </select>
+          </div>
+
+          <div class="flex gap-3">
+            <div class="input-group" style="flex: 1;">
+              <label class="input-label" data-i18n="form_ad_reward">المكافأة للعضو (₵)</label>
+              <input type="number" id="form-ad-reward" value="0.70" step="0.1" min="0.5" oninput="Engine.updateCampaignEstimates()">
+            </div>
+            <div class="input-group" style="flex: 1;">
+              <label class="input-label" data-i18n="form_ad_members">العدد المطلوب</label>
+              <input type="number" id="form-ad-members" value="50" min="10" step="10" oninput="Engine.updateCampaignEstimates()">
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" data-i18n="form_ad_type">طريقة التحقق من الإنجاز</label>
+            <select id="form-ad-type">
+              <option value="auto" data-i18n="type_auto">تلقائي فوري / عبر مراقبة البوت</option>
+              <option value="manual" data-i18n="type_manual">يدوي (يتطلب رفع رابط سكرين شوت أو إثبات)</option>
+            </select>
+          </div>
+
+          <div class="list-item flex-between" style="background: var(--c-danger-alpha); border-color: rgba(239,68,68,0.25);">
+            <span class="text-sm font-bold" data-i18n="calc_total_cost">المجموع الإجمالي (شامل 25% عمولة):</span>
+            <strong class="text-danger text-base" id="calc-total-cost">43.75 ₵</strong>
+          </div>
+
+          <button class="btn mt-3" onclick="Engine.createCampaign()" data-i18n="btn_publish_campaign">خصم الرصيد ونشر الحملة 🚀</button>
+        </div>
+      </div>
+
+      <div id="ads-manage-sec" class="ads-panel-section">
+        <div class="card">
+          <div class="card-header text-warn">
+            <span>📊</span> <span>حملاتي المنشورة والإثباتات الواردة</span>
+          </div>
+          <p class="text-xs text-muted mb-3">
+            هنا يمكنك مراجعة حملاتك النشطة، والموافقة على إثباتات الأعضاء أو رفضها مباشرة من ميزانية حملتك المحجوزة!
+          </p>
+          <div id="advertiser-campaigns-list"></div>
+        </div>
+      </div>
+    </main>
+
+    <main id="view-wallet" class="view-container">
+      <div class="card text-center" style="padding: 30px 16px;">
+        <div class="text-xs text-muted font-bold mb-2" data-i18n="wallet_overview">المحفظة المالية والمعاملات</div>
+        <h2 class="text-xl font-black mb-4"><span id="wallet-balance-num">0.00</span> ₵</h2>
+        
         <div class="flex gap-3">
-          <div class="input-group" style="flex: 1;">
-            <label class="input-label" data-i18n="form_ad_reward">المكافأة للعضو (₵)</label>
-            <input type="number" id="form-ad-reward" value="0.70" step="0.1" min="0.5" oninput="Engine.updateCampaignEstimates()">
-          </div>
-          <div class="input-group" style="flex: 1;">
-            <label class="input-label" data-i18n="form_ad_members">العدد المطلوب</label>
-            <input type="number" id="form-ad-members" value="50" min="10" step="10" oninput="Engine.updateCampaignEstimates()">
-          </div>
+          <button class="btn btn-outline" onclick="Engine.openModal('modal-deposit')" data-i18n="btn_deposit">⬇️ شحن الرصيد</button>
+          <button class="btn" onclick="Engine.openModal('modal-withdraw')" data-i18n="btn_withdraw">⬆️ سحب الأرباح</button>
         </div>
-
-        <div class="input-group">
-          <label class="input-label" data-i18n="form_ad_type">طريقة التحقق من الإنجاز</label>
-          <select id="form-ad-type">
-            <option value="auto" data-i18n="type_auto">تلقائي فوري / عبر مراقبة البوت</option>
-            <option value="manual" data-i18n="type_manual">يدوي (يتطلب رفع رابط سكرين شوت أو إثبات)</option>
-          </select>
-        </div>
-
-        <div class="list-item flex-between" style="background: var(--c-danger-alpha); border-color: rgba(239,68,68,0.25);">
-          <span class="text-sm font-bold" data-i18n="calc_total_cost">المجموع الإجمالي (شامل 25% عمولة):</span>
-          <strong class="text-danger text-base" id="calc-total-cost">43.75 ₵</strong>
-        </div>
-
-        <button class="btn mt-3" onclick="Engine.createCampaign()" data-i18n="btn_publish_campaign">خصم الرصيد ونشر الحملة 🚀</button>
       </div>
-    </div>
 
-    <div id="ads-manage-sec" class="ads-panel-section">
       <div class="card">
-        <div class="card-header text-warn">
-          <span>📊</span> <span>حملاتي المنشورة والإثباتات الواردة</span>
+        <div class="card-header">
+          <span>🧾</span> <span data-i18n="wallet_ledger_header">سجل المعاملات والتحويلات</span>
         </div>
-        <p class="text-xs text-muted mb-3">
-          هنا يمكنك مراجعة حملاتك النشطة، والموافقة على إثباتات الأعضاء أو رفضها مباشرة من ميزانية حملتك المحجوزة!
-        </p>
-        <div id="advertiser-campaigns-list"></div>
+        <div id="wallet-history-feed"></div>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <main id="view-wallet" class="view-container">
-    <div class="card text-center" style="padding: 30px 16px;">
-      <div class="text-xs text-muted font-bold mb-2" data-i18n="wallet_overview">المحفظة المالية والمعاملات</div>
-      <h2 class="text-xl font-black mb-4"><span id="wallet-balance-num">0.00</span> ₵</h2>
-      
-      <div class="flex gap-3">
-      
+    <main id="view-affiliates" class="view-container">
+      <div class="card" style="border-color: rgba(245, 158, 11, 0.4); background: linear-gradient(180deg, rgba(245, 158, 11, 0.08), transparent);">
+        <div class="card-header text-warn">
+          <span>🤝</span> <span data-i18n="affiliate_header">برنامج شركاء الإحالة (35%)</span>
+        </div>
+        <p class="text-xs text-muted mb-3" data-i18n="affiliate_desc">
+          اربح عمولة ضخمة بنسبة 35% من كل مهمة ينجزها أصدقاؤك مدى الحياة! لا يوجد سقف للأرباح.
+        </p>
+
+        <div class="list-item flex-between" style="background: rgba(0,0,0,0.4);">
+          <div class="flex-col" style="flex: 1; overflow: hidden;">
+            <span class="text-xs text-muted" data-i18n="your_affiliate_link">رابط الإحالة المباشر:</span>
+            <strong id="ui-affiliate-link" style="font-size: 13px; color: var(--c-primary); margin-top: 4px; word-break: break-all;">https://t.me/bot?start=ref_</strong>
+          </div>
+          <button class="btn btn-sm btn-warn" onclick="Engine.copyAffiliateLink()" data-i18n="btn_copy">نسخ</button>
+        </div>
+        <div class="flex-between mt-3 p-3" style="background: var(--c-bg-main); border-radius: var(--radius-sm); border: 1px solid var(--c-border);">
+          <span class="font-bold text-sm" data-i18n="total_referrals_count">الإحالات النشطة:</span>
+          <strong class="text-wa
