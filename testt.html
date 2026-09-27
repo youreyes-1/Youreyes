@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>تطبيق أرباحك المصغر</title>
+  
+  <!-- مكتبة تيليجرام الرسمية -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- مكتبة سوبابيز السحابية -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-gradient: linear-gradient(135deg, #7c3aed, #4f46e5);
+      --bg: #0b0f19;
+      --card-bg: #161e31;
+      --text: #ffffff;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --accent: #f59e0b;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      padding-bottom: 90px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+    .user-details h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .user-details span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .badge-status {
+      font-size: 11px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      padding: 4px 8px;
+      border-radius: 20px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* كرت الرصيد الفخم */
+    .balance-card {
+      background: var(--primary-gradient);
+      padding: 24px 20px;
+      border-radius: 22px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.35);
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .balance-card::after {
+      content: "";
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 100px;
+      height: 100px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+    }
+    .balance-title {
+      font-size: 13px;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+    .balance-amount {
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      margin-bottom: 18px;
+    }
+    .balance-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .btn {
+      padding: 11px 22px;
+      border-radius: 14px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+      transition: transform 0.1s ease;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+    .btn-withdraw {
+      background: #ffffff;
+      color: #5b21b6;
+    }
+    .btn-deposit {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      backdrop-filter: blur(10px);
+    }
+
+    /* قسم المهام */
+    .section-header {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .task-box {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .task-info h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .task-info span {
+      font-size: 12px;
+      color: var(--success);
+      font-weight: 700;
+    }
+    .task-btn {
+      background: var(--primary);
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 12px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* شريط التنقل السفلي */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(22, 30, 49, 0.95);
+      backdrop-filter: blur(15px);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .nav-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .nav-link.active {
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .nav-icon {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- رأس الصفحة ومعلومات المستخدم -->
+  <div class="header">
+    <div class="user-profile">
+      <div class="avatar" id="avatar-icon">👤</div>
+      <div class="user-details">
+        <h3 id="display-name">مستخدم تيليجرام</h3>
+        <span id="display-user">@username</span>
+      </div>
+    </div>
+    <div class="badge-status">نشط ⚡</div>
+  </div>
+
+  <!-- كرت الرصيد -->
+  <div class="balance-card">
+    <div class="balance-title">الرصيد الكلي المتاح</div>
+    <div class="balance-amount" id="balance-val">$0.00</div>
+    <div class="balance-actions">
+      <button class="btn btn-withdraw" onclick="alertMsg('قسم السحب قيد التجهيز')">سحب ↗</button>
+      <button class="btn btn-deposit" onclick="alertMsg('الإيداع سيتاح قريباً')">شحن +</button>
+    </div>
+  </div>
+
+  <!-- قائمة المهام اليومية السريعة -->
+  <div class="section-header">💼 مهام ربحية سريعة</div>
+
+  <div class="task-box">
+    <div class="task-info">
+      <h4>انضم لقناة البوت الرسمية</h4>
+      <span>+0.25 USD</span>
+    </div>
+    <button class="task-btn" onclick="completeTask(this, 0.25)">تنفيذ</button>
+  </div>
+
+  <div class="task-box">
+    <div class="task-info">
+      <h4>مشاركة التطبيق مع صديق</h4>
+      <span>+0.15 USD</span>
+    </div>
+    <button class="task-btn" onclick="completeTask(this, 0.15)">مشاركة</button>
+  </div>
+
+  <div class="task-box">
+    <div class="task-info">
+      <h4>مكافأة تسجيل الدخول اليومي</h4>
+      <span>+0.10 USD</span>
+    </div>
+    <button class="task-btn" onclick="completeTask(this, 0.10)">استلام</button>
+  </div>
+
+  <!-- الشريط السفلي -->
+  <div class="bottom-nav">
+    <div class="nav-link active"><span class="nav-icon">🏠</span>الرئيسية</div>
+    <div class="nav-link" onclick="alertMsg('سوق المهام قادم')"><span class="nav-icon">📋</span>المهام</div>
+    <div class="nav-link" onclick="alertMsg('المحفظة جاهزة')"><span class="nav-icon">👛</span>المحفظة</div>
+    <div class="nav-link" onclick="alertMsg('نظام الإحالات')"><span class="nav-icon">👥</span>الإحالات</div>
+  </div>
+
+  <script>
+    // ========================================================
+    // ⚙️ إعدادات الربط مع سوبابيز
+    // ========================================================
+    const PROJECT_REF = "kvessfcmquyeevbtnmka";
+    const SUPABASE_URL = `https://${PROJECT_REF}.supabase.co`;
+    
+    // ضع هنا مفتاح anon الحقيقي عندما تنسخه لاحقاً (مؤقتاً شغال محلياً)
+    const SUPABASE_KEY = "dummy_token_key"; 
+
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    let currentBalance = 0.00;
+
+    // استخراج بيانات المستخدم التلقائية من تيليجرام
+    const tgUser = tg?.initDataUnsafe?.user || {
+      id: 999999,
+      first_name: "مستخدم تجريبي",
+      username: "Guest"
+    };
+
+    document.getElementById("display-name").innerText = tgUser.first_name;
+    document.getElementById("display-user").innerText = tgUser.username ? `@${tgUser.username}` : `#${tgUser.id}`;
+    document.getElementById("avatar-icon").innerText = (tgUser.first_name || "U")[0].toUpperCase();
+
+    // تشغيل الذاكرة ومزامنة الرصيد
+    const savedBal = localStorage.getItem("app_user_balance_" + tgUser.id);
+    if (savedBal) {
+      currentBalance = parseFloat(savedBal);
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      document.getElementById("balance-val").innerText = `$${currentBalance.toFixed(2)}`;
+    }
+
+    function completeTask(btn, reward) {
+      currentBalance += reward;
+      updateDisplay();
+      localStorage.setItem("app_user_balance_" + tgUser.id, currentBalance);
+
+      btn.innerText = "تمت بنجاح ✓";
+      btn.style.background = "var(--success)";
+      btn.disabled = true;
+
+      if (tg?.HapticFeedback) {
+        tg.HapticFeedback.notificationOccurred('success');
+      }
+    }
+
+    function alertMsg(txt) {
+      if (tg?.showAlert) {
+        tg.showAlert(txt);
+      } else {
+        alert(txt);
+      }
+    }
+  </script>
+</body>
+</html>
