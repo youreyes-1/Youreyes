@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Dollar C - Part 1</title>
+  <title>Dollar C - Part 1 & 2</title>
   
   <style>
     /* ================= 1. التصميم والألوان الأساسية ================= */
@@ -19,7 +19,7 @@
       --c-border: #334155;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--c-bg); color: var(--c-text); padding-bottom: 80px; overflow-x: hidden; }
+    body { background: var(--c-bg); color: var(--c-text); padding-bottom: 80px; overflow-x: hidden; transition: all 0.3s ease; }
     
     /* الفئات المساعدة */
     .flex { display: flex; }
@@ -36,88 +36,128 @@
 
     /* الكروت والأزرار */
     .card { background: var(--c-card); border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--c-border); }
-    .btn { background: var(--c-primary); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
+    .btn { background: var(--c-primary); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; transition: transform 0.1s;}
+    .btn:active { transform: scale(0.97); }
     
     /* شريط التنقل السفلي */
     .bottom-nav { position: fixed; bottom: 0; width: 100%; background: rgba(30, 41, 59, 0.95); border-top: 1px solid var(--c-border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
     .nav-btn { background: none; border: none; color: var(--c-muted); display: flex; flex-direction: column; align-items: center; font-size: 12px; gap: 4px; cursor: pointer; font-weight: bold; }
     .nav-btn.active { color: var(--c-primary); }
+
+    /* دعم اتجاه اللغة العربية (RTL) */
+    [dir="rtl"] .flex-between { flex-direction: row-reverse; }
   </style>
 </head>
 <body>
 
-  <!-- ================= 2. هيكل الصفحات (HTML) ================= -->
+  <!-- ================= 2. هيكل الصفحات (مع علامات الترجمة data-i18n) ================= -->
   
   <header class="header flex-between">
-    <div>Dollar C Platform</div>
-    <button style="padding: 5px 10px; background: transparent; color: var(--c-primary); border: 1px solid var(--c-primary); border-radius: 5px;" id="lang-btn">عربي</button>
+    <div data-i18n="app_title" style="font-weight: bold; font-size: 16px;">Dollar C Platform</div>
+    <button style="padding: 5px 12px; background: transparent; color: var(--c-primary); border: 1px solid var(--c-primary); border-radius: 8px; font-weight: bold;" id="lang-btn" onclick="toggleLang()">عربي</button>
   </header>
 
-  <!-- شاشة المهام -->
   <main id="view-earn" class="view-section active">
     <div class="card text-center" style="background: linear-gradient(135deg, #064e3b, var(--c-primary-dark));">
-      <p>Available Balance</p>
+      <p data-i18n="avail_balance">Available Balance</p>
       <h1 style="font-size: 40px; margin: 10px 0;">0.00 ₵</h1>
     </div>
-    <div class="card"><h3>Tasks (Coming in Part 3)</h3></div>
+    <div class="card"><h3 data-i18n="tasks_coming">Tasks (Coming in Part 3)</h3></div>
   </main>
 
-  <!-- شاشة الإعلانات -->
   <main id="view-ads" class="view-section">
     <div class="card">
-      <h3 style="color: var(--c-primary);">Create Advertisement</h3>
-      <p class="text-muted" style="margin-top: 10px; font-size: 14px;">Publish tasks for users to complete.</p>
+      <h3 style="color: var(--c-primary);" data-i18n="create_ad">Create Advertisement</h3>
+      <p class="text-muted" style="margin-top: 10px; font-size: 14px;" data-i18n="ad_desc">Publish tasks for users to complete.</p>
     </div>
   </main>
 
-  <!-- شاشة المحفظة -->
   <main id="view-wallet" class="view-section">
     <div class="card text-center">
-      <h3>Wallet</h3>
-      <button class="btn">Deposit</button>
-      <button class="btn" style="background: var(--c-danger);">Withdraw</button>
+      <h3 data-i18n="wallet">Wallet</h3>
+      <button class="btn" data-i18n="deposit">Deposit</button>
+      <button class="btn" style="background: var(--c-danger);" data-i18n="withdraw">Withdraw</button>
     </div>
   </main>
 
-  <!-- شاشة الحساب -->
   <main id="view-profile" class="view-section">
     <div class="card">
-      <h3>Profile & Affiliate</h3>
-      <p class="text-muted">Invite friends and earn 35%.</p>
+      <h3 data-i18n="profile">Profile & Affiliate</h3>
+      <p class="text-muted" data-i18n="invite">Invite friends and earn 35%.</p>
     </div>
   </main>
 
-  <!-- شاشة الإدارة (مخفية مؤقتاً برمجياً) -->
   <main id="view-admin" class="view-section">
     <div class="card" style="border-color: var(--c-danger);">
-      <h3 style="color: var(--c-danger);">Admin Panel - God Mode</h3>
-      <p>Control users and funds.</p>
+      <h3 style="color: var(--c-danger);" data-i18n="admin_panel">Admin Panel - God Mode</h3>
+      <p data-i18n="admin_desc">Control users and funds.</p>
     </div>
   </main>
 
   <!-- ================= 3. أزرار التنقل السفلية ================= -->
   <nav class="bottom-nav">
-    <button class="nav-btn active" onclick="switchTab('view-earn', this)">Earn</button>
-    <button class="nav-btn" onclick="switchTab('view-ads', this)">Ads</button>
-    <button class="nav-btn" onclick="switchTab('view-wallet', this)">Wallet</button>
-    <button class="nav-btn" onclick="switchTab('view-profile', this)">Profile</button>
-    <button class="nav-btn" onclick="switchTab('view-admin', this)">Admin</button>
+    <button class="nav-btn active" onclick="switchTab('view-earn', this)" data-i18n="nav_earn">Earn</button>
+    <button class="nav-btn" onclick="switchTab('view-ads', this)" data-i18n="nav_ads">Ads</button>
+    <button class="nav-btn" onclick="switchTab('view-wallet', this)" data-i18n="nav_wallet">Wallet</button>
+    <button class="nav-btn" onclick="switchTab('view-profile', this)" data-i18n="nav_profile">Profile</button>
+    <button class="nav-btn" onclick="switchTab('view-admin', this)" data-i18n="nav_admin">Admin</button>
   </nav>
 
-  <!-- ================= 4. العقل المدبر الأساسي (JS) ================= -->
+  <!-- ================= 4. العقل المدبر (التنقل + الترجمة) ================= -->
   <script>
-    // دالة واحدة فقط ومحمية لضمان عمل الأزرار دون تعليق
+    // --- دالة التنقل (الجزء الأول) ---
     function switchTab(viewId, btnEl) {
-      // إخفاء كل الشاشات
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-      // إزالة اللون من كل الأزرار
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-      
-      // إظهار الشاشة المطلوبة والزر المضغوط
       document.getElementById(viewId).classList.add('active');
       btnEl.classList.add('active');
+    }
+
+    // --- دالة الترجمة اللحظية (الجزء الثاني) ---
+    let currentLang = 'en'; // اللغة الافتراضية
+    
+    // القاموس المصغر
+    const translations = {
+      en: {
+        app_title: "Dollar C Platform", avail_balance: "Available Balance", tasks_coming: "Tasks (Coming in Part 3)",
+        create_ad: "Create Advertisement", ad_desc: "Publish tasks for users to complete.",
+        wallet: "Wallet", deposit: "Deposit", withdraw: "Withdraw",
+        profile: "Profile & Affiliate", invite: "Invite friends and earn 35%.",
+        admin_panel: "Admin Panel - God Mode", admin_desc: "Control users and funds.",
+        nav_earn: "Earn", nav_ads: "Ads", nav_wallet: "Wallet", nav_profile: "Profile", nav_admin: "Admin",
+        lang_btn: "عربي"
+      },
+      ar: {
+        app_title: "منصة دولار C", avail_balance: "الرصيد المتاح", tasks_coming: "المهام (قادمة في الجزء 3)",
+        create_ad: "إنشاء إعلان", ad_desc: "انشر مهام للمستخدمين لإنجازها.",
+        wallet: "المحفظة", deposit: "إيداع", withdraw: "سحب",
+        profile: "الحساب والإحالة", invite: "ادعُ أصدقاءك واربح 35%.",
+        admin_panel: "لوحة الإدارة - الصلاحيات المطلقة", admin_desc: "تحكم بالمستخدمين والأموال.",
+        nav_earn: "المهام", nav_ads: "الإعلانات", nav_wallet: "المحفظة", nav_profile: "حسابي", nav_admin: "الإدارة",
+        lang_btn: "English"
+      }
+    };
+
+    function toggleLang() {
+      // تبديل المتغير
+      currentLang = currentLang === 'en' ? 'ar' : 'en';
+      
+      // تغيير اتجاه الشاشة (LTR للإنجليزية و RTL للعربية)
+      const htmlRoot = document.getElementById('html-root');
+      htmlRoot.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      htmlRoot.lang = currentLang;
+
+      // تغيير اسم زر اللغة نفسه
+      document.getElementById('lang-btn').innerText = translations[currentLang].lang_btn;
+      
+      // البحث عن كل الكلمات التي تحتوي على الكود السري (data-i18n) وترجمتها فوراً
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang][key]) {
+          el.innerText = translations[currentLang][key];
+        }
+      });
     }
   </script>
 </body>
 </html>
-
