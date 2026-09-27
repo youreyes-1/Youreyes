@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>تطبيق الأرباح المصغر</title>
+  
+  <!-- مكتبة تيليجرام الرسمية -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- مكتبة سوبابيز السحابية -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      padding-bottom: 80px;
+      user-select: none;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .user-details h3 {
+      font-size: 16px;
+    }
+    .user-details span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    /* كرت الرصيد الرئيسي */
+    .balance-card {
+      background: linear-gradient(135deg, var(--primary), #4338ca);
+      padding: 24px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .balance-title {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+    .balance-amount {
+      font-size: 34px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .balance-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+    .btn-withdraw {
+      background: #ffffff;
+      color: var(--primary-dark);
+    }
+    .btn-deposit {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+    /* أقسام المهام والخدمات */
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .task-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .task-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .task-reward {
+      font-size: 12px;
+      color: var(--success);
+      font-weight: bold;
+    }
+    .btn-action {
+      background: var(--primary);
+      color: white;
+      padding: 8px 14px;
+      font-size: 12px;
+    }
+    /* شريط التنقل السفلي */
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .nav-item.active {
+      color: var(--primary);
+      font-weight: bold;
+    }
+    .nav-icon {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- معلومات المستخدم العلوية -->
+  <div class="header">
+    <div class="user-info">
+      <div class="avatar" id="user-avatar">👤</div>
+      <div class="user-details">
+        <h3 id="user-name">جارٍ التحميل...</h3>
+        <span id="user-tag">@username</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- كرت الرصيد -->
+  <div class="balance-card">
+    <div class="balance-title">الرصيد المتاح (USD)</div>
+    <div class="balance-amount" id="user-balance">$0.00</div>
+    <div class="balance-actions">
+      <button class="btn btn-withdraw" onclick="alert('سيتم فتح السحب قريباً')">سحب الرصيد ↗</button>
+      <button class="btn btn-deposit" onclick="alert('شحن المحفظة قريباً')">شحن المحفظة +</button>
+    </div>
+  </div>
+
+  <!-- قائمة المهام المصغرة -->
+  <div class="section-title">⚡ مهام يومية سريعة</div>
+  
+  <div class="task-card">
+    <div>
+      <div class="task-title">انضم لقناة التلجرام الرسمية</div>
+      <div class="task-reward">+0.05 USD</div>
+    </div>
+    <button class="btn btn-action" onclick="claimTask(this, 0.05)">تنفيذ</button>
+  </div>
+
+  <div class="task-card">
+    <div>
+      <div class="task-title">مشاركة الرابط مع صديق</div>
+      <div class="task-reward">+0.10 USD</div>
+    </div>
+    <button class="btn btn-action" onclick="claimTask(this, 0.10)">مشاركة</button>
+  </div>
+
+  <!-- شريط التنقل السفلي -->
+  <div class="nav-bar">
+    <div class="nav-item active"><span class="nav-icon">🏠</span>الرئيسية</div>
+    <div class="nav-item"><span class="nav-icon">💼</span>المهام</div>
+    <div class="nav-item"><span class="nav-icon">👛</span>المحفظة</div>
+    <div class="nav-item"><span class="nav-icon">👥</span>الإحالات</div>
+  </div>
+
+  <script>
+    // ========================================================
+    // ⚙️ إعدادات Supabase - ضع مفتاح الـ anon الخاص بك هنا
+    // ========================================================
+    const SUPABASE_URL = "https://kvessfcmquyeevbtnmka.supabase.co";
+    const SUPABASE_KEY = "ضع_هنا_مفتاح_الـ_anon_الذي_نسخته"; // استبدل هذا بالمفتاح الخاص بك
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const tg = window.Telegram.WebApp;
+
+    // توسيع الشاشة بالكامل داخل تلجرام
+    tg.expand();
+
+    async function initApp() {
+      // استخراج بيانات مستخدم التلجرام التلقائية
+      const user = tg.initDataUnsafe?.user || {
+        id: 123456789,
+        first_name: "مستخدم تجريبي",
+        username: "test_user"
+      };
+
+      // عرض البيانات في الواجهة
+      document.getElementById("user-name").innerText = user.first_name || "مستخدم";
+      document.getElementById("user-tag").innerText = user.username ? `@${user.username}` : `#${user.id}`;
+      document.getElementById("user-avatar").innerText = (user.first_name || "U")[0].toUpperCase();
+
+      try {
+        // فحص هل المستخدم مسجل مسبقاً في قاعدة البيانات؟
+        let { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('telegram_id', user.id)
+          .single();
+
+        if (!data) {
+          // تسجيل مستخدم جديد برصيد 0.00
+          const { data: newUser } = await supabase
+            .from('users')
+            .insert([{
+              telegram_id: user.id,
+              first_name: user.first_name,
+              username: user.username,
+              balance: 0.00
+            }])
+            .select()
+            .single();
+
+          data = newUser;
+        }
+
+        // عرض الرصيد الحقيقي من قاعدة البيانات
+        if (data && data.balance !== undefined) {
+          document.getElementById("user-balance").innerText = `$${parseFloat(data.balance).toFixed(2)}`;
+        }
+      } catch (err) {
+        console.error("Supabase Error:", err);
+      }
+    }
+
+    // تجربة إضافة رصيد عند الضغط على مهمة
+    async function claimTask(btn, reward) {
+      btn.innerText = "تم بنجاح ✓";
+      btn.style.background = "var(--success)";
+      btn.disabled = true;
+      tg.HapticFeedback.notificationOccurred('success');
+    }
+
+    // تشغيل التطبيق فور التحميل
+    window.onload = initApp;
+  </script>
+</body>
+</html>
