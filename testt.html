@@ -570,6 +570,7 @@
         <button class="admin-tab-btn" onclick="Engine.switchAdminSubSection('admin-proofs', this)">الإثباتات العامة</button>
         <button class="admin-tab-btn" onclick="Engine.switchAdminSubSection('admin-tasks', this)">حقن المهام</button>
         <button class="admin-tab-btn" onclick="Engine.switchAdminSubSection('admin-users', this)">المستخدمين</button>
+        <button class="admin-tab-btn" onclick="Engine.switchAdminSubSection('admin-tickets', this)">التذاكر 🎫</button>
         <button class="admin-tab-btn" id="btn-admin-subadmins" onclick="Engine.switchAdminSubSection('admin-subadmins', this)">المشرفين الفرعيين</button>
       </div>
 
@@ -654,6 +655,13 @@
         </div>
       </div>
 
+      <div id="admin-tickets" class="admin-panel-section">
+        <div class="card">
+          <div class="card-header text-info">🎫 تذاكر الدعم الفني الواردة من الأعضاء</div>
+          <div id="admin-tickets-container"></div>
+        </div>
+      </div>
+
       <div id="admin-subadmins" class="admin-panel-section">
         <div class="card">
           <div class="card-header text-warn">👑 إدارة المشرفين الفرعيين (صلاحية الأدمن الأعلى فقط)</div>
@@ -693,7 +701,7 @@
 
       <button class="btn mb-2" onclick="Engine.copyText('TYXqJ8ZKvW9nmLoP3eRs7bC4dG1uHt2fKa')" data-i18n="btn_copy_addr">نسخ عنوان المحفظة</button>
       <button class="btn btn-outline mb-3" onclick="window.open('https://t.me/keeeeza', '_blank')" data-i18n="btn_notify_admin">مراسلة الإدارة بالإشعار (@keeeeza)</button>
-      <button class="btn btn-danger" onclick="Engine.closeModal('modal-deposit')" data-i18n="btn_close">إغلاق</button>
+      <button class="btn btn-danger" onclick="Engine.closeModal('modal-deposit')" data-i18n="btn_close">إلغاء</button>
     </div>
   </div>
 
@@ -793,7 +801,7 @@
 
       init() {
         try {
-          const raw = SafeStorage.getItem('DollarC_Platform_Store_V9');
+          const raw = SafeStorage.getItem('DollarC_Platform_Store_V10');
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed && typeof parsed === 'object') {
@@ -816,7 +824,7 @@
       },
 
       save() {
-        try { SafeStorage.setItem('DollarC_Platform_Store_V9', JSON.stringify(this.data)); } catch(e) { console.error(e); }
+        try { SafeStorage.setItem('DollarC_Platform_Store_V10', JSON.stringify(this.data)); } catch(e) { console.error(e); }
       },
 
       getUser(id, username = '') {
@@ -1020,6 +1028,28 @@
             this.currentUserObj = DB.getUser(this.currentUserId, "SupremeBoss");
           }
 
+          // --- معالجة نظام الإحالة المباشر عبر الـ Mini App Start Param ---
+          let startParam = null;
+          if (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+            startParam = tg.initDataUnsafe.start_param;
+          } else {
+            const urlParams = new URLSearchParams(window.location.search);
+            startParam = urlParams.get('startapp') || urlParams.get('ref');
+          }
+
+          if (startParam && startParam.startsWith('ref_')) {
+            const referrerId = Number(startParam.replace('ref_', ''));
+            if (referrerId && referrerId !== this.currentUserId) {
+              const currentUser = DB.getUser(this.currentUserId);
+              if (!currentUser.referredBy) {
+                currentUser.referredBy = referrerId;
+                const referrerUser = DB.getUser(referrerId);
+                referrerUser.referralsCount = (referrerUser.referralsCount || 0) + 1;
+                DB.save();
+              }
+            }
+          }
+
           const usernameDisplay = this.currentUserObj.username || `User_${this.currentUserId}`;
           const initialChar = (usernameDisplay.replace('@', '').charAt(0) || 'U').toUpperCase();
 
@@ -1030,7 +1060,7 @@
 
           if (nameEl) nameEl.innerText = usernameDisplay;
           if (avatarEl) avatarEl.innerText = initialChar;
-          if (affLinkEl) affLinkEl.innerText = `https://t.me/${CONFIG.BOT_USERNAME}?start=ref_${this.currentUserId}`;
+          if (affLinkEl) affLinkEl.innerText = `https://t.me/${CONFIG.BOT_USERNAME}/app?startapp=ref_${this.currentUserId}`;
           if (refCountEl) refCountEl.innerText = this.currentUserObj.referralsCount || 0;
 
           this.configureAdminPermissions();
@@ -1607,16 +1637,18 @@
         DB.data.tickets.unshift({
           id: Date.now(),
           userId: this.currentUserId,
+          username: this.currentUserObj ? this.currentUserObj.username : `User_${this.currentUserId}`,
           subject: subj,
           message: msg,
-          date: new Date().toLocaleTimeString()
+          status: 'open',
+          date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString()
         });
         DB.save();
 
         this.closeModal('modal-ticket');
         subjInput.value = '';
         msgInput.value = '';
-        Toast.show("تم إرسال تذكرتك بنجاح، سيتم الرد عبر الإدارة.");
+        Toast.show("تم إرسال تذكرتك بنجاح للإدارة وسيتم الرد قريباً.");
       },
 
       refreshAdminPanels() {
@@ -1634,6 +1666,7 @@
 
         this.renderAdminWithdrawals();
         this.renderAdminProofs();
+        this.renderAdminTickets();
         this.renderAdminSubAdmins();
       },
 
@@ -1742,6 +1775,41 @@
         DB.save();
         this.syncFinancialUI();
         this.refreshAdminPanels();
+      },
+
+      renderAdminTickets() {
+        const container = document.getElementById('admin-tickets-container');
+        if (!container) return;
+        container.innerHTML = '';
+        const tickets = DB.data.tickets || [];
+
+        if (tickets.length === 0) {
+          container.innerHTML = `<div class="empty-state">لا توجد تذاكر دعم فني مرسلة من الأعضاء حتى الآن.</div>`;
+          return;
+        }
+
+        tickets.forEach(t => {
+          container.innerHTML += `
+            <div class="card card-elevated" style="margin-bottom:12px; border-left:4px solid var(--c-info);">
+              <div class="flex-between mb-1">
+                <span class="text-xs text-muted">مرسل ID: ${t.userId} (${t.username})</span>
+                <span class="text-xs text-muted">${t.date}</span>
+              </div>
+              <div class="font-bold text-sm mb-1 text-info">${t.subject}</div>
+              <div class="p-2 mb-3" style="background:rgba(0,0,0,0.5); border-radius:6px; font-size:13px; line-height:1.6;">
+                ${t.message}
+              </div>
+              <button class="btn btn-sm btn-outline" style="width:auto;" onclick="Engine.closeTicket(${t.id})">إغلاق التذكرة ✓</button>
+            </div>
+          `;
+        });
+      },
+
+      closeTicket(ticketId) {
+        DB.data.tickets = DB.data.tickets.filter(t => t.id !== ticketId);
+        DB.save();
+        Toast.show("تم إغلاق التذكرة بنجاح.");
+        this.renderAdminTickets();
       },
 
       adminInjectTask() {
@@ -1891,7 +1959,7 @@
             <div class="list-item flex-between" style="padding:10px 14px;">
               <div>
                 <strong class="text-sm">ID: ${id}</strong>
-                <div class="text-xs text-muted">صلاحيات: مراجعة السحوبات والإثباتات</div>
+                <div class="text-xs text-muted">صلاحيات: مراجعة السحوبات والإثباتات والتذاكر</div>
               </div>
               <button class="btn btn-sm btn-danger" onclick="Engine.adminRemoveSubAdmin(${id})">عزل ✕</button>
             </div>
