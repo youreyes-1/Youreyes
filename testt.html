@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl" id="app-root">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Dollar C - Supreme Enterprise Platform</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -25,6 +25,8 @@
       --c-warn-alpha: rgba(245, 158, 11, 0.15);
       --c-info: #3b82f6;
       --c-info-alpha: rgba(59, 130, 246, 0.15);
+      --c-purple: #a855f7;
+      --c-purple-alpha: rgba(168, 85, 247, 0.15);
       --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --radius-sm: 8px;
       --radius-md: 14px;
@@ -45,36 +47,34 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    body {
       background-color: var(--c-bg-main);
       color: var(--c-text-main);
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      padding-bottom: 95px;
+      overflow-x: hidden;
+      min-height: 100vh;
+      line-height: 1.5;
     }
 
-    /* Main Scrollable Viewport Area */
-    .app-scroll-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      padding-bottom: 110px;
-      -webkit-overflow-scrolling: touch;
-    }
-
+    /* Core Utility Classes */
     .hidden { display: none !important; }
     .flex { display: flex; }
     .flex-col { display: flex; flex-direction: column; }
     .flex-row { display: flex; flex-direction: row; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .flex-center { display: flex; justify-content: center; align-items: center; }
+    .flex-wrap { display: flex; flex-wrap: wrap; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .gap-1 { gap: 4px; }
     .gap-2 { gap: 8px; }
     .gap-3 { gap: 12px; }
     .gap-4 { gap: 16px; }
+    .mt-1 { margin-top: 4px; }
     .mt-2 { margin-top: 8px; }
     .mt-3 { margin-top: 12px; }
     .mt-4 { margin-top: 16px; }
+    .mb-1 { margin-bottom: 4px; }
     .mb-2 { margin-bottom: 8px; }
     .mb-3 { margin-bottom: 12px; }
     .mb-4 { margin-bottom: 16px; }
@@ -83,10 +83,13 @@
     .p-4 { padding: 16px; }
     .w-full { width: 100%; }
     .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .text-left { text-align: left; }
     .text-c { color: var(--c-primary); }
     .text-danger { color: var(--c-danger); }
     .text-warn { color: var(--c-warn); }
     .text-info { color: var(--c-info); }
+    .text-purple { color: var(--c-purple); }
     .text-muted { color: var(--c-text-muted); }
     .text-xs { font-size: 11px; }
     .text-sm { font-size: 13px; }
@@ -95,109 +98,163 @@
     .text-xl { font-size: 22px; }
     .font-bold { font-weight: 700; }
     .font-black { font-weight: 900; }
+    .cursor-pointer { cursor: pointer; }
+    .rounded-full { border-radius: 9999px; }
 
+    /* Sticky Navigation Header */
     .app-header {
-      background: rgba(17, 26, 45, 0.9);
+      background: rgba(17, 26, 45, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      padding: 12px 16px;
+      padding: 14px 18px;
+      position: sticky;
+      top: 0;
       z-index: 60;
       border-bottom: 1px solid var(--c-border);
       box-shadow: var(--shadow-sm);
-      flex-shrink: 0;
     }
 
     .user-avatar {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       border-radius: var(--radius-full);
       background: linear-gradient(135deg, var(--c-primary), #0284c7);
       color: #fff;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 800;
       box-shadow: 0 4px 14px var(--c-primary-alpha);
       border: 2px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
     }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
     .balance-pill {
       background: var(--c-primary-alpha);
       color: var(--c-primary);
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: var(--radius-full);
       font-weight: 800;
-      font-size: 13px;
+      font-size: 14px;
       border: 1px solid var(--c-primary-glow);
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
 
+    /* Screen Views Controller */
     .view-container {
       display: none;
-      animation: viewSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      padding: 16px;
+      animation: viewSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    .view-container.active {
-      display: block;
-    }
+    .view-container.active { display: block; }
     @keyframes viewSlide {
-      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
+    /* Card Panels */
     .card {
       background: var(--c-bg-surface);
       border-radius: var(--radius-md);
-      padding: 16px;
-      margin-bottom: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
       border: 1px solid var(--c-border);
       box-shadow: var(--shadow-sm);
+      transition: var(--trans-fast);
     }
     .card-elevated {
       background: var(--c-bg-surface-elevated);
       border: 1px solid var(--c-border-light);
     }
     .card-header {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 800;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
       color: var(--c-text-main);
       border-bottom: 1px solid var(--c-border);
-      padding-bottom: 8px;
+      padding-bottom: 10px;
     }
 
+    /* Hero Balance Card */
     .balance-master {
       background: linear-gradient(135deg, #063d2e, #0c2b22 60%, #0d1e34);
       text-align: center;
-      padding: 24px 16px;
+      padding: 30px 18px;
       border-radius: var(--radius-lg);
       position: relative;
       overflow: hidden;
       border: 1px solid var(--c-primary);
       box-shadow: 0 12px 35px var(--c-primary-alpha);
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+    }
+    .balance-master::after {
+      content: "";
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
+      top: -100px;
+      left: -80px;
+      pointer-events: none;
     }
     .balance-master h1 {
-      font-size: 40px;
+      font-size: 46px;
       font-weight: 900;
-      margin: 6px 0;
-      letter-spacing: -1px;
+      margin: 8px 0;
+      letter-spacing: -1.5px;
       color: #ffffff;
       text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
 
-    .input-group { margin-bottom: 12px; }
-    .input-label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--c-text-muted); font-weight: 600; }
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat-box {
+      background: var(--c-bg-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      text-align: center;
+    }
+    .stat-box .stat-value {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--c-primary);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .stat-box .stat-label {
+      font-size: 11px;
+      color: var(--c-text-muted);
+      font-weight: 700;
+    }
+
+    /* Inputs, Textareas, Selects */
+    .input-group { margin-bottom: 14px; }
+    .input-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: var(--c-text-muted);
+      font-weight: 600;
+    }
     input, textarea, select {
       width: 100%;
-      padding: 12px 14px;
-      background: rgba(7, 13, 23, 0.8);
+      padding: 14px 16px;
+      background: rgba(7, 13, 23, 0.7);
       border: 1px solid var(--c-border);
       color: #fff;
       border-radius: var(--radius-sm);
       outline: none;
+      transition: var(--trans-fast);
       font-size: 14px;
     }
     input:focus, textarea:focus, select:focus {
@@ -205,35 +262,70 @@
       box-shadow: 0 0 0 3px var(--c-primary-alpha);
     }
     select option { background: var(--c-bg-surface); color: #fff; }
+    textarea { resize: vertical; min-height: 80px; }
 
+    /* Interactive Buttons */
     .btn {
       background: var(--c-primary);
       color: #fff;
       border: none;
-      padding: 12px 18px;
+      padding: 14px 20px;
       border-radius: var(--radius-sm);
       font-weight: 800;
       font-size: 14px;
       cursor: pointer;
       width: 100%;
+      transition: var(--trans-fast);
       display: inline-flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .btn:active { transform: scale(0.97); opacity: 0.9; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-danger { background: var(--c-danger); }
+    .btn-danger:active { background: #dc2626; }
     .btn-warn { background: var(--c-warn); color: #000; }
-    .btn-outline { background: transparent; border: 2px solid var(--c-primary); color: var(--c-primary); }
-    .btn-sm { padding: 8px 12px; font-size: 12px; width: auto; border-radius: 6px; }
+    .btn-info { background: var(--c-info); }
+    .btn-purple { background: var(--c-purple); }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--c-primary);
+      color: var(--c-primary);
+    }
+    .btn-outline:active { background: var(--c-primary-alpha); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--c-border);
+      color: var(--c-text-main);
+    }
+    .btn-sm {
+      padding: 8px 14px;
+      font-size: 12px;
+      width: auto;
+      border-radius: 6px;
+    }
+    .btn-xs {
+      padding: 5px 10px;
+      font-size: 11px;
+      width: auto;
+      border-radius: 6px;
+    }
 
+    /* List Items & Badges */
     .list-item {
       background: rgba(7, 13, 23, 0.45);
       border: 1px solid var(--c-border);
-      padding: 12px 14px;
+      padding: 14px 16px;
       border-radius: var(--radius-sm);
       margin-bottom: 10px;
+      transition: var(--trans-fast);
+    }
+    .list-item:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(7, 13, 23, 0.7);
     }
     .badge {
       display: inline-flex;
@@ -247,26 +339,44 @@
     .badge-danger { background: var(--c-danger-alpha); color: var(--c-danger); }
     .badge-warn { background: var(--c-warn-alpha); color: var(--c-warn); }
     .badge-info { background: var(--c-info-alpha); color: var(--c-info); }
+    .badge-purple { background: var(--c-purple-alpha); color: var(--c-purple); }
 
     .empty-state {
       text-align: center;
-      padding: 30px 16px;
+      padding: 40px 16px;
       color: var(--c-text-muted);
       border: 2px dashed var(--c-border);
       border-radius: var(--radius-md);
       font-size: 13px;
     }
 
+    /* Progress Bar */
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(7, 13, 23, 0.7);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress-bar .fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--c-primary), #34d399);
+      transition: width 0.4s ease;
+    }
+
+    /* Modal Popups Overlay */
     .modal-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 1000;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 16px;
+      padding: 18px;
       opacity: 0;
       pointer-events: none;
       transition: var(--trans-normal);
@@ -275,18 +385,34 @@
     .modal-content {
       background: var(--c-bg-surface);
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       border-radius: var(--radius-lg);
-      padding: 20px;
+      padding: 24px;
+      transform: translateY(30px) scale(0.96);
+      transition: var(--trans-normal);
       border: 1px solid var(--c-border);
       box-shadow: var(--shadow-lg);
       max-height: 85vh;
       overflow-y: auto;
     }
+    .modal-overlay.active .modal-content {
+      transform: translateY(0) scale(1);
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--c-border);
+    }
 
+    /* Notification Toasts */
     .toast-container {
       position: fixed;
-      top: 16px;
+      top: 18px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 9999;
@@ -294,69 +420,79 @@
       flex-direction: column;
       gap: 8px;
       width: 90%;
-      max-width: 360px;
+      max-width: 380px;
       pointer-events: none;
     }
     .toast {
       background: var(--c-bg-surface-elevated);
       color: #fff;
-      padding: 12px 16px;
+      padding: 14px 18px;
       border-radius: var(--radius-sm);
       box-shadow: var(--shadow-lg);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-weight: 600;
       font-size: 13px;
-      border-right: 4px solid var(--c-primary);
+      border-left: 4px solid var(--c-primary);
+      animation: toastShow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      pointer-events: auto;
     }
-    .toast.error { border-right-color: var(--c-danger); }
-    .toast.warn { border-right-color: var(--c-warn); }
+    .toast.error { border-left-color: var(--c-danger); }
+    .toast.warn { border-left-color: var(--c-warn); }
+    .toast.info { border-left-color: var(--c-info); }
+    .toast.fade-out { animation: toastHide 0.3s ease forwards; }
+    @keyframes toastShow {
+      from { opacity: 0; transform: translateY(-20px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes toastHide {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(-20px) scale(0.9); }
+    }
 
-    .admin-subnav, .ads-subnav {
+    /* Admin Sub-Tabs */
+    .admin-subnav {
       display: flex;
       background: rgba(0, 0, 0, 0.4);
       border-radius: var(--radius-sm);
       padding: 4px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       overflow-x: auto;
       gap: 4px;
     }
-    .admin-tab-btn, .ads-tab-btn {
+    .admin-tab-btn {
       flex: 1;
       text-align: center;
-      padding: 8px;
+      padding: 10px 8px;
       font-size: 12px;
       font-weight: 700;
       color: var(--c-text-muted);
       cursor: pointer;
       border-radius: 6px;
+      transition: var(--trans-fast);
+      white-space: nowrap;
       background: transparent;
       border: none;
-      white-space: nowrap;
     }
-    .admin-tab-btn.active, .ads-tab-btn.active {
-      background: var(--c-primary);
-      color: #fff;
-    }
-    .admin-panel-section, .ads-panel-section { display: none; }
-    .admin-panel-section.active, .ads-panel-section.active { display: block; }
+    .admin-tab-btn.active { background: var(--c-primary); color: #fff; }
+    .admin-panel-section { display: none; }
+    .admin-panel-section.active { display: block; }
 
-    /* Bottom Navigation Bar Locked Safely to Viewport Bottom */
+    /* Bottom Navigation Bar */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(17, 26, 45, 0.98);
+      background: rgba(17, 26, 45, 0.95);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-top: 1px solid var(--c-border);
       display: flex;
       justify-content: space-around;
-      padding: 8px 0 env(safe-area-inset-bottom, 14px) 0;
+      padding: 10px 0 20px;
       z-index: 500;
-      flex-shrink: 0;
     }
     .nav-btn {
       background: none;
@@ -368,11 +504,36 @@
       font-size: 11px;
       gap: 4px;
       cursor: pointer;
+      transition: var(--trans-fast);
       font-weight: 700;
       flex: 1;
     }
-    .nav-btn.active { color: var(--c-primary); }
+    .nav-btn.active { color: var(--c-primary); transform: translateY(-2px); }
     .nav-btn svg { width: 22px; height: 22px; fill: currentColor; }
+
+    /* Referral Box */
+    .referral-box {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(16, 185, 129, 0.1));
+      border: 1px solid var(--c-purple);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* RTL Orientation Handling */
+    [dir="rtl"] .app-header { flex-direction: row; }
+    [dir="rtl"] .flex-between { flex-direction: row; }
+    [dir="rtl"] .toast { border-left: none; border-right: 4px solid var(--c-primary); }
+    [dir="rtl"] .toast.error { border-right-color: var(--c-danger); }
+    [dir="rtl"] .toast.warn { border-right-color: var(--c-warn); }
+    [dir="rtl"] .toast.info { border-right-color: var(--c-info); }
+    [dir="rtl"] input, [dir="rtl"] textarea, [dir="rtl"] select { text-align: right; }
+    [dir="ltr"] input, [dir="ltr"] textarea, [dir="ltr"] select { text-align: left; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 3px; }
   </style>
 </head>
 <body>
@@ -383,7 +544,7 @@
     <div class="flex gap-3 flex-center">
       <div class="user-avatar flex-center" id="ui-avatar">U</div>
       <div class="flex-col">
-        <span class="font-bold text-sm" id="ui-username">المستخدم</span>
+        <span class="font-bold text-sm" id="ui-username">تحميل...</span>
         <span class="text-xs text-muted" id="ui-badge-role">عضو مسجل</span>
       </div>
     </div>
@@ -395,149 +556,1570 @@
     </div>
   </header>
 
-  <div class="app-scroll-area">
-    <main id="view-earn" class="view-container active">
-      <div class="balance-master">
-        <div class="text-muted text-xs font-bold" data-i18n="hero_balance_title">الرصيد المتاح القابل للسحب</div>
-        <h1><span id="main-balance-val">0.00</span> <span style="color: #6ee7b7;">₵</span></h1>
-        <div class="text-xs font-bold" style="color: #a7f3d0; background: rgba(0,0,0,0.25); display: inline-block; padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08);">
-          ≈ <span id="main-balance-usdt">0.000</span> USDT
-        </div>
+  <!-- EARN VIEW -->
+  <main id="view-earn" class="view-container active">
+    <div class="balance-master">
+      <div class="text-muted text-xs font-bold" data-i18n="hero_balance_title">الرصيد المتاح القابل للسحب</div>
+      <h1><span id="main-balance-val">0.00</span> <span style="color: #6ee7b7;">₵</span></h1>
+      <div class="text-xs font-bold" style="color: #a7f3d0; background: rgba(0,0,0,0.25); display: inline-block; padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08);">
+        ≈ <span id="main-balance-usdt">0.000</span> USDT
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <span class="stat-value" id="stat-tasks-done">0</span>
+        <span class="stat-label" data-i18n="stat_tasks_done">مهام منجزة</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-value" id="stat-total-earned">0.00</span>
+        <span class="stat-label" data-i18n="stat_total_earned">إجمالي الأرباح</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-value" id="stat-referrals">0</span>
+        <span class="stat-label" data-i18n="stat_referrals">الإحالات</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-value" id="stat-pending">0.00</span>
+        <span class="stat-label" data-i18n="stat_pending">قيد السحب</span>
+      </div>
+    </div>
+
+    <div class="referral-box">
+      <div class="flex-between mb-2">
+        <span class="font-bold text-sm text-purple">🎁 <span data-i18n="referral_title">نظام الإحالة</span></span>
+        <span class="badge badge-purple" id="referral-count-badge">0</span>
+      </div>
+      <p class="text-xs text-muted mb-3" data-i18n="referral_subtitle">ادعُ أصدقاءك واحصل على 10% من أرباح كل إحالة مدى الحياة.</p>
+      <div class="flex gap-2">
+        <input type="text" id="referral-link-input" readonly style="font-size: 12px;">
+        <button class="btn btn-sm btn-purple" onclick="Engine.copyReferral()" data-i18n="btn_copy">نسخ</button>
+      </div>
+    </div>
+
+    <div class="flex-between mb-3">
+      <h3 class="font-bold text-base flex flex-center gap-2">
+        <span>⚡</span> <span data-i18n="tasks_available_header">المهام المتاحة للإنجاز</span>
+      </h3>
+      <select id="filter-task-category" style="width: auto; padding: 6px 12px; margin: 0;" onchange="Engine.renderTasks()">
+        <option value="all" data-i18n="filter_all">جميع المهام</option>
+        <option value="telegram" data-i18n="filter_tg">قنوات تلغرام</option>
+        <option value="ad" data-i18n="filter_ads">مشاهدة إعلانات</option>
+        <option value="custom" data-i18n="filter_custom">مهام خاصة</option>
+      </select>
+    </div>
+
+    <div id="tasks-feed-container"></div>
+  </main>
+
+  <!-- ADS / CREATE VIEW -->
+  <main id="view-ads" class="view-container">
+    <div class="card">
+      <div class="card-header text-c">
+        <span>📢</span> <span data-i18n="create_ad_header">إنشاء مهمة أو إعلان جديد</span>
+      </div>
+      <p class="text-xs text-muted mb-4" data-i18n="create_ad_subtitle">
+        زوّد أعضاء قناتك أو روّج لرابطك بين آلاف المستخدمين. تخصم المنصة نسبة 25% كعمولة تشغيلية للمنصة.
+      </p>
+
+      <div class="input-group">
+        <label class="input-label" data-i18n="form_ad_title">عنوان المهمة</label>
+        <input type="text" id="form-ad-title" placeholder="مثال: اشترك في قناة الأخبار الرسمية">
       </div>
 
-      <div class="flex-between mb-3">
-        <h3 class="font-bold text-base flex flex-center gap-2">
-          <span>⚡</span> <span data-i18n="tasks_available_header">المهام المتاحة للإنجاز</span>
-        </h3>
-        <select id="filter-task-category" style="width: auto; padding: 6px 12px; margin: 0;" onchange="Engine.renderTasks()">
-          <option value="all" data-i18n="filter_all">جميع المهام</option>
-          <option value="telegram" data-i18n="filter_tg">قنوات تلغرام</option>
-          <option value="twitter" data-i18n="filter_twitter">تويتر (X)</option>
-          <option value="ad" data-i18n="filter_ads">مشاهدة إعلانات</option>
-          <option value="custom" data-i18n="filter_custom">مهام خاصة</option>
+      <div class="input-group">
+        <label class="input-label" data-i18n="form_ad_link">الرابط المستهدف أو رابط القناة</label>
+        <input type="text" id="form-ad-link" placeholder="https://t.me/your_channel">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" data-i18n="form_ad_category">قسم المهمة</label>
+        <select id="form-ad-category">
+          <option value="telegram" data-i18n="cat_tg">اشتراك في قناة تلغرام</option>
+          <option value="ad" data-i18n="cat_ad">مشاهدة إعلان وزيارة رابط</option>
+          <option value="custom" data-i18n="cat_custom">مهمة مخصصة مع إثبات</option>
         </select>
       </div>
 
-      <div id="tasks-feed-container"></div>
-    </main>
-
-    <main id="view-ads" class="view-container">
-      <div class="ads-subnav">
-        <button class="ads-tab-btn active" onclick="Engine.switchAdsSubSection('ads-create-sec', this)">إنشاء إعلان جديد</button>
-        <button class="ads-tab-btn" onclick="Engine.switchAdsSubSection('ads-manage-sec', this)">حملاتي ومراجعة إثباتاتي 📋</button>
-      </div>
-
-      <div id="ads-create-sec" class="ads-panel-section active">
-        <div class="card">
-          <div class="card-header text-c">
-            <span>📢</span> <span data-i18n="create_ad_header">إنشاء مهمة أو حملة جديدة</span>
-          </div>
-          <p class="text-xs text-muted mb-3" data-i18n="create_ad_subtitle">
-            زوّد أعضاء قناتك أو روّج لرابطك بين آلاف المستخدمين. تخصم المنصة نسبة 25% كعمولة تشغيلية للمنصة.
-          </p>
-
-          <div class="p-3 mb-3" style="background: rgba(245, 158, 11, 0.1); border: 1px dashed var(--c-warn); border-radius: var(--radius-sm);">
-            <p class="text-xs text-warn font-bold" data-i18n="tg_channel_notice">
-              تنبيه إلزامي لأصحاب القنوات: إذا اخترت قسم "اشتراك في قناة تلغرام"، يجب عليك رفع البوت (@Ta7oiilbot) مشرفاً في قناتك بكافة الصلاحيات؛ ليتمكن من كشف اشتراك الأعضاء ومنع الغش!
-            </p>
-          </div>
-
-          <div class="input-group">
-            <label class="input-label" data-i18n="form_ad_title">عنوان المهمة</label>
-            <input type="text" id="form-ad-title" placeholder="مثال: اشترك في قناة الأخبار الرسمية">
-          </div>
-
-          <div class="input-group">
-            <label class="input-label" data-i18n="form_ad_link">الرابط المستهدف أو رابط القناة / التغريدة</label>
-            <input type="text" id="form-ad-link" placeholder="https://t.me/your_channel أو رابط التغريدة">
-          </div>
-
-          <div class="input-group">
-            <label class="input-label" data-i18n="form_ad_category">قسم المهمة</label>
-            <select id="form-ad-category" onchange="Engine.onAdCategoryChange()">
-              <option value="telegram">اشتراك في قناة تلغرام (تحقق آلي بالبوت المشرف)</option>
-              <option value="twitter">تويتر / X (لايك، ريتويت، متابعة - إثبات سكرين شوت)</option>
-              <option value="ad">مشاهدة إعلان وزيارة رابط</option>
-              <option value="custom">مهمة مخصصة مع إثبات</option>
-            </select>
-          </div>
-
-          <div class="flex gap-3">
-            <div class="input-group" style="flex: 1;">
-              <label class="input-label" data-i18n="form_ad_reward">المكافأة للعضو (₵)</label>
-              <input type="number" id="form-ad-reward" value="0.70" step="0.1" min="0.5" oninput="Engine.updateCampaignEstimates()">
-            </div>
-            <div class="input-group" style="flex: 1;">
-              <label class="input-label" data-i18n="form_ad_members">العدد المطلوب</label>
-              <input type="number" id="form-ad-members" value="50" min="10" step="10" oninput="Engine.updateCampaignEstimates()">
-            </div>
-          </div>
-
-          <div class="input-group">
-            <label class="input-label" data-i18n="form_ad_type">طريقة التحقق من الإنجاز</label>
-            <select id="form-ad-type">
-              <option value="auto" data-i18n="type_auto">تلقائي فوري / عبر مراقبة البوت</option>
-              <option value="manual" data-i18n="type_manual">يدوي (يتطلب رفع رابط سكرين شوت أو إثبات)</option>
-            </select>
-          </div>
-
-          <div class="list-item flex-between" style="background: var(--c-danger-alpha); border-color: rgba(239,68,68,0.25);">
-            <span class="text-sm font-bold" data-i18n="calc_total_cost">المجموع الإجمالي (شامل 25% عمولة):</span>
-            <strong class="text-danger text-base" id="calc-total-cost">43.75 ₵</strong>
-          </div>
-
-          <button class="btn mt-3" onclick="Engine.createCampaign()" data-i18n="btn_publish_campaign">خصم الرصيد ونشر الحملة 🚀</button>
+      <div class="flex gap-3">
+        <div class="input-group" style="flex: 1;">
+          <label class="input-label" data-i18n="form_ad_reward">المكافأة للعضو (₵)</label>
+          <input type="number" id="form-ad-reward" value="0.70" step="0.1" min="0.1" oninput="Engine.updateCampaignEstimates()">
+        </div>
+        <div class="input-group" style="flex: 1;">
+          <label class="input-label" data-i18n="form_ad_members">العدد المطلوب</label>
+          <input type="number" id="form-ad-members" value="50" min="10" step="10" oninput="Engine.updateCampaignEstimates()">
         </div>
       </div>
 
-      <div id="ads-manage-sec" class="ads-panel-section">
-        <div class="card">
-          <div class="card-header text-warn">
-            <span>📊</span> <span>حملاتي المنشورة والإثباتات الواردة</span>
-          </div>
-          <p class="text-xs text-muted mb-3">
-            هنا يمكنك مراجعة حملاتك النشطة، والموافقة على إثباتات الأعضاء أو رفضها مباشرة من ميزانية حملتك المحجوزة!
-          </p>
-          <div id="advertiser-campaigns-list"></div>
-        </div>
+      <div class="input-group">
+        <label class="input-label" data-i18n="form_ad_type">طريقة التحقق من الإنجاز</label>
+        <select id="form-ad-type">
+          <option value="auto" data-i18n="type_auto">تلقائي فوري (بدون إثبات يدوي)</option>
+          <option value="manual" data-i18n="type_manual">يدوي (يتطلب رفع رابط سكرين شوت أو إثبات)</option>
+        </select>
       </div>
-    </main>
 
-    <main id="view-wallet" class="view-container">
-      <div class="card text-center" style="padding: 30px 16px;">
-        <div class="text-xs text-muted font-bold mb-2" data-i18n="wallet_overview">المحفظة المالية والمعاملات</div>
-        <h2 class="text-xl font-black mb-4"><span id="wallet-balance-num">0.00</span> ₵</h2>
-        
-        <div class="flex gap-3">
-          <button class="btn btn-outline" onclick="Engine.openModal('modal-deposit')" data-i18n="btn_deposit">⬇️ شحن الرصيد</button>
-          <button class="btn" onclick="Engine.openModal('modal-withdraw')" data-i18n="btn_withdraw">⬆️ سحب الأرباح</button>
+      <div class="list-item flex-between" style="background: var(--c-danger-alpha); border-color: rgba(239,68,68,0.25);">
+        <span class="text-sm font-bold" data-i18n="calc_total_cost">المجموع الإجمالي (شامل 25% عمولة):</span>
+        <strong class="text-danger text-base" id="calc-total-cost">43.75 ₵</strong>
+      </div>
+
+      <button class="btn mt-3" onclick="Engine.createCampaign()" data-i18n="btn_publish_campaign">خصم الرصيد ونشر الحملة 🚀</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>📋</span> <span data-i18n="my_campaigns_header">حملاتي المنشورة</span>
+      </div>
+      <div id="my-campaigns-feed"></div>
+    </div>
+  </main>
+
+  <!-- WALLET VIEW -->
+  <main id="view-wallet" class="view-container">
+    <div class="card text-center" style="padding: 30px 16px;">
+      <div class="text-xs text-muted font-bold mb-2" data-i18n="wallet_overview">المحفظة المالية والمعاملات</div>
+      <h2 class="text-xl font-black mb-4"><span id="wallet-balance-num">0.00</span> ₵</h2>
+      <div class="flex gap-3">
+        <button class="btn btn-outline" onclick="Engine.openModal('modal-deposit')" data-i18n="btn_deposit">⬇️ شحن الرصيد</button>
+        <button class="btn" onclick="Engine.openModal('modal-withdraw')" data-i18n="btn_withdraw">⬆️ سحب الأرباح</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>🧾</span> <span data-i18n="wallet_ledger_header">سجل المعاملات والتحويلات</span>
+      </div>
+      <div id="wallet-history-feed"></div>
+    </div>
+  </main>
+
+  <!-- PROFILE VIEW -->
+  <main id="view-profile" class="view-container">
+    <div class="card text-center">
+      <div class="user-avatar flex-center" id="profile-avatar" style="width: 80px; height: 80px; font-size: 30px; margin: 0 auto 12px;">U</div>
+      <h2 class="font-black text-lg" id="profile-name">User</h2>
+      <p class="text-xs text-muted mb-3" id="profile-handle">@username</p>
+      <div class="badge badge-primary" id="profile-role-badge">عضو مسجل</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>👤</span> <span data-i18n="profile_info_header">معلومات الحساب</span>
+      </div>
+      <div class="list-item flex-between">
+        <span class="text-sm text-muted" data-i18n="profile_id">معرف المستخدم</span>
+        <span class="font-bold text-sm" id="profile-uid">-</span>
+      </div>
+      <div class="list-item flex-between">
+        <span class="text-sm text-muted" data-i18n="profile_joined">تاريخ الانضمام</span>
+        <span class="font-bold text-sm" id="profile-joined">-</span>
+      </div>
+      <div class="list-item flex-between">
+        <span class="text-sm text-muted" data-i18n="profile_code">كود الإحالة</span>
+        <span class="font-bold text-sm text-purple" id="profile-refcode">-</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>⚙️</span> <span data-i18n="profile_settings_header">الإعدادات</span>
+      </div>
+      <div class="list-item flex-between cursor-pointer" onclick="Engine.toggleLang()">
+        <span class="text-sm" data-i18n="setting_lang">تغيير اللغة</span>
+        <span class="badge badge-info" id="lang-badge">العربية</span>
+      </div>
+      <div class="list-item flex-between cursor-pointer" onclick="Engine.openModal('modal-support')">
+        <span class="text-sm" data-i18n="setting_support">الدعم الفني</span>
+        <span class="text-muted">←</span>
+      </div>
+      <div class="list-item flex-between cursor-pointer" onclick="Engine.openModal('modal-about')">
+        <span class="text-sm" data-i18n="setting_about">عن المنصة</span>
+        <span class="text-muted">←</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADMIN VIEW -->
+  <main id="view-admin" class="view-container">
+    <div class="admin-subnav">
+      <button class="admin-tab-btn active" data-admin-tab="overview" data-i18n="admin_tab_overview">نظرة عامة</button>
+      <button class="admin-tab-btn" data-admin-tab="users" data-i18n="admin_tab_users">المستخدمون</button>
+      <button class="admin-tab-btn" data-admin-tab="withdrawals" data-i18n="admin_tab_withdrawals">السحوبات</button>
+      <button class="admin-tab-btn" data-admin-tab="tasks" data-i18n="admin_tab_tasks">المهام</button>
+      <button class="admin-tab-btn" data-admin-tab="settings" data-i18n="admin_tab_settings">الإعدادات</button>
+    </div>
+
+    <div class="admin-panel-section active" data-admin-panel="overview">
+      <div class="stats-grid">
+        <div class="stat-box">
+          <span class="stat-value" id="admin-stat-users">0</span>
+          <span class="stat-label" data-i18n="admin_stat_users">إجمالي المستخدمين</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="admin-stat-balance">0.00</span>
+          <span class="stat-label" data-i18n="admin_stat_balance">إجمالي الأرصدة</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="admin-stat-withdrawals">0</span>
+          <span class="stat-label" data-i18n="admin_stat_withdrawals">طلبات سحب معلقة</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="admin-stat-tasks">0</span>
+          <span class="stat-label" data-i18n="admin_stat_tasks">مهام نشطة</span>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <span>🧾</span> <span data-i18n="wallet_ledger_header">سجل المعاملات والتحويلات</span>
+          <span>📢</span> <span data-i18n="admin_broadcast_header">إرسال إشعار جماعي</span>
         </div>
-        <div id="wallet-history-feed"></div>
+        <div class="input-group">
+          <textarea id="admin-broadcast-text" placeholder="اكتب نص الإشعار هنا..."></textarea>
+        </div>
+        <button class="btn" onclick="Engine.adminBroadcast()" data-i18n="btn_send_broadcast">إرسال للجميع</button>
       </div>
-    </main>
+    </div>
 
-    <main id="view-affiliates" class="view-container">
-      <div class="card" style="border-color: rgba(245, 158, 11, 0.4); background: linear-gradient(180deg, rgba(245, 158, 11, 0.08), transparent);">
-        <div class="card-header text-warn">
-          <span>🤝</span> <span data-i18n="affiliate_header">برنامج شركاء الإحالة (35%)</span>
+    <div class="admin-panel-section" data-admin-panel="users">
+      <div class="input-group">
+        <input type="text" id="admin-user-search" placeholder="بحث بالاسم أو المعرف..." oninput="Engine.renderAdminUsers()">
+      </div>
+      <div id="admin-users-feed"></div>
+    </div>
+
+    <div class="admin-panel-section" data-admin-panel="withdrawals">
+      <div id="admin-withdrawals-feed"></div>
+    </div>
+
+    <div class="admin-panel-section" data-admin-panel="tasks">
+      <div class="card">
+        <div class="card-header">
+          <span>➕</span> <span data-i18n="admin_add_task_header">إضافة مهمة رسمية</span>
         </div>
-        <p class="text-xs text-muted mb-3" data-i18n="affiliate_desc">
-          اربح عمولة ضخمة بنسبة 35% من كل مهمة ينجزها أصدقاؤك مدى الحياة! لا يوجد سقف للأرباح.
-        </p>
-
-        <div class="list-item flex-between" style="background: rgba(0,0,0,0.4);">
-          <div class="flex-col" style="flex: 1; overflow: hidden;">
-            <span class="text-xs text-muted" data-i18n="your_affiliate_link">رابط الإحالة المباشر:</span>
-            <strong id="ui-affiliate-link" style="font-size: 13px; color: var(--c-primary); margin-top: 4px; word-break: break-all;">https://t.me/bot?start=ref_</strong>
+        <div class="input-group">
+          <label class="input-label" data-i18n="form_ad_title">عنوان المهمة</label>
+          <input type="text" id="admin-task-title">
+        </div>
+        <div class="input-group">
+          <label class="input-label" data-i18n="form_ad_link">الرابط</label>
+          <input type="text" id="admin-task-link">
+        </div>
+        <div class="flex gap-3">
+          <div class="input-group" style="flex: 1;">
+            <label class="input-label" data-i18n="form_ad_reward">المكافأة</label>
+            <input type="number" id="admin-task-reward" value="0.5" step="0.1">
           </div>
-          <button class="btn btn-sm btn-warn" onclick="Engine.copyAffiliateLink()" data-i18n="btn_copy">نسخ</button>
+          <div class="input-group" style="flex: 1;">
+            <label class="input-label" data-i18n="form_ad_members">العدد</label>
+            <input type="number" id="admin-task-slots" value="1000">
+          </div>
         </div>
-        <div class="flex-between mt-3 p-3" style="background: var(--c-bg-main); border-radius: var(--radius-sm); border: 1px solid var(--c-border);">
-          <span class="font-bold text-sm" data-i18n="total_referrals_count">الإحالات النشطة:</span>
-          <strong class="text-wa
+        <div class="input-group">
+          <label class="input-label" data-i18n="form_ad_category">القسم</label>
+          <select id="admin-task-category">
+            <option value="telegram" data-i18n="cat_tg">اشتراك تلغرام</option>
+            <option value="ad" data-i18n="cat_ad">إعلان</option>
+            <option value="custom" data-i18n="cat_custom">مخصص</option>
+          </select>
+        </div>
+        <button class="btn" onclick="Engine.adminAddTask()" data-i18n="btn_add_task">إضافة المهمة</button>
+      </div>
+      <div id="admin-tasks-feed"></div>
+    </div>
+
+    <div class="admin-panel-section" data-admin-panel="settings">
+      <div class="card">
+        <div class="card-header">
+          <span>⚙️</span> <span data-i18n="admin_settings_header">إعدادات المنصة</span>
+        </div>
+        <div class="input-group">
+          <label class="input-label" data-i18n="setting_usdt_rate">سعر صرف 1 ₵ = USDT</label>
+          <input type="number" id="setting-usdt-rate" step="0.0001">
+        </div>
+        <div class="input-group">
+          <label class="input-label" data-i18n="setting_commission">عمولة المنصة (%)</label>
+          <input type="number" id="setting-commission" step="1">
+        </div>
+        <div class="input-group">
+          <label class="input-label" data-i18n="setting_min_withdraw">الحد الأدنى للسحب (₵)</label>
+          <input type="number" id="setting-min-withdraw" step="1">
+        </div>
+        <div class="input-group">
+          <label class="input-label" data-i18n="setting_referral_bonus">نسبة الإحالة (%)</label>
+          <input type="number" id="setting-referral-bonus" step="1">
+        </div>
+        <button class="btn" onclick="Engine.adminSaveSettings()" data-i18n="btn_save_settings">حفظ الإعدادات</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header text-danger">
+          <span>⚠️</span> <span data-i18n="admin_danger_zone">منطقة الخطر</span>
+        </div>
+        <button class="btn btn-danger" onclick="Engine.adminResetAll()" data-i18n="btn_reset_all">إعادة تعيين جميع البيانات</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="nav-btn active" data-view="view-earn">
+      <svg viewBox="0 0 24 24"><path d="M12 2L4 7v10l8 5 8-5V7l-8-5zm0 2.3l5.5 3.4v1.6L12 12.7 6.5 9.3V7.3L12 4.3zm-5.5 6.9l5 3.1v5.3l-5-3.1v-5.3zm11 0v5.3l-5 3.1v-5.3l5-3.1z"/></svg>
+      <span data-i18n="nav_earn">الأرباح</span>
+    </button>
+    <button class="nav-btn" data-view="view-ads">
+      <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm2 2v14h14V5H5zm2 3h6v2H7V8zm0 4h10v2H7v-2zm0 4h10v2H7v-2z"/></svg>
+      <span data-i18n="nav_ads">إعلاناتي</span>
+    </button>
+    <button class="nav-btn" data-view="view-wallet">
+      <svg viewBox="0 0 24 24"><path d="M21 7H5a2 2 0 010-4h14v2h2v-2h1a1 1 0 011 1v3zm0 2v10a1 1 0 01-1 1H4a2 2 0 01-2-2V6a3 3 0 013-3h16v4h-2V5H5a1 1 0 000 2h16a1 1 0 011 1v1zm-6 3v2h3v-2h-3z"/></svg>
+      <span data-i18n="nav_wallet">المحفظة</span>
+    </button>
+    <button class="nav-btn" data-view="view-profile">
+      <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z"/></svg>
+      <span data-i18n="nav_profile">الملف</span>
+    </button>
+    <button class="nav-btn hidden" data-view="view-admin" id="nav-admin-btn">
+      <svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
+      <span data-i18n="nav_admin">الإدارة</span>
+    </button>
+  </nav>
+
+  <!-- MODALS -->
+  <div class="modal-overlay" id="modal-deposit">
+    <div class="modal-content">
+      <div class="modal-title"><span>⬇️</span> <span data-i18n="modal_deposit_title">شحن الرصيد</span></div>
+      <div class="input-group">
+        <label class="input-label" data-i18n="label_amount">المبلغ (₵)</label>
+        <input type="number" id="deposit-amount" placeholder="10" min="1" step="1">
+      </div>
+      <div class="input-group">
+        <label class="input-label" data-i18n="label_payment_method">طريقة الدفع</label>
+        <select id="deposit-method">
+          <option value="usdt">USDT (TRC20)</option>
+          <option value="card">بطاقة بنكية</option>
+          <option value="vodafone">فودافون كاش</option>
+        </select>
+      </div>
+      <div class="list-item" style="background: var(--c-info-alpha); border-color: rgba(59,130,246,0.25);">
+        <div class="text-xs text-muted font-bold mb-1" data-i18n="label_receive_address">عنوان الاستلام:</div>
+        <div class="text-sm font-bold" style="word-break: break-all;">TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-ghost" onclick="Engine.closeModal('modal-deposit')" data-i18n="btn_cancel">إلغاء</button>
+        <button class="btn" onclick="Engine.submitDeposit()" data-i18n="btn_confirm">تأكيد الشحن</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-withdraw">
+    <div class="modal-content">
+      <div class="modal-title"><span>⬆️</span> <span data-i18n="modal_withdraw_title">سحب الأرباح</span></div>
+      <div class="list-item flex-between" style="background: var(--c-primary-alpha); border-color: var(--c-primary-glow);">
+        <span class="text-sm font-bold" data-i18n="label_available">المتاح للسحب:</span>
+        <strong class="text-c" id="withdraw-available">0.00 ₵</strong>
+      </div>
+      <div class="input-group mt-3">
+        <label class="input-label" data-i18n="label_amount">المبلغ (₵)</label>
+        <input type="number" id="withdraw-amount" placeholder="5" min="1" step="1">
+      </div>
+      <div class="input-group">
+        <label class="input-label" data-i18n="label_payout_method">طريقة الاستلام</label>
+        <select id="withdraw-method">
+          <option value="usdt">USDT (TRC20)</option>
+          <option value="vodafone">فودافون كاش</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label class="input-label" data-i18n="label_wallet_address">عنوان المحفظة / رقم الهاتف</label>
+        <input type="text" id="withdraw-address" placeholder="TRxxx... أو 010xxx">
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-ghost" onclick="Engine.closeModal('modal-withdraw')" data-i18n="btn_cancel">إلغاء</button>
+        <button class="btn" onclick="Engine.submitWithdraw()" data-i18n="btn_confirm">تأكيد الطلب</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-proof">
+    <div class="modal-content">
+      <div class="modal-title"><span>📝</span> <span data-i18n="modal_proof_title">إثبات الإنجاز</span></div>
+      <p class="text-xs text-muted mb-3" data-i18n="modal_proof_subtitle">أدخل رابط الإثبات (سكرين شوت على تلغرام أو صورة على موقع استضافة).</p>
+      <div class="input-group">
+        <label class="input-label" data-i18n="label_proof_link">رابط الإثبات</label>
+        <input type="text" id="proof-link" placeholder="https://...">
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-ghost" onclick="Engine.closeModal('modal-proof')" data-i18n="btn_cancel">إلغاء</button>
+        <button class="btn" onclick="Engine.submitProof()" data-i18n="btn_submit_proof">إرسال الإثبات</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-support">
+    <div class="modal-content">
+      <div class="modal-title"><span>💬</span> <span data-i18n="modal_support_title">الدعم الفني</span></div>
+      <p class="text-sm mb-3" data-i18n="modal_support_subtitle">للتواصل مع الدعم الفني، يرجى مراسلة الحساب الرسمي.</p>
+      <div class="list-item text-center">
+        <span class="text-c font-bold">@DollarC_support</span>
+      </div>
+      <button class="btn mt-3" onclick="Engine.closeModal('modal-support')" data-i18n="btn_close">إغلاق</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-about">
+    <div class="modal-content">
+      <div class="modal-title"><span>ℹ️</span> <span data-i18n="modal_about_title">عن المنصة</span></div>
+      <p class="text-sm text-muted mb-3" data-i18n="modal_about_subtitle">Dollar C هي منصة ربح من المهام والإعلانات مدعومة بتقنية تلغرام WebApp. اربح من إنجاز المهام ودعوة الأصدقاء.</p>
+      <p class="text-xs text-muted">الإصدار 3.0.0</p>
+      <button class="btn mt-3" onclick="Engine.closeModal('modal-about')" data-i18n="btn_close">إغلاق</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-ad-edit">
+    <div class="modal-content">
+      <div class="modal-title"><span>👤</span> <span data-i18n="modal_user_edit_title">تعديل بيانات المستخدم</span></div>
+      <div class="input-group">
+        <label class="input-label" data-i18n="label_user_id">معرف المستخدم</label>
+        <input type="text" id="edit-user-id" readonly>
+      </div>
+      <div class="input-group">
+        <label class="input-label" data-i18n="label_balance_adjust">تعديل الرصيد (₵) - استخدم سالب للخصم</label>
+        <input type="number" id="edit-user-balance-adjust" step="0.1" placeholder="0">
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-ghost" onclick="Engine.closeModal('modal-ad-edit')" data-i18n="btn_cancel">إلغاء</button>
+        <button class="btn" onclick="Engine.adminApplyUserEdit()" data-i18n="btn_apply">تطبيق</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================================
+       Dollar C - Supreme Enterprise Platform - Engine
+       ===================================================================== */
+    const Engine = (() => {
+      // --- CONFIGURATION ---
+      const ADMIN_IDS = [123456789, 987654321, 0];
+      const STORAGE_KEY = 'dollarc_state_v3';
+      const USER_KEY = 'dollarc_user_v3';
+      const LANG_KEY = 'dollarc_lang_v3';
+
+      // --- I18N DICTIONARY ---
+      const I18N = {
+        ar: {
+          hero_balance_title: "الرصيد المتاح القابل للسحب",
+          tasks_available_header: "المهام المتاحة للإنجاز",
+          filter_all: "جميع المهام",
+          filter_tg: "قنوات تلغرام",
+          filter_ads: "مشاهدة إعلانات",
+          filter_custom: "مهام خاصة",
+          create_ad_header: "إنشاء مهمة أو إعلان جديد",
+          create_ad_subtitle: "زوّد أعضاء قناتك أو روّج لرابطك بين آلاف المستخدمين. تخصم المنصة نسبة 25% كعمولة تشغيلية للمنصة.",
+          form_ad_title: "عنوان المهمة",
+          form_ad_link: "الرابط المستهدف أو رابط القناة",
+          form_ad_category: "قسم المهمة",
+          form_ad_reward: "المكافأة للعضو (₵)",
+          form_ad_members: "العدد المطلوب",
+          form_ad_type: "طريقة التحقق من الإنجاز",
+          type_auto: "تلقائي فوري (بدون إثبات يدوي)",
+          type_manual: "يدوي (يتطلب رفع رابط سكرين شوت أو إثبات)",
+          calc_total_cost: "المجموع الإجمالي (شامل 25% عمولة):",
+          btn_publish_campaign: "خصم الرصيد ونشر الحملة 🚀",
+          my_campaigns_header: "حملاتي المنشورة",
+          wallet_overview: "المحفظة المالية والمعاملات",
+          btn_deposit: "⬇️ شحن الرصيد",
+          btn_withdraw: "⬆️ سحب الأرباح",
+          wallet_ledger_header: "سجل المعاملات والتحويلات",
+          profile_info_header: "معلومات الحساب",
+          profile_id: "معرف المستخدم",
+          profile_joined: "تاريخ الانضمام",
+          profile_code: "كود الإحالة",
+          profile_settings_header: "الإعدادات",
+          setting_lang: "تغيير اللغة",
+          setting_support: "الدعم الفني",
+          setting_about: "عن المنصة",
+          setting_usdt_rate: "سعر صرف 1 ₵ = USDT",
+          setting_commission: "عمولة المنصة (%)",
+          setting_min_withdraw: "الحد الأدنى للسحب (₵)",
+          setting_referral_bonus: "نسبة الإحالة (%)",
+          stat_tasks_done: "مهام منجزة",
+          stat_total_earned: "إجمالي الأرباح",
+          stat_referrals: "الإحالات",
+          stat_pending: "قيد السحب",
+          referral_title: "نظام الإحالة",
+          referral_subtitle: "ادعُ أصدقاءك واحصل على 10% من أرباح كل إحالة مدى الحياة.",
+          btn_copy: "نسخ",
+          cat_tg: "اشتراك في قناة تلغرام",
+          cat_ad: "مشاهدة إعلان وزيارة رابط",
+          cat_custom: "مهمة مخصصة مع إثبات",
+          btn_claim: "إنجاز المهمة",
+          btn_claimed: "تم الإنجاز",
+          btn_go: "زيارة والتحقق",
+          btn_pending: "قيد المراجعة",
+          empty_tasks: "لا توجد مهام متاحة حاليًا، عد قريبًا!",
+          empty_history: "لا توجد معاملات بعد.",
+          empty_campaigns: "لم تنشئ أي حملة بعد.",
+          empty_users: "لا يوجد مستخدمون.",
+          empty_withdrawals: "لا توجد طلبات سحب.",
+          modal_deposit_title: "شحن الرصيد",
+          modal_withdraw_title: "سحب الأرباح",
+          modal_proof_title: "إثبات الإنجاز",
+          modal_proof_subtitle: "أدخل رابط الإثبات (سكرين شوت على تلغرام أو صورة على موقع استضافة).",
+          modal_support_title: "الدعم الفني",
+          modal_support_subtitle: "للتواصل مع الدعم الفني، يرجى مراسلة الحساب الرسمي.",
+          modal_about_title: "عن المنصة",
+          modal_about_subtitle: "Dollar C هي منصة ربح من المهام والإعلانات مدعومة بتقنية تلغرام WebApp. اربح من إنجاز المهام ودعوة الأصدقاء.",
+          modal_user_edit_title: "تعديل بيانات المستخدم",
+          label_amount: "المبلغ (₵)",
+          label_payment_method: "طريقة الدفع",
+          label_receive_address: "عنوان الاستلام:",
+          label_payout_method: "طريقة الاستلام",
+          label_wallet_address: "عنوان المحفظة / رقم الهاتف",
+          label_available: "المتاح للسحب:",
+          label_proof_link: "رابط الإثبات",
+          label_user_id: "معرف المستخدم",
+          label_balance_adjust: "تعديل الرصيد (₵) - استخدم سالب للخصم",
+          btn_cancel: "إلغاء",
+          btn_confirm: "تأكيد",
+          btn_close: "إغلاق",
+          btn_apply: "تطبيق",
+          btn_submit_proof: "إرسال الإثبات",
+          nav_earn: "الأرباح",
+          nav_ads: "إعلاناتي",
+          nav_wallet: "المحفظة",
+          nav_profile: "الملف",
+          nav_admin: "الإدارة",
+          admin_tab_overview: "نظرة عامة",
+          admin_tab_users: "المستخدمون",
+          admin_tab_withdrawals: "السحوبات",
+          admin_tab_tasks: "المهام",
+          admin_tab_settings: "الإعدادات",
+          admin_stat_users: "إجمالي المستخدمين",
+          admin_stat_balance: "إجمالي الأرصدة",
+          admin_stat_withdrawals: "طلبات سحب معلقة",
+          admin_stat_tasks: "مهام نشطة",
+          admin_broadcast_header: "إرسال إشعار جماعي",
+          btn_send_broadcast: "إرسال للجميع",
+          admin_add_task_header: "إضافة مهمة رسمية",
+          btn_add_task: "إضافة المهمة",
+          admin_settings_header: "إعدادات المنصة",
+          admin_danger_zone: "منطقة الخطر",
+          btn_reset_all: "إعادة تعيين جميع البيانات",
+          btn_save_settings: "حفظ الإعدادات",
+          role_admin: "مدير المنصة",
+          role_user: "عضو مسجل",
+          role_banned: "محظور",
+          msg_loading: "تحميل...",
+          msg_copied: "تم النسخ بنجاح ✓",
+          msg_task_claimed: "تم استلام المكافأة! ✓",
+          msg_task_pending: "تم إرسال الإثبات، في انتظار المراجعة.",
+          msg_already_claimed: "لقد أنجزت هذه المهمة بالفعل.",
+          msg_insufficient: "رصيدك غير كافٍ.",
+          msg_invalid_input: "الرجاء إدخال بيانات صحيحة.",
+          msg_withdraw_submitted: "تم إرسال طلب السحب، سيتم مراجعته قريبًا.",
+          msg_deposit_submitted: "تم إرسال طلب الشحن.",
+          msg_admin_only: "هذا الإجراء للمشرفين فقط.",
+          msg_saved: "تم الحفظ بنجاح ✓",
+          msg_reset_done: "تم إعادة التعيين.",
+          msg_coming_soon: "قريبًا...",
+          msg_min_withdraw: "الحد الأدنى للسحب هو ",
+          msg_campaign_created: "تم نشر الحملة بنجاح!",
+          confirm_delete: "هل أنت متأكد من الحذف؟",
+          confirm_approve: "تأكيد الموافقة؟",
+          confirm_reject: "تأكيد الرفض؟"
+        },
+        en: {
+          hero_balance_title: "Available Withdrawable Balance",
+          tasks_available_header: "Available Tasks",
+          filter_all: "All Tasks",
+          filter_tg: "Telegram Channels",
+          filter_ads: "Watch Ads",
+          filter_custom: "Custom Tasks",
+          create_ad_header: "Create New Task or Ad",
+          create_ad_subtitle: "Boost your channel or promote your link among thousands of users. Platform charges 25% operational commission.",
+          form_ad_title: "Task Title",
+          form_ad_link: "Target Link or Channel URL",
+          form_ad_category: "Task Category",
+          form_ad_reward: "Reward per User (₵)",
+          form_ad_members: "Required Members",
+          form_ad_type: "Verification Method",
+          type_auto: "Automatic Instant (No manual proof)",
+          type_manual: "Manual (Requires screenshot proof)",
+          calc_total_cost: "Total Cost (incl. 25% commission):",
+          btn_publish_campaign: "Deduct Balance & Publish 🚀",
+          my_campaigns_header: "My Published Campaigns",
+          wallet_overview: "Financial Wallet & Transactions",
+          btn_deposit: "⬇️ Deposit",
+          btn_withdraw: "⬆️ Withdraw",
+          wallet_ledger_header: "Transaction Ledger",
+          profile_info_header: "Account Information",
+          profile_id: "User ID",
+          profile_joined: "Join Date",
+          profile_code: "Referral Code",
+          profile_settings_header: "Settings",
+          setting_lang: "Change Language",
+          setting_support: "Support",
+          setting_about: "About",
+          setting_usdt_rate: "Rate: 1 ₵ = USDT",
+          setting_commission: "Platform Commission (%)",
+          setting_min_withdraw: "Min Withdrawal (₵)",
+          setting_referral_bonus: "Referral Bonus (%)",
+          stat_tasks_done: "Tasks Done",
+          stat_total_earned: "Total Earned",
+          stat_referrals: "Referrals",
+          stat_pending: "Pending Withdrawal",
+          referral_title: "Referral System",
+          referral_subtitle: "Invite friends and earn 10% of every referral's earnings for life.",
+          btn_copy: "Copy",
+          cat_tg: "Telegram Channel Join",
+          cat_ad: "Watch Ad & Visit Link",
+          cat_custom: "Custom Task with Proof",
+          btn_claim: "Claim Task",
+          btn_claimed: "Claimed",
+          btn_go: "Visit & Verify",
+          btn_pending: "Under Review",
+          empty_tasks: "No tasks available right now, check back later!",
+          empty_history: "No transactions yet.",
+          empty_campaigns: "You haven't created any campaign yet.",
+          empty_users: "No users found.",
+          empty_withdrawals: "No withdrawal requests.",
+          modal_deposit_title: "Deposit Funds",
+          modal_withdraw_title: "Withdraw Earnings",
+          modal_proof_title: "Submit Proof",
+          modal_proof_subtitle: "Enter proof link (screenshot on Telegram or image host).",
+          modal_support_title: "Support",
+          modal_support_subtitle: "To contact support, message the official account.",
+          modal_about_title: "About Platform",
+          modal_about_subtitle: "Dollar C is a task-based earning platform powered by Telegram WebApp.",
+          modal_user_edit_title: "Edit User Data",
+          label_amount: "Amount (₵)",
+          label_payment_method: "Payment Method",
+          label_receive_address: "Receiving Address:",
+          label_payout_method: "Payout Method",
+          label_wallet_address: "Wallet Address / Phone",
+          label_available: "Available:",
+          label_proof_link: "Proof Link",
+          label_user_id: "User ID",
+          label_balance_adjust: "Balance Adjustment (₵)",
+          btn_cancel: "Cancel",
+          btn_confirm: "Confirm",
+          btn_close: "Close",
+          btn_apply: "Apply",
+          btn_submit_proof: "Submit Proof",
+          nav_earn: "Earn",
+          nav_ads: "My Ads",
+          nav_wallet: "Wallet",
+          nav_profile: "Profile",
+          nav_admin: "Admin",
+          admin_tab_overview: "Overview",
+          admin_tab_users: "Users",
+          admin_tab_withdrawals: "Withdrawals",
+          admin_tab_tasks: "Tasks",
+          admin_tab_settings: "Settings",
+          admin_stat_users: "Total Users",
+          admin_stat_balance: "Total Balances",
+          admin_stat_withdrawals: "Pending Withdrawals",
+          admin_stat_tasks: "Active Tasks",
+          admin_broadcast_header: "Broadcast Notification",
+          btn_send_broadcast: "Send to All",
+          admin_add_task_header: "Add Official Task",
+          btn_add_task: "Add Task",
+          admin_settings_header: "Platform Settings",
+          admin_danger_zone: "Danger Zone",
+          btn_reset_all: "Reset All Data",
+          btn_save_settings: "Save Settings",
+          role_admin: "Platform Admin",
+          role_user: "Registered Member",
+          role_banned: "Banned",
+          msg_loading: "Loading...",
+          msg_copied: "Copied successfully ✓",
+          msg_task_claimed: "Reward received! ✓",
+          msg_task_pending: "Proof submitted, awaiting review.",
+          msg_already_claimed: "You already completed this task.",
+          msg_insufficient: "Insufficient balance.",
+          msg_invalid_input: "Please enter valid data.",
+          msg_withdraw_submitted: "Withdrawal request submitted.",
+          msg_deposit_submitted: "Deposit request submitted.",
+          msg_admin_only: "Admins only.",
+          msg_saved: "Saved successfully ✓",
+          msg_reset_done: "Reset completed.",
+          msg_coming_soon: "Coming soon...",
+          msg_min_withdraw: "Minimum withdrawal is ",
+          msg_campaign_created: "Campaign published successfully!",
+          confirm_delete: "Are you sure you want to delete?",
+          confirm_approve: "Confirm approval?",
+          confirm_reject: "Confirm rejection?"
+        }
+      };
+
+      // --- STATE ---
+      let state = {
+        settings: {
+          usdtRate: 0.00045,
+          commission: 25,
+          minWithdraw: 5,
+          referralBonus: 10,
+          botUsername: 'DollarC_bot',
+          supportUsername: 'DollarC_support',
+          paymentAddress: 'TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+        },
+        users: [],
+        tasks: [],
+        campaigns: [],
+        transactions: [],
+        withdrawals: [],
+        deposits: [],
+        notifications: []
+      };
+
+      let currentUser = null;
+      let lang = 'ar';
+      let pendingTask = null;
+      let editingUserId = null;
+
+      // --- HELPER FUNCTIONS ---
+      const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      const now = () => Date.now();
+      const fmt = (n) => Number(n || 0).toFixed(2);
+      const fmtDate = (ts) => new Date(ts).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const t = (key) => (I18N[lang] && I18N[lang][key]) || (I18N.ar[key]) || key;
+      const isAdmin = (user) => user && ADMIN_IDS.includes(user.id);
+      const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+      // --- PERSISTENCE ---
+      function save() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      }
+      function load() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            state = Object.assign(state, parsed);
+          }
+        } catch (e) {}
+        try {
+          const rawU = localStorage.getItem(USER_KEY);
+          if (rawU) currentUser = JSON.parse(rawU);
+        } catch (e) {}
+        try {
+          const l = localStorage.getItem(LANG_KEY);
+          if (l) lang = l;
+        } catch (e) {}
+      }
+      function saveUser() {
+        try { localStorage.setItem(USER_KEY, JSON.stringify(currentUser)); } catch (e) {}
+        const idx = state.users.findIndex(u => u.id === currentUser.id);
+        if (idx >= 0) state.users[idx] = Object.assign({}, state.users[idx], currentUser);
+        else state.users.push(currentUser);
+        save();
+      }
+
+      // --- TOASTS ---
+      function toast(msg, type = 'success') {
+        const root = document.getElementById('toast-root');
+        if (!root) return;
+        const el = document.createElement('div');
+        el.className = 'toast ' + (type === 'success' ? '' : type);
+        const icon = type === 'error' ? '✗' : type === 'warn' ? '!' : type === 'info' ? 'i' : '✓';
+        el.innerHTML = `<span style="font-weight:900;">${icon}</span><span>${esc(msg)}</span>`;
+        root.appendChild(el);
+        setTimeout(() => { el.classList.add('fade-out'); setTimeout(() => el.remove(), 300); }, 2800);
+      }
+
+      // --- MODAL MANAGEMENT ---
+      function openModal(id) {
+        const m = document.getElementById(id);
+        if (m) m.classList.add('active');
+      }
+      function closeModal(id) {
+        const m = document.getElementById(id);
+        if (m) m.classList.remove('active');
+      }
+
+      // --- LANG / I18N ---
+      function applyI18n() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const k = el.getAttribute('data-i18n');
+          const val = t(k);
+          if (val) el.textContent = val;
+        });
+        const root = document.getElementById('app-root');
+        root.setAttribute('lang', lang);
+        root.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+        const btn = document.getElementById('ui-btn-lang');
+        if (btn) btn.textContent = lang === 'ar' ? 'EN' : 'AR';
+        const langBadge = document.getElementById('lang-badge');
+        if (langBadge) langBadge.textContent = lang === 'ar' ? 'العربية' : 'English';
+      }
+
+      function toggleLang() {
+        lang = lang === 'ar' ? 'en' : 'ar';
+        try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+        applyI18n();
+        renderAll();
+      }
+
+      // --- SEEDING ---
+      function seedTasks() {
+        if (state.tasks.length > 0) return;
+        state.tasks = [
+          { id: uid(), title: 'اشترك في قناة Dollar C الرسمية', title_en: 'Join Dollar C Official Channel', link: 'https://t.me/DollarC_official', category: 'telegram', reward: 0.5, slots: 100000, filled: 0, type: 'auto', ownerId: 'system', active: true, createdAt: now(), completions: [] },
+          { id: uid(), title: 'انضم إلى قناة الأخبار العربية', title_en: 'Join Arabic News Channel', link: 'https://t.me/arabic_news', category: 'telegram', reward: 0.4, slots: 5000, filled: 0, type: 'auto', ownerId: 'system', active: true, createdAt: now(), completions: [] },
+          { id: uid(), title: 'شاهد الإعلان وزيارة الموقع', title_en: 'Watch Ad & Visit Site', link: 'https://example.com/ad', category: 'ad', reward: 0.3, slots: 2000, filled: 0, type: 'auto', ownerId: 'system', active: true, createdAt: now(), completions: [] },
+          { id: uid(), title: 'سجل في تطبيق الشراكة', title_en: 'Register in Partner App', link: 'https://example.com/register', category: 'custom', reward: 1.0, slots: 500, filled: 0, type: 'manual', ownerId: 'system', active: true, createdAt: now(), completions: [] }
+        ];
+        save();
+      }
+
+      // --- INIT ---
+      async function init() {
+        load();
+        // TG User
+        try {
+          if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            try { tg.setHeaderColor('#111a2d'); } catch (e) {}
+            try { tg.setBackgroundColor('#070d17'); } catch (e) {}
+            const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
+            if (u) {
+              if (!currentUser || currentUser.id !== u.id) {
+                currentUser = {
+                  id: u.id,
+                  username: u.username || '',
+                  firstName: u.first_name || 'User',
+                  lastName: u.last_name || '',
+                  photoUrl: u.photo_url || '',
+                  balance: currentUser && currentUser.id === u.id ? currentUser.balance : 0,
+                  totalEarned: currentUser ? currentUser.totalEarned : 0,
+                  tasksCompleted: currentUser ? currentUser.tasksCompleted : 0,
+                  pendingWithdraw: currentUser ? currentUser.pendingWithdraw : 0,
+                  referralCode: currentUser && currentUser.referralCode ? currentUser.referralCode : ('DC' + u.id.toString(36).toUpperCase()),
+                  referredBy: currentUser ? currentUser.referredBy : null,
+                  referrals: currentUser ? (currentUser.referrals || []) : [],
+                  joinedAt: currentUser ? currentUser.joinedAt : now(),
+                  completedTasks: currentUser ? (currentUser.completedTasks || {}) : {},
+                  pendingTasks: currentUser ? (currentUser.pendingTasks || {}) : {},
+                  banned: currentUser ? currentUser.banned : false
+                };
+              }
+              try {
+                const startParam = tg.initDataUnsafe.start_param;
+                if (startParam && startParam.startsWith('ref_') && currentUser.referredBy === null) {
+                  currentUser.referredBy = startParam.replace('ref_', '');
+                }
+              } catch (e) {}
+            }
+          }
+        } catch (e) { console.warn('TG init failed', e); }
+
+        // Fallback user
+        if (!currentUser) {
+          currentUser = {
+            id: 0,
+            username: 'demo_user',
+            firstName: 'Demo',
+            lastName: 'User',
+            photoUrl: '',
+            balance: 100,
+            totalEarned: 100,
+            tasksCompleted: 0,
+            pendingWithdraw: 0,
+            referralCode: 'DCDEMO',
+            referredBy: null,
+            referrals: [],
+            joinedAt: now(),
+            completedTasks: {},
+            pendingTasks: {},
+            banned: false
+          };
+        }
+
+        // Ensure fields
+        currentUser.completedTasks = currentUser.completedTasks || {};
+        currentUser.pendingTasks = currentUser.pendingTasks || {};
+        currentUser.referrals = currentUser.referrals || [];
+        currentUser.balance = Number(currentUser.balance) || 0;
+        currentUser.totalEarned = Number(currentUser.totalEarned) || 0;
+        currentUser.pendingWithdraw = Number(currentUser.pendingWithdraw) || 0;
+
+        // Register in users
+        const idx = state.users.findIndex(u => u.id === currentUser.id);
+        if (idx >= 0) state.users[idx] = Object.assign({}, state.users[idx], currentUser);
+        else state.users.push(currentUser);
+
+        seedTasks();
+        saveUser();
+
+        // Apply lang
+        applyI18n();
+
+        // Show admin nav
+        if (isAdmin(currentUser)) {
+          document.getElementById('nav-admin-btn').classList.remove('hidden');
+        }
+
+        // Setup nav
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-view');
+            if (target === 'view-admin' && !isAdmin(currentUser)) {
+              toast(t('msg_admin_only'), 'error');
+              return;
+            }
+            switchView(target);
+          });
+        });
+
+        // Admin tabs
+        document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const tab = btn.getAttribute('data-admin-tab');
+            document.querySelectorAll('.admin-panel-section').forEach(p => p.classList.remove('active'));
+            const target = document.querySelector(`[data-admin-panel="${tab}"]`);
+            if (target) target.classList.add('active');
+            renderAdmin();
+          });
+        });
+
+        // Modal backdrop click
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+          m.addEventListener('click', (e) => {
+            if (e.target === m) m.classList.remove('active');
+          });
+        });
+
+        renderAll();
+      }
+
+      // --- VIEW SWITCH ---
+      function switchView(viewId) {
+        document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+        const target = document.getElementById(viewId);
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(b => {
+          b.classList.toggle('active', b.getAttribute('data-view') === viewId);
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // --- RENDER ALL ---
+      function renderAll() {
+        renderHeader();
+        renderBalance();
+        renderStats();
+        renderReferral();
+        renderTasks();
+        renderWallet();
+        renderHistory();
+        renderProfile();
+        renderMyCampaigns();
+        renderAdmin();
+        updateCampaignEstimates();
+      }
+
+      function renderHeader() {
+        const av = document.getElementById('ui-avatar');
+        if (currentUser.photoUrl) {
+          av.innerHTML = `<img src="${esc(currentUser.photoUrl)}" alt="">`;
+        } else {
+          av.textContent = (currentUser.firstName || 'U').charAt(0).toUpperCase();
+        }
+        document.getElementById('ui-username').textContent = (currentUser.firstName + ' ' + (currentUser.lastName || '')).trim() || 'User';
+        const roleEl = document.getElementById('ui-badge-role');
+        if (currentUser.banned) roleEl.textContent = t('role_banned');
+        else if (isAdmin(currentUser)) roleEl.textContent = t('role_admin');
+        else roleEl.textContent = t('role_user');
+      }
+
+      function renderBalance() {
+        const bal = fmt(currentUser.balance);
+        document.getElementById('ui-header-balance').textContent = bal;
+        document.getElementById('main-balance-val').textContent = bal;
+        document.getElementById('wallet-balance-num').textContent = bal;
+        document.getElementById('main-balance-usdt').textContent = (currentUser.balance * state.settings.usdtRate).toFixed(3);
+        document.getElementById('withdraw-available').textContent = bal + ' ₵';
+        document.getElementById('referral-link-input').value = `https://t.me/${state.settings.botUsername}?start=ref_${currentUser.referralCode}`;
+      }
+
+      function renderStats() {
+        document.getElementById('stat-tasks-done').textContent = currentUser.tasksCompleted || 0;
+        document.getElementById('stat-total-earned').textContent = fmt(currentUser.totalEarned);
+        document.getElementById('stat-referrals').textContent = currentUser.referrals.length || 0;
+        document.getElementById('stat-pending').textContent = fmt(currentUser.pendingWithdraw);
+        document.getElementById('referral-count-badge').textContent = currentUser.referrals.length || 0;
+      }
+
+      function renderReferral() {
+        document.getElementById('referral-link-input').value = `https://t.me/${state.settings.botUsername}?start=ref_${currentUser.referralCode}`;
+      }
+
+      function renderTasks() {
+        const container = document.getElementById('tasks-feed-container');
+        const filter = document.getElementById('filter-task-category').value;
+        let tasks = state.tasks.filter(t => t.active && t.filled < t.slots);
+        if (filter !== 'all') tasks = tasks.filter(t => t.category === filter);
+        // sort: not completed first
+        tasks.sort((a, b) => {
+          const ac = currentUser.completedTasks[a.id] ? 1 : 0;
+          const bc = currentUser.completedTasks[b.id] ? 1 : 0;
+          return ac - bc;
+        });
+
+        if (tasks.length === 0) {
+          container.innerHTML = `<div class="empty-state">${t('empty_tasks')}</div>`;
+          return;
+        }
+        container.innerHTML = tasks.map(task => {
+          const done = !!currentUser.completedTasks[task.id];
+          const pending = !!currentUser.pendingTasks[task.id];
+          const title = lang === 'ar' ? task.title : (task.title_en || task.title);
+          const pct = Math.min(100, (task.filled / task.slots) * 100);
+          let btn;
+          if (done) btn = `<button class="btn btn-sm btn-ghost" disabled>${t('btn_claimed')}</button>`;
+          else if (pending) btn = `<button class="btn btn-sm btn-ghost" disabled>${t('btn_pending')}</button>`;
+          else btn = `<button class="btn btn-sm" onclick="Engine.startTask('${task.id}')">${task.type === 'manual' ? t('btn_submit_proof') : t('btn_claim')}</button>`;
+
+          const catBadge = task.category === 'telegram' ? `<span class="badge badge-info">${t('filter_tg')}</span>`
+            : task.category === 'ad' ? `<span class="badge badge-warn">${t('filter_ads')}</span>`
+            : `<span class="badge badge-purple">${t('filter_custom')}</span>`;
+
+          return `
+            <div class="list-item">
+              <div class="flex-between mb-2">
+                <strong class="text-sm">${esc(title)}</strong>
+                <span class="badge badge-primary">+${fmt(task.reward)} ₵</span>
+              </div>
+              <div class="flex gap-2 mb-2">${catBadge}<span class="badge badge-primary">${task.filled}/${task.slots}</span></div>
+              <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>
+              <div class="mt-3">${btn}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderMyCampaigns() {
+        const container = document.getElementById('my-campaigns-feed');
+        const mine = state.campaigns.filter(c => c.ownerId === currentUser.id);
+        if (mine.length === 0) {
+          container.innerHTML = `<div class="empty-state">${t('empty_campaigns')}</div>`;
+          return;
+        }
+        container.innerHTML = mine.map(c => {
+          const pct = Math.min(100, (c.filled / c.slots) * 100);
+          return `
+            <div class="list-item">
+              <div class="flex-between mb-2">
+                <strong class="text-sm">${esc(c.title)}</strong>
+                <span class="badge badge-warn">${c.filled}/${c.slots}</span>
+              </div>
+              <div class="text-xs text-muted mb-2">${esc(c.link)}</div>
+              <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>
+              <div class="flex-between mt-2">
+                <span class="text-xs text-muted">${fmt(c.reward)} ₵ / عضو</span>
+                <button class="btn btn-xs btn-danger" onclick="Engine.deleteCampaign('${c.id}')">حذف</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderWallet() {
+        renderBalance();
+      }
+
+      function renderHistory() {
+        const container = document.getElementById('wallet-history-feed');
+        const txs = state.transactions.filter(t => t.userId === currentUser.id).slice().reverse();
+        if (txs.length === 0) {
+          container.innerHTML = `<div class="empty-state">${t('empty_history')}</div>`;
+          return;
+        }
+        container.innerHTML = txs.slice(0, 50).map(tx => {
+          const sign = tx.amount >= 0 ? '+' : '';
+          const cls = tx.amount >= 0 ? 'text-c' : 'text-danger';
+          const icon = tx.type === 'deposit' ? '⬇️' : tx.type === 'withdraw' ? '⬆️' : tx.type === 'task' ? '⚡' : tx.type === 'referral' ? '🎁' : '💠';
+          const statusBadge = tx.status === 'pending' ? `<span class="badge badge-warn">قيد المراجعة</span>`
+            : tx.status === 'rejected' ? `<span class="badge badge-danger">مرفوض</span>`
+            : `<span class="badge badge-primary">مكتمل</span>`;
+          return `
+            <div class="list-item">
+              <div class="flex-between mb-1">
+                <span class="text-sm font-bold">${icon} ${esc(tx.note || tx.type)}</span>
+                <span class="${cls} font-bold text-sm">${sign}${fmt(tx.amount)} ₵</span>
+              </div>
+              <div class="flex-between">
+                <span class="text-xs text-muted">${fmtDate(tx.createdAt)}</span>
+                ${statusBadge}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderProfile() {
+        const av = document.getElementById('profile-avatar');
+        if (currentUser.photoUrl) av.innerHTML = `<img src="${esc(currentUser.photoUrl)}" alt="">`;
+        else av.textContent = (currentUser.firstName || 'U').charAt(0).toUpperCase();
+        document.getElementById('profile-name').textContent = (currentUser.firstName + ' ' + (currentUser.lastName || '')).trim();
+        document.getElementById('profile-handle').textContent = currentUser.username ? '@' + currentUser.username : '—';
+        const rb = document.getElementById('profile-role-badge');
+        if (currentUser.banned) { rb.textContent = t('role_banned'); rb.className = 'badge badge-danger'; }
+        else if (isAdmin(currentUser)) { rb.textContent = t('role_admin'); rb.className = 'badge badge-purple'; }
+        else { rb.textContent = t('role_user'); rb.className = 'badge badge-primary'; }
+        document.getElementById('profile-uid').textContent = currentUser.id;
+        document.getElementById('profile-joined').textContent = fmtDate(currentUser.joinedAt);
+        document.getElementById('profile-refcode').textContent = currentUser.referralCode;
+      }
+
+      // --- TASK ACTIONS ---
+      function startTask(taskId) {
+        if (currentUser.banned) return toast(t('role_banned'), 'error');
+        const task = state.tasks.find(t => t.id === taskId);
+        if (!task) return;
+        if (currentUser.completedTasks[taskId]) return toast(t('msg_already_claimed'), 'warn');
+        if (currentUser.pendingTasks[taskId]) return toast(t('msg_task_pending'), 'warn');
+
+        // Open link
+        try {
+          if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openLink(task.link);
+          else window.open(task.link, '_blank');
+        } catch (e) { window.open(task.link, '_blank'); }
+
+        if (task.type === 'manual') {
+          pendingTask = taskId;
+          document.getElementById('proof-link').value = '';
+          openModal('modal-proof');
+        } else {
+          setTimeout(() => completeTask(task), 1200);
+        }
+      }
+
+      function submitProof() {
+        if (!pendingTask) return;
+        const link = document.getElementById('proof-link').value.trim();
+        if (!link || !/^https?:\/\//.test(link)) return toast(t('msg_invalid_input'), 'error');
+        const task = state.tasks.find(t => t.id === pendingTask);
+        if (!task) return;
+        currentUser.pendingTasks[task.id] = { link, at: now() };
+        saveUser();
+        closeModal('modal-proof');
+        toast(t('msg_task_pending'), 'info');
+        pendingTask = null;
+        renderTasks();
+        // Auto approve after 30s for demo
+        setTimeout(() => {
+          if (currentUser.pendingTasks[task.id]) {
+            delete currentUser.pendingTasks[task.id];
+            completeTask(task, true);
+          }
+        }, 30000);
+      }
+
+      function completeTask(task, silent) {
+        if (currentUser.completedTasks[task.id]) return;
+        // Reward user
+        const reward = Number(task.reward) || 0;
+        currentUser.balance += reward;
+        currentUser.totalEarned += reward;
+        currentUser.tasksCompleted = (currentUser.tasksCompleted || 0) + 1;
+        currentUser.completedTasks[task.id] = now();
+        task.filled += 1;
+        // Referral bonus
+        if (currentUser.referredBy) {
+          const refUser = state.users.find(u => u.referralCode === currentUser.referredBy);
+          if (refUser) {
+            const bonus = reward * (state.settings.referralBonus / 100);
+            refUser.balance = (refUser.balance || 0) + bonus;
+            refUser.totalEarned = (refUser.totalEarned || 0) + bonus;
+            state.transactions.push({ id: uid(), userId: refUser.id, type: 'referral', amount: bonus, status: 'done', note: 'عمولة إحالة', createdAt: now() });
+          }
+        }
+        // Transaction
+        state.transactions.push({ id: uid(), userId: currentUser.id, type: 'task', amount: reward, status: 'done', note: task.title, createdAt: now() });
+        saveUser();
+        if (!silent) toast(t('msg_task_claimed'));
+        renderAll();
+      }
+
+      // --- CAMPAIGN CREATION ---
+      function updateCampaignEstimates() {
+        const reward = parseFloat(document.getElementById('form-ad-reward').value) || 0;
+        const members = parseInt(document.getElementById('form-ad-members').value) || 0;
+        const total = reward * members * (1 + state.settings.commission / 100);
+        document.getElementById('calc-total-cost').textContent = fmt(total) + ' ₵';
+      }
+
+      function createCampaign() {
+        if (currentUser.banned) return toast(t('role_banned'), 'error');
+        const title = document.getElementById('form-ad-title').value.trim();
+        const link = document.getElementById('form-ad-link').value.trim();
+        const category = document.getElementById('form-ad-category').value;
+        const reward = parseFloat(document.getElementById('form-ad-reward').value) || 0;
+        const members = parseInt(document.getElementById('form-ad-members').value) || 0;
+        const type = document.getElementById('form-ad-type').value;
+        if (!title || !link || !/^https?:\/\//.test(link) || reward <= 0 || members < 1) {
+          return toast(t('msg_invalid_input'), 'error');
+        }
+        const total = reward * members * (1 + state.settings.commission / 100);
+        if (currentUser.balance < total) return toast(t('msg_insufficient'), 'error');
+
+        currentUser.balance -= total;
+        const campaign = {
+          id: uid(), title, title_en: title, link, category, reward, slots: members, filled: 0,
+          type, ownerId: currentUser.id, active: true, createdAt: now()
+        };
+        state.campaigns.push(campaign);
+        state.tasks.push(campaign);
+        state.transactions.push({ id: uid(), userId: currentUser.id, type: 'campaign', amount: -total, status: 'done', note: 'نشر حملة: ' + title, createdAt: now() });
+        saveUser();
+        toast(t('msg_campaign_created'));
+        // reset
+        document.getElementById('form-ad-title').value = '';
+        document.getElementById('form-ad-link').value = '';
+        renderAll();
+      }
+
+      function deleteCampaign(id) {
+        if (!confirm(t('confirm_delete'))) return;
+        const c = state.campaigns.find(x => x.id === id);
+        if (c && c.ownerId === currentUser.id) {
+          c.active = false;
+          const tsk = state.tasks.find(x => x.id === id);
+          if (tsk) tsk.active = false;
+          save();
+          toast(t('msg_saved'));
+          renderAll();
+        }
+      }
+
+      // --- DEPOSIT / WITHDRAW ---
+      function submitDeposit() {
+        const amount = parseFloat(document.getElementById('deposit-amount').value) || 0;
+        const method = document.getElementById('deposit-method').value;
+        if (amount <= 0) return toast(t('msg_invalid_input'), 'error');
+        state.deposits.push({ id: uid(), userId: currentUser.id, amount, method, status: 'pending', createdAt: now() });
+        state.transactions.push({ id: uid(), userId: currentUser.id, type: 'deposit', amount: amount, status: 'pending', note: 'شحن رصيد (' + method + ')', createdAt: now() });
+        // Demo: auto approve
+        setTimeout(() => {
+          const dep = state.deposits.find(d => d.userId === currentUser.id && d.status === 'pending');
+          if (dep) {
+            dep.status = 'approved';
+            currentUser.balance += dep.amount;
+            currentUser.totalEarned += dep.amount;
+            const tx = state.transactions.find(tr => tr.userId === currentUser.id && tr.type === 'deposit' && tr.status === 'pending');
+            if (tx) tx.status = 'done';
+            saveUser();
+            toast('تم إضافة الرصيد ✓');
+            renderAll();
+          }
+        }, 3000);
+        closeModal('modal-deposit');
+        toast(t('msg_deposit_submitted'), 'info');
+        renderAll();
+      }
+
+      function submitWithdraw() {
+        const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
+        const method = document.getElementById('withdraw-method').value;
+        const address = document.getElementById('withdraw-address').value.trim();
+        if (amount <= 0 || !address) return toast(t('msg_invalid_input'), 'error');
+        if (amount < state.settings.minWithdraw) return toast(t('msg_min_withdraw') + state.settings.minWithdraw + ' ₵', 'error');
+        if (currentUser.balance < amount) return toast(t('msg_insufficient'), 'error');
+        currentUser.balance -= amount;
+        currentUser.pendingWithdraw += amount;
+        const wd = { id: uid(), userId: currentUser.id, amount, method, address, status: 'pending', createdAt: now() };
+        state.withdrawals.push(wd);
+        state.transactions.push({ id: uid(), userId: currentUser.id, type: 'withdraw', amount: -amount, status: 'pending', note: 'سحب أرباح', createdAt: now() });
+        saveUser();
+        closeModal('modal-withdraw');
+        toast(t('msg_withdraw_submitted'), 'info');
+        renderAll();
+      }
+
+      // --- REFERRAL ---
+      function copyReferral() {
+        const input = document.getElementById('referral-link-input');
+        input.select();
+        input.setSelectionRange(0, 99999);
+        try {
+          if (navigator.clipboard) navigator.clipboard.writeText(input.value);
+          else document.execCommand('copy');
+          toast(t('msg_copied'));
+        } catch (e) {
+          toast(t('msg_copied'));
+        }
+      }
+
+      // --- ADMIN ---
+      function renderAdmin() {
+        if (!isAdmin(currentUser)) return;
+        const totalUsers = state.users.length;
+        const totalBalance = state.users.reduce((s, u) => s + (Number(u.balance) || 0), 0);
+        const pendingWd = state.withdrawals.filter(w => w.status === 'pending').length;
+        const activeTasks = state.tasks.filter(t => t.active).length;
+        document.getElementById('admin-stat-users').textContent = totalUsers;
+        document.getElementById('admin-stat-balance').textContent = fmt(totalBalance);
+        document.getElementById('admin-stat-withdrawals').textContent = pendingWd;
+        document.getElementById('admin-stat-tasks').textContent = activeTasks;
+        renderAdminUsers();
+        renderAdminWithdrawals();
+        renderAdminTasks();
+        renderAdminSettings();
+      }
+
+      function renderAdminUsers() {
+        const container = document.getElementById('admin-users-feed');
+        const q = (document.getElementById('admin-user-search').value || '').toLowerCase();
+        let users = state.users.slice().reverse();
+        if (q) users = users.filter(u => (u.firstName + ' ' + (u.lastName || '')).toLowerCase().includes(q) || (u.username || '').toLowerCase().includes(q) || String(u.id).includes(q));
+        if (users.length === 0) { container.innerHTML = `<div class="empty-state">${t('empty_users')}</div>`; return; }
+        container.innerHTML = users.slice(0, 100).map(u => `
+          <div class="list-item">
+            <div class="flex-between mb-2">
+              <div>
+                <div class="font-bold text-sm">${esc(u.firstName)} ${esc(u.lastName || '')}</div>
+                <div class="text-xs text-muted">@${esc(u.username || '—')} • #${u.id}</div>
+              </div>
+              <div class="text-c font-bold text-sm">${fmt(u.balance)} ₵</div>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn btn-xs btn-ghost" onclick="Engine.adminEditUser('${u.id}')">💰 تعديل</button>
+              <button class="btn btn-xs ${u.banned ? 'btn-outline' : 'btn-danger'}" onclick="Engine.adminToggleBan('${u.id}')">${u.banned ? 'فك الحظر' : 'حظر'}</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function adminEditUser(userId) {
+        const u = state.users.find(x => String(x.id) === String(userId));
+        if (!u) return;
+        editingUserId = u.id;
+        document.getElementById('edit-user-id').value = u.id;
+        document.getElementById('edit-user-balance-adjust').value = '';
+        openModal('modal-ad-edit');
+      }
+
+      function adminApplyUserEdit() {
+        const u = state.users.find(x => String(x.id) === String(editingUserId));
+        if (!u) return;
+        const adj = parseFloat(document.getElementById('edit-user-balance-adjust').value) || 0;
+        u.balance = (Number(u.balance) || 0) + adj;
+        if (adj > 0) u.totalEarned = (Number(u.totalEarned) || 0) + adj;
+        if (String(u.id) === String(currentUser.id)) {
+          currentUser.balance = u.balance;
+          currentUser.totalEarned = u.totalEarned;
+          saveUser();
+        }
+        save();
+        closeModal('modal-ad-edit');
+        toast(t('msg_saved'));
+        renderAll();
+      }
+
+      function adminToggleBan(userId) {
+        const u = state.users.find(x => String(x.id) === String(userId));
+        if (!u) return;
+        u.banned = !u.banned;
+        if (String(u.id) === String(currentUser.id)) currentUser.banned = u.banned;
+        save();
+        toast(u.banned ? 'تم الحظر' : 'تم فك الحظر', u.banned ? 'error' : 'success');
+        renderAdmin();
+      }
+
+      function renderAdminWithdrawals() {
+        const container = document.getElementById('admin-withdrawals-feed');
+        const wds = state.withdrawals.slice().reverse();
+        if (wds.length === 0) { container.innerHTML = `<div class="empty-state">${t('empty_withdrawals')}</div>`; return; }
+        container.innerHTML = wds.slice(0, 100).map(w => {
+          const u = state.users.find(x => x.id === w.userId);
+          const badge = w.status === 'pending' ? `<span class="badge badge-warn">معلق</span>` : w.status === 'approved' ? `<span class="badge badge-primary">موافق</span>` : `<span class="badge badge-danger">مرفوض</span>`;
+          return `
+            <div class="list-item">
+              <div class="flex-between mb-2">
+                <div>
+                  <div class="font-bold text-sm">${fmt(w.amount)} ₵ - ${esc(w.method)}</div>
+                  <div class="text-xs text-muted">${esc(u ? u.firstName + ' @' + (u.username || '—') : 'Unknown')}</div>
+                </div>
+                ${badge}
+              </div>
+              <div class="text-xs text-muted mb-2" style="word-break:break-all;">📮 ${esc(w.address)}</div>
+              <div class="text-xs text-muted mb-2">${fmtDate(w.createdAt)}</div>
+              ${w.status === 'pending' ? `
+                <div class="flex gap-2">
+                  <button class="btn btn-xs" onclick="Engine.adminApproveWithdraw('${w.id}')">✓ موافقة</button>
+                  <button class="btn btn-xs btn-danger" onclick="Engine.adminRejectWithdraw('${w.id}')">✗ رفض</button>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      function adminApproveWithdraw(id) {
+        const w = state.withdrawals.find(x => x.id === id);
+        if (!w || w.status !== 'pending') return;
+        w.status = 'approved';
+        const u = state.users.find(x => x.id === w.userId);
+        if (u) {
+          u.pendingWithdraw = Math.max(0, (Number(u.pendingWithdraw) || 0) - w.amount);
+          if (String(u.id) === String(currentUser.id)) currentUser.pendingWithdraw = u.pendingWithdraw;
+        }
+        const tx = state.transactions.find(tr => tr.userId === w.userId && tr.type === 'withdraw' && tr.status === 'pending' && Math.abs(tr.amount) === w.amount);
+        if (tx) tx.status = 'done';
+        save();
+        toast(t('msg_saved'));
+        renderAll();
+      }
+
+      function adminRejectWithdraw(id) {
+        const w = state.withdrawals.find(x => x.id === id);
+        if (!w || w.status !== 'pending') return;
+        w.status = 'rejected';
+        const u = state.users.find(x => x.id === w.userId);
+        if (u) {
+          u.balance = (Number(u.balance) || 0) + w.amount;
+          u.pendingWithdraw = Math.max(0, (Number(u.pendingWithdraw) || 0) - w.amount);
+          if (String(u.id) === String(currentUser.id)) {
+            currentUser.balance = u.balance;
+            currentUser.pendingWithdraw = u.pendingWithdraw;
+          }
+        }
+        const tx = state.transactions.find(tr => tr.userId === w.userId && tr.type === 'withdraw' && tr.status === 'pending' && Math.abs(tr.amount) === w.amount);
+        if (tx) tx.status = 'rejected';
+        save();
+        toast('تم الرفض', 'warn');
+        renderAll();
+      }
+
+      function adminAddTask() {
+        const title = document.getElementById('admin-task-title').value.trim();
+        const link = document.getElementById('admin-task-link').value.trim();
+        const reward = parseFloat(document.getElementById('admin-task-reward').value) || 0;
+        const slots = parseInt(document.getElementById('admin-task-slots').value) || 0;
+        const category = document.getElementById('admin-task-category').value;
+        if (!title || !link || reward <= 0 || slots <= 0) return toast(t('msg_invalid_input'), 'error');
+        const task = { id: uid(), title, title_en: title, link, category, reward, slots, filled: 0, type: 'auto', ownerId: 'system', active: true, createdAt: now(), completions: [] };
+        state.tasks.push(task);
+        save();
+        toast(t('msg_saved'));
+        document.getElementById('admin-task-title').value = '';
+        document.getElementById('admin-task-link').value = '';
+        renderAll();
+      }
+
+      function renderAdminTasks() {
+        const container = document.getElementById('admin-tasks-feed');
+        const tasks = state.tasks.slice().reverse();
+        if (tasks.length === 0) { container.innerHTML = `<div class="empty-state">${t('empty_tasks')}</div>`; return; }
+        container.innerHTML = tasks.slice(0, 60).map(task => `
+          <div class="list-item">
+            <div class="flex-between mb-2">
+              <strong class="text-sm">${esc(task.title)}</strong>
+              <span class="badge badge-primary">${fmt(task.reward)} ₵</span>
+            </div>
+            <div class="flex-between text-xs text-muted mb-2">
+              <span>${esc(task.category)} • ${task.filled}/${task.slots}</span>
+              <span>${task.active ? '✅' : '⛔'}</span>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn btn-xs btn-ghost" onclick="Engine.adminToggleTask('${task.id}')">${task.active ? 'تعطيل' : 'تفعيل'}</button>
+              <button class="btn btn-xs btn-danger" onclick="Engine.adminDeleteTask('${task.id}')">حذف</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function adminToggleTask(id) {
+        const task = state.tasks.find(x => x.id === id);
+        if (!task) return;
+        task.active = !task.active;
+        save();
+        renderAll();
+      }
+
+      function adminDeleteTask(id) {
+        if (!confirm(t('confirm_delete'))) return;
+        state.tasks = state.tasks.filter(x => x.id !== id);
+        state.campaigns = state.campaigns.filter(x => x.id !== id);
+        save();
+        toast(t('msg_saved'));
+        renderAll();
+      }
+
+      function renderAdminSettings() {
+        document.getElementById('setting-usdt-rate').value = state.settings.usdtRate;
+        document.getElementById('setting-commission').value = state.settings.commission;
+        document.getElementById('setting-min-withdraw').value = state.settings.minWithdraw;
+        document.getElementById('setting-referral-bonus').value = state.settings.referralBonus;
+      }
+
+      function adminSaveSettings() {
+        state.settings.usdtRate = parseFloat(document.getElementById('setting-usdt-rate').value) || 0.00045;
+        state.settings.commission = parseFloat(document.getElementById('setting-commission').value) || 25;
+        state.settings.minWithdraw = parseFloat(document.getElementById('setting-min-withdraw').value) || 5;
+        state.settings.referralBonus = parseFloat(document.getElementById('setting-referral-bonus').value) || 10;
+        save();
+        toast(t('msg_saved'));
+        renderAll();
+      }
+
+      function adminResetAll() {
+        if (!confirm('سيتم حذف جميع البيانات! هل أنت متأكد؟')) return;
+        try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(USER_KEY); } catch (e) {}
+        location.reload();
+      }
+
+      function adminBroadcast() {
+        const text = document.getElementById('admin-broadcast-text').value.trim();
+        if (!text) return toast(t('msg_invalid_input'), 'error');
+        state.notifications.push({ id: uid(), text, at: now() });
+        save();
+        toast('تم إرسال الإشعار لجميع المستخدمين ✓');
+        document.getElementById('admin-broadcast-text').value = '';
+      }
+
+      // --- PUBLIC API ---
+      return {
+        init,
+        toggleLang,
+        openModal,
+        closeModal,
+        renderTasks,
+        startTask,
+        submitProof,
+        updateCampaignEstimates,
+        createCampaign,
+        deleteCampaign,
+        submitDeposit,
+        submitWithdraw,
+        copyReferral,
+        renderAdmin,
+        renderAdminUsers,
+        adminEditUser,
+        adminApplyUserEdit,
+        adminToggleBan,
+        adminApproveWithdraw,
+        adminRejectWithdraw,
+        adminAddTask,
+        adminToggleTask,
+        adminDeleteTask,
+        adminSaveSettings,
+        adminResetAll,
+        adminBroadcast
+      };
+    })();
+
+    // --- BOOT ---
+    document.addEventListener('DOMContentLoaded', () => {
+      Engine.init();
+    });
+  </script>
+</body>
+  </html>
