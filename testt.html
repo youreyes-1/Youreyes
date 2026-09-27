@@ -1,353 +1,487 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" id="app-root">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Dollar C - Supreme Enterprise Platform v2.0</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-/* ═══════════════════════════════════════════════════════════
-   CORE DESIGN SYSTEM — الأصلية + محسّنة
-   ═══════════════════════════════════════════════════════════ */
-:root{
-  --c-primary:#10b981;--c-primary-hover:#059669;--c-primary-alpha:rgba(16,185,129,.15);
-  --c-primary-glow:rgba(16,185,129,.35);--c-bg-main:#070d17;--c-bg-surface:#111a2d;
-  --c-bg-surface-elevated:#1a263f;--c-border:#1f2d4a;--c-border-light:rgba(255,255,255,.08);
-  --c-text-main:#f8fafc;--c-text-muted:#8492a6;--c-danger:#ef4444;
-  --c-danger-alpha:rgba(239,68,68,.15);--c-warn:#f59e0b;--c-warn-alpha:rgba(245,158,11,.15);
-  --c-info:#3b82f6;--c-info-alpha:rgba(59,130,246,.15);
-  --c-purple:#8b5cf6;--c-purple-alpha:rgba(139,92,246,.15);
-  --c-gold:#fbbf24;--c-gold-alpha:rgba(251,191,36,.15);
-  --font-stack:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --radius-sm:8px;--radius-md:14px;--radius-lg:22px;--radius-full:9999px;
-  --shadow-sm:0 2px 6px rgba(0,0,0,.25);--shadow-md:0 8px 24px rgba(0,0,0,.35);
-  --shadow-lg:0 16px 40px rgba(0,0,0,.55);--trans-fast:.15s ease;
-  --trans-normal:.3s cubic-bezier(.4,0,.2,1)
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font-stack);-webkit-tap-highlight-color:transparent}
-body{background-color:var(--c-bg-main);color:var(--c-text-main);padding-bottom:95px;
-  overflow-x:hidden;min-height:100vh;line-height:1.5}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dollar C - Supreme Enterprise Platform</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-/* ═══ Utility Classes — الأصلية ═══ */
-.hidden{display:none!important}.flex{display:flex}.flex-col{display:flex;flex-direction:column}
-.flex-row{display:flex;flex-direction:row}.flex-between{display:flex;justify-content:space-between;align-items:center}
-.flex-center{display:flex;justify-content:center;align-items:center}.flex-wrap{display:flex;flex-wrap:wrap}
-.gap-1{gap:4px}.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}
-.mt-1{margin-top:4px}.mt-2{margin-top:8px}.mt-3{margin-top:12px}.mt-4{margin-top:16px}
-.mb-1{margin-bottom:4px}.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}
-.p-2{padding:8px}.p-3{padding:12px}.p-4{padding:16px}.w-full{width:100%}
-.text-center{text-align:center}.text-right{text-align:right}.text-left{text-align:left}
-.text-c{color:var(--c-primary)}.text-danger{color:var(--c-danger)}.text-warn{color:var(--c-warn)}
-.text-info{color:var(--c-info)}.text-muted{color:var(--c-text-muted)}.text-gold{color:var(--c-gold)}
-.text-purple{color:var(--c-purple)}
-.text-xs{font-size:11px}.text-sm{font-size:13px}.text-base{font-size:15px}
-.text-lg{font-size:18px}.text-xl{font-size:22px}.font-bold{font-weight:700}.font-black{font-weight:900}
+  <style>
+    :root {
+      --c-primary: #10b981;
+      --c-primary-hover: #059669;
+      --c-primary-alpha: rgba(16, 185, 129, 0.15);
+      --c-primary-glow: rgba(16, 185, 129, 0.35);
+      --c-bg-main: #070d17;
+      --c-bg-surface: #111a2d;
+      --c-bg-surface-elevated: #1a263f;
+      --c-border: #1f2d4a;
+      --c-border-light: rgba(255, 255, 255, 0.08);
+      --c-text-main: #f8fafc;
+      --c-text-muted: #8492a6;
+      --c-danger: #ef4444;
+      --c-danger-alpha: rgba(239, 68, 68, 0.15);
+      --c-warn: #f59e0b;
+      --c-warn-alpha: rgba(245, 158, 11, 0.15);
+      --c-info: #3b82f6;
+      --c-info-alpha: rgba(59, 130, 246, 0.15);
+      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55);
+      --trans-fast: 0.15s ease;
+      --trans-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-/* ═══ Sticky Header — الأصلية ═══ */
-.app-header{background:rgba(17,26,45,.85);backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);padding:14px 18px;position:sticky;top:0;z-index:60;
-  border-bottom:1px solid var(--c-border);box-shadow:var(--shadow-sm)}
-.user-avatar{width:44px;height:44px;border-radius:var(--radius-full);
-  background:linear-gradient(135deg,var(--c-primary),#0284c7);color:#fff;font-size:18px;
-  font-weight:800;box-shadow:0 4px 14px var(--c-primary-alpha);
-  border:2px solid rgba(255,255,255,.1);overflow:hidden}
-.user-avatar img{width:100%;height:100%;object-fit:cover}
-.balance-pill{background:var(--c-primary-alpha);color:var(--c-primary);padding:6px 14px;
-  border-radius:var(--radius-full);font-weight:800;font-size:14px;
-  border:1px solid var(--c-primary-glow);display:inline-flex;align-items:center;gap:6px}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-stack);
+      -webkit-tap-highlight-color: transparent;
+    }
 
-/* ═══ Views Controller — الأصلية ═══ */
-.view-container{display:none;padding:16px;animation:viewSlide .35s cubic-bezier(.16,1,.3,1) forwards}
-.view-container.active{display:block}
-@keyframes viewSlide{from{opacity:0;transform:translateY(18px) scale(.98)}
-  to{opacity:1;transform:translateY(0) scale(1)}}
+    body {
+      background-color: var(--c-bg-main);
+      color: var(--c-text-main);
+      padding-bottom: 95px;
+      overflow-x: hidden;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
 
-/* ═══ Cards — الأصلية ═══ */
-.card{background:var(--c-bg-surface);border-radius:var(--radius-md);padding:18px;
-  margin-bottom:16px;border:1px solid var(--c-border);box-shadow:var(--shadow-sm);
-  transition:var(--trans-fast)}
-.card-elevated{background:var(--c-bg-surface-elevated);border:1px solid var(--c-border-light)}
-.card-header{font-size:16px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;
-  gap:8px;color:var(--c-text-main);border-bottom:1px solid var(--c-border);padding-bottom:10px}
+    /* Core Utility Classes */
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .flex-col { display: flex; flex-direction: column; }
+    .flex-row { display: flex; flex-direction: row; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .flex-center { display: flex; justify-content: center; align-items: center; }
+    .gap-1 { gap: 4px; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .gap-4 { gap: 16px; }
+    .mt-1 { margin-top: 4px; }
+    .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 12px; }
+    .mt-4 { margin-top: 16px; }
+    .mb-1 { margin-bottom: 4px; }
+    .mb-2 { margin-bottom: 8px; }
+    .mb-3 { margin-bottom: 12px; }
+    .mb-4 { margin-bottom: 16px; }
+    .p-2 { padding: 8px; }
+    .p-3 { padding: 12px; }
+    .p-4 { padding: 16px; }
+    .w-full { width: 100%; }
+    .text-center { text-align: center; }
+    .text-c { color: var(--c-primary); }
+    .text-danger { color: var(--c-danger); }
+    .text-warn { color: var(--c-warn); }
+    .text-info { color: var(--c-info); }
+    .text-muted { color: var(--c-text-muted); }
+    .text-xs { font-size: 11px; }
+    .text-sm { font-size: 13px; }
+    .text-base { font-size: 15px; }
+    .text-lg { font-size: 18px; }
+    .text-xl { font-size: 22px; }
+    .font-bold { font-weight: 700; }
+    .font-black { font-weight: 900; }
 
-/* ═══ Hero Balance — الأصلية ═══ */
-.balance-master{background:linear-gradient(135deg,#063d2e,#0c2b22 60%,#0d1e34);
-  text-align:center;padding:30px 18px;border-radius:var(--radius-lg);position:relative;
-  overflow:hidden;border:1px solid var(--c-primary);
-  box-shadow:0 12px 35px var(--c-primary-alpha);margin-bottom:20px}
-.balance-master::after{content:"";position:absolute;width:250px;height:250px;
-  background:radial-gradient(circle,rgba(16,185,129,.2) 0%,transparent 70%);
-  top:-100px;left:-80px;pointer-events:none}
-.balance-master h1{font-size:46px;font-weight:900;margin:8px 0;
-  letter-spacing:-1.5px;color:#fff;text-shadow:0 4px 12px rgba(0,0,0,.4)}
+    /* Sticky Navigation Header */
+    .app-header {
+      background: rgba(17, 26, 45, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 14px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      border-bottom: 1px solid var(--c-border);
+      box-shadow: var(--shadow-sm);
+    }
 
-/* ═══ Inputs — الأصلية ═══ */
-.input-group{margin-bottom:14px}
-.input-label{display:block;margin-bottom:6px;font-size:13px;color:var(--c-text-muted);font-weight:600}
-input,textarea,select{width:100%;padding:14px 16px;background:rgba(7,13,23,.7);
-  border:1px solid var(--c-border);color:#fff;border-radius:var(--radius-sm);outline:none;
-  transition:var(--trans-fast);font-size:14px;font-family:inherit}
-input:focus,textarea:focus,select:focus{border-color:var(--c-primary);
-  box-shadow:0 0 0 3px var(--c-primary-alpha)}
-select option{background:var(--c-bg-surface);color:#fff}
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--c-primary), #0284c7);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      box-shadow: 0 4px 14px var(--c-primary-alpha);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
 
-/* ═══ Buttons — الأصلية + إضافات ═══ */
-.btn{background:var(--c-primary);color:#fff;border:none;padding:14px 20px;
-  border-radius:var(--radius-sm);font-weight:800;font-size:14px;cursor:pointer;width:100%;
-  transition:var(--trans-fast);display:inline-flex;justify-content:center;align-items:center;
-  gap:8px;text-transform:uppercase;letter-spacing:.5px}
-.btn:active{transform:scale(.97);opacity:.9}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.btn-danger{background:var(--c-danger)}.btn-danger:active{background:#dc2626}
-.btn-warn{background:var(--c-warn);color:#000}
-.btn-info{background:var(--c-info)}
-.btn-purple{background:var(--c-purple)}
-.btn-outline{background:transparent;border:2px solid var(--c-primary);color:var(--c-primary)}
-.btn-outline:active{background:var(--c-primary-alpha)}
-.btn-outline-danger{background:transparent;border:2px solid var(--c-danger);color:var(--c-danger)}
-.btn-outline-danger:active{background:var(--c-danger-alpha)}
-.btn-outline-warn{background:transparent;border:2px solid var(--c-warn);color:var(--c-warn)}
-.btn-outline-warn:active{background:var(--c-warn-alpha)}
-.btn-sm{padding:8px 14px;font-size:12px;width:auto;border-radius:6px}
-.btn-xs{padding:5px 10px;font-size:10px;width:auto;border-radius:5px}
-.btn-block{width:100%}
+    .balance-pill {
+      background: var(--c-primary-alpha);
+      color: var(--c-primary);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-weight: 800;
+      font-size: 14px;
+      border: 1px solid var(--c-primary-glow);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-/* ═══ List Items — الأصلية ═══ */
-.list-item{background:rgba(7,13,23,.45);border:1px solid var(--c-border);
-  padding:14px 16px;border-radius:var(--radius-sm);margin-bottom:10px;transition:var(--trans-fast)}
-.list-item:hover{border-color:rgba(255,255,255,.15);background:rgba(7,13,23,.7)}
+    /* Screen Views Controller */
+    .view-container {
+      display: none;
+      padding: 16px;
+      animation: viewSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .view-container.active {
+      display: block;
+    }
+    @keyframes viewSlide {
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
 
-/* ═══ Badges — الأصلية + إضافات ═══ */
-.badge{display:inline-flex;align-items:center;padding:3px 8px;
-  border-radius:var(--radius-full);font-size:11px;font-weight:700}
-.badge-primary{background:var(--c-primary-alpha);color:var(--c-primary)}
-.badge-danger{background:var(--c-danger-alpha);color:var(--c-danger)}
-.badge-warn{background:var(--c-warn-alpha);color:var(--c-warn)}
-.badge-info{background:var(--c-info-alpha);color:var(--c-info)}
-.badge-purple{background:var(--c-purple-alpha);color:var(--c-purple)}
-.badge-gold{background:var(--c-gold-alpha);color:var(--c-gold)}
+    /* Card Panels */
+    .card {
+      background: var(--c-bg-surface);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin-bottom: 16px;
+      border: 1px solid var(--c-border);
+      box-shadow: var(--shadow-sm);
+      transition: var(--trans-fast);
+    }
+    .card-header {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--c-text-main);
+      border-bottom: 1px solid var(--c-border);
+      padding-bottom: 10px;
+    }
 
-/* ═══ Empty State — الأصلية ═══ */
-.empty-state{text-align:center;padding:40px 16px;color:var(--c-text-muted);
-  border:2px dashed var(--c-border);border-radius:var(--radius-md);font-size:13px}
+    /* Hero Balance Card */
+    .balance-master {
+      background: linear-gradient(135deg, #063d2e, #0c2b22 60%, #0d1e34);
+      text-align: center;
+      padding: 30px 18px;
+      border-radius: var(--radius-lg);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--c-primary);
+      box-shadow: 0 12px 35px var(--c-primary-alpha);
+      margin-bottom: 20px;
+    }
+    .balance-master::after {
+      content: "";
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
+      top: -100px;
+      left: -80px;
+      pointer-events: none;
+    }
+    .balance-master h1 {
+      font-size: 46px;
+      font-weight: 900;
+      margin: 8px 0;
+      letter-spacing: -1.5px;
+      color: #ffffff;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
 
-/* ═══ Modals — الأصلية ═══ */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:1000;
-  display:flex;justify-content:center;align-items:center;padding:18px;opacity:0;
-  pointer-events:none;transition:var(--trans-normal)}
-.modal-overlay.active{opacity:1;pointer-events:auto}
-.modal-content{background:var(--c-bg-surface);width:100%;max-width:440px;
-  border-radius:var(--radius-lg);padding:24px;transform:translateY(30px) scale(.96);
-  transition:var(--trans-normal);border:1px solid var(--c-border);
-  box-shadow:var(--shadow-lg);max-height:85vh;overflow-y:auto}
-.modal-overlay.active .modal-content{transform:translateY(0) scale(1)}
+    /* Inputs, Textareas, Selects */
+    .input-group { margin-bottom: 14px; }
+    .input-label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--c-text-muted); font-weight: 600; }
+    input, textarea, select {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(7, 13, 23, 0.7);
+      border: 1px solid var(--c-border);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: var(--trans-fast);
+      font-size: 14px;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 3px var(--c-primary-alpha);
+    }
+    select option { background: var(--c-bg-surface); color: #fff; }
 
-/* ═══ Toasts — الأصلية ═══ */
-.toast-container{position:fixed;top:18px;left:50%;transform:translateX(-50%);
-  z-index:9999;display:flex;flex-direction:column;gap:8px;width:90%;max-width:380px;
-  pointer-events:none}
-.toast{background:var(--c-bg-surface-elevated);color:#fff;padding:14px 18px;
-  border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);display:flex;align-items:center;
-  gap:12px;font-weight:600;font-size:13px;border-left:4px solid var(--c-primary);
-  animation:toastShow .3s cubic-bezier(.175,.885,.32,1.275) forwards}
-.toast.error{border-left-color:var(--c-danger)}.toast.warn{border-left-color:var(--c-warn)}
-.toast.info{border-left-color:var(--c-info)}.toast.fade-out{animation:toastHide .3s ease forwards}
-@keyframes toastShow{from{opacity:0;transform:translateY(-20px) scale(.9)}
-  to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes toastHide{from{opacity:1;transform:translateY(0) scale(1)}
-  to{opacity:0;transform:translateY(-20px) scale(.9)}}
+    /* Interactive Buttons */
+    .btn {
+      background: var(--c-primary);
+      color: #fff;
+      border: none;
+      padding: 14px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      transition: var(--trans-fast);
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn:active { transform: scale(0.97); opacity: 0.9; }
+    .btn-danger { background: var(--c-danger); }
+    .btn-warn { background: var(--c-warn); color: #000; }
+    .btn-outline { background: transparent; border: 2px solid var(--c-primary); color: var(--c-primary); }
+    .btn-outline:active { background: var(--c-primary-alpha); }
+    .btn-sm { padding: 8px 14px; font-size: 12px; width: auto; border-radius: 6px; }
 
-/* ═══ Admin Subnav — الأصلية + محسّنة ═══ */
-.admin-subnav{display:flex;background:rgba(0,0,0,.4);border-radius:var(--radius-sm);
-  padding:4px;margin-bottom:16px;overflow-x:auto;gap:4px;scrollbar-width:none}
-.admin-subnav::-webkit-scrollbar{display:none}
-.admin-tab-btn{flex:1;text-align:center;padding:10px 10px;font-size:12px;font-weight:700;
-  color:var(--c-text-muted);cursor:pointer;border-radius:6px;transition:var(--trans-fast);
-  white-space:nowrap;background:transparent;border:none;font-family:inherit;min-width:80px}
-.admin-tab-btn.active{background:var(--c-primary);color:#fff}
-.admin-panel-section{display:none}.admin-panel-section.active{display:block}
+    /* List Items & Badges */
+    .list-item {
+      background: rgba(7, 13, 23, 0.45);
+      border: 1px solid var(--c-border);
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 10px;
+      transition: var(--trans-fast);
+    }
+    .list-item:hover { border-color: rgba(255, 255, 255, 0.15); background: rgba(7, 13, 23, 0.7); }
+    .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; }
+    .badge-primary { background: var(--c-primary-alpha); color: var(--c-primary); }
+    .badge-danger { background: var(--c-danger-alpha); color: var(--c-danger); }
+    .badge-warn { background: var(--c-warn-alpha); color: var(--c-warn); }
+    .badge-info { background: var(--c-info-alpha); color: var(--c-info); }
 
-/* ═══ Bottom Nav — الأصلية + زر أدمن ═══ */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(17,26,45,.95);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border-top:1px solid var(--c-border);display:flex;justify-content:space-around;
-  padding:10px 0 20px;z-index:500}
-.nav-btn{background:none;border:none;color:var(--c-text-muted);display:flex;
-  flex-direction:column;align-items:center;font-size:11px;gap:4px;cursor:pointer;
-  transition:var(--trans-fast);font-weight:700;flex:1;font-family:inherit;position:relative}
-.nav-btn.active{color:var(--c-primary);transform:translateY(-2px)}
-.nav-btn svg{width:22px;height:22px;fill:currentColor}
-.nav-badge{position:absolute;top:-4px;right:calc(50% - 18px);background:var(--c-danger);
-  color:#fff;font-size:9px;font-weight:900;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center}
+    .empty-state { text-align: center; padding: 40px 16px; color: var(--c-text-muted); border: 2px dashed var(--c-border); border-radius: var(--radius-md); font-size: 13px; }
 
-/* ═══ KPI Grid — جديدة ═══ */
-.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
-.kpi-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.kpi{background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(16,185,129,.02));
-  border:1px solid var(--c-border);border-radius:var(--radius-sm);padding:12px;text-align:center}
-.kpi .kpi-val{font-size:20px;font-weight:900;color:var(--c-primary)}
-.kpi .kpi-lbl{font-size:11px;color:var(--c-text-muted);font-weight:600;margin-top:2px}
-.kpi.kpi-warn{background:linear-gradient(135deg,var(--c-warn-alpha),transparent)}
-.kpi.kpi-warn .kpi-val{color:var(--c-warn)}
-.kpi.kpi-danger{background:linear-gradient(135deg,var(--c-danger-alpha),transparent)}
-.kpi.kpi-danger .kpi-val{color:var(--c-danger)}
-.kpi.kpi-info{background:linear-gradient(135deg,var(--c-info-alpha),transparent)}
-.kpi.kpi-info .kpi-val{color:var(--c-info)}
-.kpi.kpi-purple{background:linear-gradient(135deg,var(--c-purple-alpha),transparent)}
-.kpi.kpi-purple .kpi-val{color:var(--c-purple)}
+    /* Modal Popups Overlay */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px); z-index: 1000; display: flex; justify-content: center; align-items: center;
+      padding: 18px; opacity: 0; pointer-events: none; transition: var(--trans-normal);
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-content {
+      background: var(--c-bg-surface); width: 100%; max-width: 440px; border-radius: var(--radius-lg); padding: 24px;
+      transform: translateY(30px) scale(0.96); transition: var(--trans-normal); border: 1px solid var(--c-border);
+      box-shadow: var(--shadow-lg); max-height: 85vh; overflow-y: auto;
+    }
+    .modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
 
-/* ═══ Address Box — جديدة ═══ */
-.addr-box{font-family:'Courier New',monospace;font-size:11px;background:rgba(0,0,0,.5);
-  padding:10px;border-radius:6px;border:1px dashed var(--c-border);word-break:break-all;
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  direction:ltr;text-align:left}
-.addr-box .addr-txt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.copy-btn{background:var(--c-primary-alpha);color:var(--c-primary);
-  border:1px solid var(--c-primary-glow);padding:4px 10px;border-radius:6px;
-  font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
-.copy-btn:active{background:var(--c-primary);color:#fff}
+    /* Notification Toasts */
+    .toast-container {
+      position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column;
+      gap: 8px; width: 90%; max-width: 380px; pointer-events: none;
+    }
+    .toast {
+      background: var(--c-bg-surface-elevated); color: #fff; padding: 14px 18px; border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 13px;
+      border-left: 4px solid var(--c-primary); animation: toastShow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .toast.error { border-left-color: var(--c-danger); }
+    .toast.warn { border-left-color: var(--c-warn); }
+    .toast.fade-out { animation: toastHide 0.3s ease forwards; }
+    @keyframes toastShow { from { opacity: 0; transform: translateY(-20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes toastHide { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.9); } }
 
-/* ═══ Progress Bar — جديدة ═══ */
-.progress{height:8px;background:rgba(0,0,0,.4);border-radius:4px;overflow:hidden;margin-top:6px}
-.progress-bar{height:100%;background:linear-gradient(90deg,var(--c-primary),#34d399);
-  border-radius:4px;transition:width .4s ease}
+    /* Admin Sub-Tabs */
+    .admin-subnav {
+      display: flex; background: rgba(0, 0, 0, 0.4); border-radius: var(--radius-sm); padding: 4px;
+      margin-bottom: 16px; overflow-x: auto; gap: 4px;
+    }
+    .admin-tab-btn {
+      flex: 1; text-align: center; padding: 10px 8px; font-size: 12px; font-weight: 700; color: var(--c-text-muted);
+      cursor: pointer; border-radius: 6px; transition: var(--trans-fast); white-space: nowrap; background: transparent; border: none;
+    }
+    .admin-tab-btn.active { background: var(--c-primary); color: #fff; }
+    .admin-panel-section { display: none; }
+    .admin-panel-section.active { display: block; }
 
-/* ═══ Toggle Switch — جديدة ═══ */
-.switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
-.switch input{opacity:0;width:0;height:0}
-.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;
-  background:#2a3a5c;transition:.3s;border-radius:24px}
-.slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;
-  background:#fff;transition:.3s;border-radius:50%}
-input:checked+.slider{background:var(--c-primary)}
-input:checked+.slider:before{transform:translateX(20px)}
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; background: rgba(17, 26, 45, 0.95); backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--c-border); display: flex; justify-content: space-around;
+      padding: 10px 0 20px; z-index: 500;
+    }
+    .nav-btn {
+      background: none; border: none; color: var(--c-text-muted); display: flex; flex-direction: column; align-items: center;
+      font-size: 11px; gap: 4px; cursor: pointer; transition: var(--trans-fast); font-weight: 700; flex: 1;
+    }
+    .nav-btn.active { color: var(--c-primary); transform: translateY(-2px); }
+    .nav-btn svg { width: 22px; height: 22px; fill: currentColor; }
 
-/* ═══ Tabs داخل الأدمن — جديدة ═══ */
-.inner-tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
-.inner-tab{padding:6px 14px;border-radius:var(--radius-full);font-size:12px;
-  font-weight:700;background:rgba(0,0,0,.3);border:1px solid var(--c-border);
-  color:var(--c-text-muted);cursor:pointer;white-space:nowrap;font-family:inherit}
-.inner-tab.active{background:var(--c-primary);color:#fff;border-color:var(--c-primary)}
-
-/* ═══ Stat Row — جديدة ═══ */
-.stat-row{display:flex;justify-content:space-between;padding:8px 0;
-  border-bottom:1px solid var(--c-border);font-size:13px}
-.stat-row:last-child{border-bottom:none}
-
-/* ═══ RTL / LTR — الأصلية ═══ */
-[dir="rtl"] .toast{border-left:none;border-right:4px solid var(--c-primary)}
-[dir="rtl"] .toast.error{border-right-color:var(--c-danger)}
-[dir="rtl"] .toast.warn{border-right-color:var(--c-warn)}
-[dir="rtl"] .toast.info{border-right-color:var(--c-info)}
-[dir="rtl"] input,[dir="rtl"] textarea,[dir="rtl"] select{text-align:right}
-[dir="ltr"] input,[dir="ltr"] textarea,[dir="ltr"] select{text-align:left}
-[dir="ltr"] .addr-box{text-align:left}
-
-/* ═══ Scrollbar — جديدة ═══ */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--c-border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--c-text-muted)}
-</style>
+    /* RTL Orientation */
+    [dir="rtl"] .app-header, [dir="rtl"] .flex-between { flex-direction: row; }
+    [dir="rtl"] .toast { border-left: none; border-right: 4px solid var(--c-primary); }
+    [dir="rtl"] .toast.error { border-right-color: var(--c-danger); }
+    [dir="rtl"] .toast.warn { border-right-color: var(--c-warn); }
+    [dir="rtl"] input, [dir="rtl"] textarea, [dir="rtl"] select { text-align: right; }
+    [dir="ltr"] input, [dir="ltr"] textarea, [dir="ltr"] select { text-align: left; }
+  </style>
 </head>
 <body>
 
-<!-- ═══════════ TOAST CONTAINER ═══════════ -->
-<div class="toast-container" id="toast-root"></div>
+  <div class="toast-container" id="toast-root"></div>
 
-<!-- ═══════════ APP HEADER ═══════════ -->
-<header class="app-header flex-between">
-  <div class="flex gap-3 flex-center">
-    <div class="user-avatar flex-center" id="ui-avatar">U</div>
-    <div class="flex-col">
-      <span class="font-bold text-sm" id="ui-username">تحميل...</span>
-      <span class="text-xs text-muted" id="ui-badge-role">عضو مسجل</span>
+  <header class="app-header flex-between">
+    <div class="flex gap-3 flex-center">
+      <div class="user-avatar flex-center" id="ui-avatar">U</div>
+      <div class="flex-col">
+        <span class="font-bold text-sm" id="ui-username">تحميل...</span>
+        <span class="text-xs text-muted" id="ui-badge-role">عضو مسجل</span>
+      </div>
     </div>
-  </div>
-  <div class="flex gap-2 flex-center">
-    <div class="balance-pill">
-      <span id="ui-header-balance">0.00</span> ₵
+    <div class="flex gap-2 flex-center">
+      <div class="balance-pill">
+        <span id="ui-header-balance">0.00</span> ₵
+      </div>
+      <button class="btn btn-sm btn-outline" onclick="Engine.toggleLang()" id="ui-btn-lang">EN</button>
     </div>
-    <button class="btn btn-sm btn-outline" onclick="Engine.toggleLang()" id="ui-btn-lang">EN</button>
-  </div>
-</header>
+  </header>
 
-<!-- ═══════════ VIEW: EARN (المهام) ═══════════ -->
-<main id="view-earn" class="view-container active">
-  <div class="balance-master">
-    <div class="text-muted text-xs font-bold" data-i18n="hero_balance_title">الرصيد المتاح القابل للسحب</div>
-    <h1><span id="main-balance-val">0.00</span> <span style="color:#6ee7b7;">₵</span></h1>
-    <div class="text-xs font-bold" style="color:#a7f3d0;background:rgba(0,0,0,.25);
-      display:inline-block;padding:4px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.08);">
-      ≈ <span id="main-balance-usdt">0.000</span> USDT
+  <main id="view-earn" class="view-container active">
+    <div class="balance-master">
+      <div class="text-muted text-xs font-bold" data-i18n="hero_balance_title">الرصيد المتاح القابل للسحب</div>
+      <h1><span id="main-balance-val">0.00</span> <span style="color: #6ee7b7;">₵</span></h1>
+      <div class="text-xs font-bold" style="color: #a7f3d0; background: rgba(0,0,0,0.25); display: inline-block; padding: 4px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08);">
+        ≈ <span id="main-balance-usdt">0.000</span> USDT
+      </div>
     </div>
-  </div>
 
-  <!-- شريط الإحصائيات السريعة -->
-  <div class="kpi-grid-3">
-    <div class="kpi"><div class="kpi-val" id="earn-kpi-tasks">0</div><div class="kpi-lbl">مهام منجزة</div></div>
-    <div class="kpi kpi-warn"><div class="kpi-val" id="earn-kpi-refs">0</div><div class="kpi-lbl">إحالات</div></div>
-    <div class="kpi kpi-info"><div class="kpi-val" id="earn-kpi-total">0.00</div><div class="kpi-lbl">إجمالي الأرباح</div></div>
-  </div>
-
-  <div class="flex-between mb-3">
-    <h3 class="font-bold text-base flex flex-center gap-2">
-      <span>⚡</span> <span data-i18n="tasks_available_header">المهام المتاحة للإنجاز</span>
-    </h3>
-    <select id="filter-task-category" style="width:auto;padding:6px 12px;margin:0;" onchange="Engine.renderTasks()">
-      <option value="all" data-i18n="filter_all">جميع المهام</option>
-      <option value="telegram" data-i18n="filter_tg">قنوات تلغرام</option>
-      <option value="ad" data-i18n="filter_ads">مشاهدة إعلانات</option>
-      <option value="custom" data-i18n="filter_custom">مهام خاصة</option>
-      <option value="survey">استبيانات</option>
-      <option value="game">ألعاب</option>
-    </select>
-  </div>
-
-  <div id="tasks-feed-container"></div>
-</main>
-
-<!-- ═══════════ VIEW: CREATE ADS ═══════════ -->
-<main id="view-ads" class="view-container">
-  <div class="card">
-    <div class="card-header text-c">
-      <span>📢</span> <span data-i18n="create_ad_header">إنشاء مهمة أو إعلان جديد</span>
-    </div>
-    <p class="text-xs text-muted mb-4" data-i18n="create_ad_subtitle">
-      زوّد أعضاء قناتك أو روّج لرابطك بين آلاف المستخدمين. تخصم المنصة نسبة 25% كعمولة تشغيلية.
-    </p>
-
-    <div class="input-group">
-      <label class="input-label" data-i18n="form_ad_title">عنوان المهمة</label>
-      <input type="text" id="form-ad-title" placeholder="مثال: اشترك في قناة الأخبار الرسمية">
-    </div>
-    <div class="input-group">
-      <label class="input-label" data-i18n="form_ad_link">الرابط المستهدف أو رابط القناة</label>
-      <input type="text" id="form-ad-link" placeholder="https://t.me/your_channel">
-    </div>
-    <div class="input-group">
-      <label class="input-label" data-i18n="form_ad_category">قسم المهمة</label>
-      <select id="form-ad-category">
-        <option value="telegram">اشتراك في قناة تلغرام</option>
-        <option value="ad">مشاهدة إعلان وزيارة رابط</option>
-        <option value="custom">مهمة مخصصة مع إثبات</option>
-        <option value="survey">استبيان / نموذج</option>
-        <option value="game">تجربة لعبة</option>
+    <div class="flex-between mb-3">
+      <h3 class="font-bold text-base flex flex-center gap-2">
+        <span>⚡</span> <span data-i18n="tasks_available_header">المهام المتاحة للإنجاز</span>
+      </h3>
+      <select id="filter-task-category" style="width: auto; padding: 6px 12px; margin: 0;" onchange="Engine.renderTasks()">
+        <option value="all" data-i18n="filter_all">جميع المهام</option>
+        <option value="telegram" data-i18n="filter_tg">قنوات تلغرام</option>
+        <option value="ad" data-i18n="filter_ads">مشاهدة إعلانات</option>
+        <option value="custom" data-i18n="filter_custom">مهام خاصة</option>
       </select>
     </div>
-    <div class="flex gap-3">
-      <div class="input-group" style="flex:1;">
-        <label class="input-label" data-i18n="form_ad_reward">المكافأة للعضو (₵)</label>
-        <input type="number" id="form-ad-reward" value="0.70" step="0.1" min="0.5"
-          oninput="Engine.updateCampaignEstimates()">
+
+    <div id="tasks-feed-container"></div>
+  </main>
+
+  <main id="view-ads" class="view-container">
+    <div class="card">
+      <div class="card-header text-c">
+        <span>📢</span> <span data-i18n="create_ad_header">إنشاء مهمة أو إعلان جديد</span>
       </div>
-      <div class="input-group" style="flex:1;">
-        <label class="input-label" data-i18n="form_ad_members">العدد المطلوب</label>
-        <input type="number" id="form-ad-members" value="50" min="10" step="10"
-          oninput="Engine.updateCampaignEstimates()">
+      <p class="text-xs text-muted mb-4" data-i18n="create_ad_subtitle">
+        زوّد أعضاء قناتك أو روّج لرابطك بين آلاف المستخدمين. تخصم المنصة نسبة 25% كعمولة تشغيلية للمنصة.
+      </p>
+
+      <div class="input-group">
+        <label class="input-label" data-i18n="form_ad_title">عنوان المهمة</label>
+        <input type="text" id="form-ad-title" placeholder="مثال: اشترك في قناة الأخبار الرسمية">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" data-i18n="form_ad_link">الرابط المستهدف أو رابط القناة</label>
+        <input type="text" id="form-ad-link" placeholder="https://t.me/your_channel">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" data-i18n="form_ad_category">قسم المهمة</label>
+        <select id="form-ad-category">
+          <option value="telegram">اشتراك في قناة تلغرام</option>
+          <option value="ad">مشاهدة إعلان وزيارة رابط</option>
+          <option value="custom">مهمة مخصصة مع إثبات</option>
+        </select>
+      </div>
+
+      <div class="flex gap-3">
+        <div class="input-group" style="flex: 1;">
+          <label class="input-label" data-i18n="form_ad_reward">المكافأة للعضو (₵)</label>
+          <input type="number" id="form-ad-reward" value="0.70" step="0.1" min="0.5" oninput="Engine.updateCampaignEstimates()">
+        </div>
+        <div class="input-group" style="flex: 1;">
+          <label class="input-label" data-i18n="form_ad_members">العدد المطلوب</label>
+          <input type="number" id="form-ad-members" value="50" min="10" step="10" oninput="Engine.updateCampaignEstimates()">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" data-i18n="form_ad_type">طريقة التحقق من الإنجاز</label>
+        <select id="form-ad-type">
+          <option value="auto" data-i18n="type_auto">تلقائي فوري (بدون إثبات يدوي)</option>
+          <option value="manual" data-i18n="type_manual">يدوي (يتطلب رفع رابط سكرين شوت أو إثبات)</option>
+        </select>
+      </div>
+
+      <div class="list-item flex-between" style="background: var(--c-danger-alpha); border-color: rgba(239,68,68,0.25);">
+        <span class="text-sm font-bold" data-i18n="calc_total_cost">المجموع الإجمالي (شامل 25% عمولة):</span>
+        <strong class="text-danger text-base" id="calc-total-cost">43.75 ₵</strong>
+      </div>
+
+      <button class="btn mt-3" onclick="Engine.createCampaign()" data-i18n="btn_publish_campaign">خصم الرصيد ونشر الحملة 🚀</button>
+    </div>
+  </main>
+
+  <main id="view-wallet" class="view-container">
+    <div class="card text-center" style="padding: 30px 16px;">
+      <div class="text-xs text-muted font-bold mb-2" data-i18n="wallet_overview">المحفظة المالية والمعاملات</div>
+      <h2 class="text-xl font-black mb-4"><span id="wallet-balance-num">0.00</span> ₵</h2>
+      
+      <div class="flex gap-3">
+        <button class="btn btn-outline" onclick="Engine.openModal('modal-deposit')" data-i18n="btn_deposit">⬇️ شحن الرصيد</button>
+        <button class="btn" onclick="Engine.openModal('modal-withdraw')" data-i18n="btn_withdraw">⬆️ سحب الأرباح</button>
       </div>
     </div>
-    <div class="input-group">
-      <label class="input-label" data-i18n="form_ad_type">طريقة التحقق من الإنجاز</label>
-  
+
+    <div class="card">
+      <div class="card-header">
+        <span>🧾</span> <span data-i18n="wallet_ledger_header">سجل المعاملات والتحويلات</span>
+      </div>
+      <div id="wallet-history-feed"></div>
+    </div>
+  </main>
+
+  <main id="view-affiliates" class="view-container">
+    <div class="card" style="border-color: rgba(245, 158, 11, 0.4); background: linear-gradient(180deg, rgba(245, 158, 11, 0.08), transparent);">
+      <div class="card-header text-warn">
+        <span>🤝</span> <span data-i18n="affiliate_header">برنامج شركاء الإحالة (35%)</span>
+      </div>
+      <p class="text-xs text-muted mb-3" data-i18n="affiliate_desc">
+        اربح عمولة ضخمة بنسبة 35% من كل مهمة ينجزها أصدقاؤك مدى الحياة! لا يوجد سقف للأرباح.
+      </p>
+
+      <div class="list-item flex-between" style="background: rgba(0,0,0,0.4);">
+        <div class="flex-col" style="flex: 1; overflow: hidden;">
+          <span class="text-xs text-muted" data-i18n="your_affiliate_link">رابط الإحالة المباشر:</span>
+          <strong id="ui-affiliate-link" class="text-xs text-c mt-1" style="word-break: break-all;">تحميل الرابط...</strong>
+        </div>
+        <button class="btn btn-sm btn-warn" onclick="Engine.copyAffiliateLink()" data-i18n="btn_copy">نسخ</button>
+      </div>
+
+      <div class="flex gap-3 mt-3">
+        <div class="list-item text-center" style="flex: 1;">
+          <span class="text-xs text-muted" data-i18n="stat_invited_users">الأعضاء المدعوين</span>
+          <h4 class="text-lg font-bold text-warn mt-1" id="stat-referrals-count">0</h4>
+        </div>
+        <div class="list-item text-center" style="flex: 1;">
+          <span class="text-xs text-muted" data-i18n="stat_referral_earnings">أرباح الإحالات</span>
+          <h4 class="text-lg font-bold text-c mt-1" id="stat-referrals-earned">0.00 ₵</h4>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>🏆</span> <span data-i18n="leaderboard_header">المتصدرون الأكثر ربحاً</span>
+      </div>
+      <div id="leaderboard-feed"></div>
+    </div>
+  </main>
+
+  <main id="view-profile" class="view-container">
+    <div class="card">
+      <div class="card-header">
+        <span>👤</span> <s
