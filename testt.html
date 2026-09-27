@@ -1,163 +1,645 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" id="html-root">
+<html lang="en" dir="ltr" id="app-root">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Dollar C - Part 1 & 2</title>
-  
+  <title>Dollar C - Ultimate Platform</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
-    /* ================= 1. التصميم والألوان الأساسية ================= */
     :root {
-      --c-primary: #10b981; 
+      --c-primary: #10b981; /* Emerald Green */
       --c-primary-dark: #059669;
-      --c-bg: #0f172a;
-      --c-card: #1e293b;
+      --c-primary-light: #34d399;
+      --c-bg: #0b1120;
+      --c-surface: #1e293b;
+      --c-surface-hover: #334155;
       --c-text: #f8fafc;
       --c-muted: #94a3b8;
       --c-danger: #ef4444;
       --c-warn: #f59e0b;
       --c-border: #334155;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--c-bg); color: var(--c-text); padding-bottom: 80px; overflow-x: hidden; transition: all 0.3s ease; }
-    
-    /* الفئات المساعدة */
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--c-bg); color: var(--c-text); padding-bottom: 90px; overflow-x: hidden; }
+
+    /* Core Utilities */
+    .hidden { display: none !important; }
     .flex { display: flex; }
+    .flex-col { display: flex; flex-direction: column; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .flex-center { display: flex; justify-content: center; align-items: center; }
+    .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; }
+    .mt-2 { margin-top: 8px; } .mt-4 { margin-top: 16px; } .mb-2 { margin-bottom: 8px; } .mb-4 { margin-bottom: 16px; }
+    .p-4 { padding: 16px; }
     .text-center { text-align: center; }
-    
-    /* الشريط العلوي */
-    .header { padding: 16px; background: var(--c-card); border-bottom: 1px solid var(--c-border); position: sticky; top: 0; z-index: 50; }
-    
-    /* الشاشات (Views) */
-    .view-section { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
-    .view-section.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .text-c { color: var(--c-primary); }
+    .text-danger { color: var(--c-danger); }
+    .text-warn { color: var(--c-warn); }
+    .text-sm { font-size: 13px; }
+    .text-xs { font-size: 11px; }
+    .text-muted { color: var(--c-muted); }
+    .font-bold { font-weight: bold; }
 
-    /* الكروت والأزرار */
-    .card { background: var(--c-card); border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--c-border); }
-    .btn { background: var(--c-primary); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; transition: transform 0.1s;}
-    .btn:active { transform: scale(0.97); }
-    
-    /* شريط التنقل السفلي */
-    .bottom-nav { position: fixed; bottom: 0; width: 100%; background: rgba(30, 41, 59, 0.95); border-top: 1px solid var(--c-border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
-    .nav-btn { background: none; border: none; color: var(--c-muted); display: flex; flex-direction: column; align-items: center; font-size: 12px; gap: 4px; cursor: pointer; font-weight: bold; }
-    .nav-btn.active { color: var(--c-primary); }
+    /* Header */
+    .app-header { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); padding: 16px; position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--c-border); }
+    .user-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--c-primary), #3b82f6); font-size: 20px; font-weight: bold; border: 2px solid var(--c-surface); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
 
-    /* دعم اتجاه اللغة العربية (RTL) */
+    /* Views & Animations */
+    .view-container { display: none; padding: 16px; animation: slideUp 0.4s ease forwards; }
+    .view-container.active { display: block; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Cards */
+    .card { background: var(--c-surface); border-radius: var(--radius-md); padding: 20px; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2); }
+    .card-header { font-size: 16px; font-weight: bold; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    /* Balance Showcase */
+    .balance-master { background: linear-gradient(135deg, #022c22, var(--c-primary-dark)); text-align: center; padding: 30px 20px; border-radius: var(--radius-lg); position: relative; overflow: hidden; border: 1px solid var(--c-primary); box-shadow: 0 15px 30px rgba(5, 150, 105, 0.2); margin-bottom: 24px; }
+    .balance-master::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); pointer-events: none; }
+    .balance-master h1 { font-size: 48px; font-weight: 900; margin: 10px 0; letter-spacing: -1px; text-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+
+    /* Form Elements */
+    .input-group { margin-bottom: 16px; }
+    .input-label { display: block; margin-bottom: 8px; font-size: 13px; color: var(--c-muted); }
+    input, textarea, select { width: 100%; padding: 14px; background: rgba(0,0,0,0.2); border: 1px solid var(--c-border); color: white; border-radius: var(--radius-sm); outline: none; transition: var(--transition); font-size: 14px; }
+    input:focus, textarea:focus, select:focus { border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
+
+    /* Buttons */
+    .btn { background: var(--c-primary); color: white; border: none; padding: 14px 24px; border-radius: var(--radius-sm); font-weight: 700; font-size: 15px; cursor: pointer; width: 100%; transition: var(--transition); display: inline-flex; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .btn:active { transform: scale(0.95); }
+    .btn-danger { background: var(--c-danger); }
+    .btn-warn { background: var(--c-warn); }
+    .btn-outline { background: transparent; border: 2px solid var(--c-primary); color: var(--c-primary); }
+    .btn-sm { padding: 8px 16px; font-size: 12px; width: auto; }
+
+    /* Lists & Items */
+    .list-item { background: rgba(0,0,0,0.2); border: 1px solid var(--c-border); padding: 16px; border-radius: var(--radius-md); margin-bottom: 12px; transition: var(--transition); }
+    .list-item:hover { border-color: var(--c-primary-dark); }
+    
+    /* Modals */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px; opacity: 0; pointer-events: none; transition: var(--transition); }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-content { background: var(--c-surface); width: 100%; max-width: 400px; border-radius: var(--radius-lg); padding: 24px; transform: scale(0.9); transition: var(--transition); border: 1px solid var(--c-border); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    .modal-overlay.active .modal-content { transform: scale(1); }
+
+    /* Bottom Navigation */
+    .bottom-nav { position: fixed; bottom: 0; width: 100%; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; padding: 12px 0 20px; z-index: 500; }
+    .nav-btn { background: none; border: none; color: var(--c-muted); display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 6px; cursor: pointer; transition: var(--transition); font-weight: 600; width: 20%; }
+    .nav-btn.active { color: var(--c-primary); transform: translateY(-4px); }
+    .nav-btn svg { width: 24px; height: 24px; fill: currentColor; }
+
+    /* RTL Support */
     [dir="rtl"] .flex-between { flex-direction: row-reverse; }
+    [dir="rtl"] .btn { flex-direction: row-reverse; }
+    [dir="rtl"] input, [dir="rtl"] textarea { text-align: right; }
   </style>
 </head>
 <body>
 
-  <!-- ================= 2. هيكل الصفحات (مع علامات الترجمة data-i18n) ================= -->
-  
-  <header class="header flex-between">
-    <div data-i18n="app_title" style="font-weight: bold; font-size: 16px;">Dollar C Platform</div>
-    <button style="padding: 5px 12px; background: transparent; color: var(--c-primary); border: 1px solid var(--c-primary); border-radius: 8px; font-weight: bold;" id="lang-btn" onclick="toggleLang()">عربي</button>
+  <header class="app-header flex-between">
+    <div class="flex gap-3 flex-center">
+      <div class="user-avatar flex-center" id="ui-avatar">M</div>
+      <div class="flex-col">
+        <span class="font-bold text-sm" id="ui-name">Master User</span>
+        <span class="text-xs text-muted" id="ui-role">Member</span>
+      </div>
+    </div>
+    <div class="flex gap-2 flex-center">
+      <div style="background: rgba(16,185,129,0.15); color: var(--c-primary); padding: 8px 16px; border-radius: 20px; font-weight: 800; border: 1px solid rgba(16,185,129,0.3); font-size: 14px;">
+        <span id="ui-top-balance">0.00</span> ₵
+      </div>
+      <button class="btn btn-sm btn-outline" style="padding: 8px;" onclick="App.toggleLang()" id="lang-btn">عربي</button>
+    </div>
   </header>
 
-  <main id="view-earn" class="view-section active">
-    <div class="card text-center" style="background: linear-gradient(135deg, #064e3b, var(--c-primary-dark));">
-      <p data-i18n="avail_balance">Available Balance</p>
-      <h1 style="font-size: 40px; margin: 10px 0;">0.00 ₵</h1>
+  <main id="view-earn" class="view-container active">
+    
+    <div class="balance-master">
+      <div data-i18n="avail_balance" class="text-muted text-sm" style="text-transform: uppercase; letter-spacing: 1px;">Available Balance</div>
+      <h1><span id="main-balance">0.00</span> <span style="color: #6ee7b7;">₵</span></h1>
+      <div class="text-sm font-bold" style="color: #a7f3d0;">≈ <span id="main-usdt">0.000</span> USDT</div>
     </div>
-    <div class="card"><h3 data-i18n="tasks_coming">Tasks (Coming in Part 3)</h3></div>
+
+    <div class="flex-between mb-4">
+      <h3 class="card-header" style="margin: 0;">
+        <span style="font-size: 20px;">💼</span> <span data-i18n="available_tasks">Available Tasks</span>
+      </h3>
+      <select id="task-filter" style="width: auto; margin: 0; padding: 8px 12px; background: var(--c-surface);" onchange="App.renderTasks()">
+        <option value="all" data-i18n="filter_all">All Categories</option>
+        <option value="social" data-i18n="filter_social">Social Media</option>
+        <option value="web" data-i18n="filter_web">Web & Ads</option>
+      </select>
+    </div>
+
+    <div id="tasks-container"></div>
+    
   </main>
 
-  <main id="view-ads" class="view-section">
+  <main id="view-ads" class="view-container">
     <div class="card">
-      <h3 style="color: var(--c-primary);" data-i18n="create_ad">Create Advertisement</h3>
-      <p class="text-muted" style="margin-top: 10px; font-size: 14px;" data-i18n="ad_desc">Publish tasks for users to complete.</p>
+      <h3 class="card-header text-c"><span style="font-size: 22px;">📢</span> <span data-i18n="create_ad">Create Campaign</span></h3>
+      <p class="text-sm text-muted mb-4" data-i18n="ad_desc">Boost your channel or project. Note: Platform deducts a 25% service fee from the total budget.</p>
+      
+      <div class="input-group">
+        <label class="input-label" data-i18n="ad_title">Campaign Title</label>
+        <input type="text" id="ad-title" placeholder="e.g., Join my Telegram Channel">
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label" data-i18n="ad_url">Target Link / Description</label>
+        <textarea id="ad-desc" rows="3" placeholder="https://t.me/..."></textarea>
+      </div>
+      
+      <div class="flex gap-4">
+        <div class="input-group" style="flex: 1;">
+          <label class="input-label" data-i18n="reward_per_user">Reward/User (₵)</label>
+          <input type="number" id="ad-reward" value="1.0" step="0.1" oninput="App.calculateAdCost()">
+        </div>
+        <div class="input-group" style="flex: 1;">
+          <label class="input-label" data-i18n="target_users">Total Users</label>
+          <input type="number" id="ad-count" value="100" min="10" oninput="App.calculateAdCost()">
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label" data-i18n="approval_type">Approval Method</label>
+        <select id="ad-type">
+          <option value="auto" data-i18n="ad_type_auto">Auto Approval (Instant)</option>
+          <option value="manual" data-i18n="ad_type_manual">Manual (Requires Screenshot)</option>
+        </select>
+      </div>
+
+      <div class="list-item flex-between" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3);">
+        <span class="font-bold" data-i18n="total_cost">Total Cost (incl. 25% fee):</span>
+        <strong class="text-danger" style="font-size: 18px;"><span id="ad-total-cost">125.00</span> ₵</strong>
+      </div>
+      
+      <button class="btn mt-4" onclick="App.submitAd()" data-i18n="btn_publish">Launch Campaign 🚀</button>
     </div>
   </main>
 
-  <main id="view-wallet" class="view-section">
-    <div class="card text-center">
-      <h3 data-i18n="wallet">Wallet</h3>
-      <button class="btn" data-i18n="deposit">Deposit</button>
-      <button class="btn" style="background: var(--c-danger);" data-i18n="withdraw">Withdraw</button>
+  <main id="view-wallet" class="view-container">
+    <div class="card text-center" style="padding: 30px 20px;">
+      <h3 class="text-muted mb-4" data-i18n="wallet">Wallet Management</h3>
+      <div class="flex gap-4">
+        <button class="btn btn-outline" onclick="App.showModal('modal-deposit')" data-i18n="btn_deposit">⬇️ Deposit</button>
+        <button class="btn" onclick="App.showModal('modal-withdraw')" data-i18n="btn_withdraw">⬆️ Withdraw</button>
+      </div>
     </div>
-  </main>
 
-  <main id="view-profile" class="view-section">
     <div class="card">
-      <h3 data-i18n="profile">Profile & Affiliate</h3>
-      <p class="text-muted" data-i18n="invite">Invite friends and earn 35%.</p>
+      <h3 class="card-header"><span style="font-size: 20px;">🧾</span> <span data-i18n="tx_history">Transaction History</span></h3>
+      <div id="tx-container">
+        </div>
     </div>
   </main>
 
-  <main id="view-admin" class="view-section">
+  <main id="view-profile" class="view-container">
+    <div class="card" style="border-color: var(--c-warn);">
+      <h3 class="card-header text-warn"><span style="font-size: 20px;">🤝</span> <span data-i18n="affiliate_title">Affiliate Program</span></h3>
+      <p class="text-sm text-muted mb-4" data-i18n="affiliate_desc">Earn a massive 35% commission from every task your referrals complete. Lifetime earnings!</p>
+      <div class="list-item flex-between">
+        <div class="flex-col">
+          <span class="text-xs text-muted" data-i18n="your_ref_link">Your Referral Link:</span>
+          <strong id="ref-link" style="font-size: 12px; color: var(--c-primary);">https://t.me/bot?start=ref_...</strong>
+        </div>
+        <button class="btn btn-sm btn-warn" onclick="App.copyRef()" data-i18n="btn_copy">Copy</button>
+      </div>
+      <div class="flex-between mt-4 p-4" style="background: rgba(0,0,0,0.2); border-radius: var(--radius-sm);">
+        <span class="font-bold" data-i18n="total_referrals">Total Referrals:</span>
+        <strong class="text-warn" style="font-size: 18px;">0</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-header"><span style="font-size: 20px;">🏆</span> <span data-i18n="leaderboard">Global Leaderboard</span></h3>
+      <div id="leaderboard-container"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-header text-danger"><span style="font-size: 20px;">⚖️</span> <span data-i18n="terms_title">Platform Terms & Rules</span></h3>
+      <div style="height: 150px; overflow-y: auto; font-size: 12px; color: var(--c-muted); padding: 12px; background: rgba(0,0,0,0.3); border-radius: var(--radius-sm); line-height: 1.6; border: 1px solid var(--c-border);" id="terms-box">
+        </div>
+    </div>
+  </main>
+
+  <main id="view-admin" class="view-container">
+    <div style="background: linear-gradient(90deg, #991b1b, #dc2626); color: white; padding: 16px; border-radius: var(--radius-md); text-align: center; margin-bottom: 20px; box-shadow: 0 10px 15px rgba(220, 38, 38, 0.3);">
+      <h2 style="font-weight: 900; letter-spacing: 2px;">⚡ GOD MODE ACTIVE ⚡</h2>
+      <p class="text-sm mt-2" style="opacity: 0.8;">Absolute control over the platform economics and users.</p>
+    </div>
+    
     <div class="card" style="border-color: var(--c-danger);">
-      <h3 style="color: var(--c-danger);" data-i18n="admin_panel">Admin Panel - God Mode</h3>
-      <p data-i18n="admin_desc">Control users and funds.</p>
+      <h3 class="card-header">🏦 Treasury Statistics</h3>
+      <div class="flex gap-4">
+        <div class="list-item text-center" style="flex:1;">
+          <span class="text-xs text-muted block mb-2">Platform Revenue (25%)</span>
+          <strong class="text-c" style="font-size: 18px;">+142,500 ₵</strong>
+        </div>
+        <div class="list-item text-center" style="flex:1;">
+          <span class="text-xs text-muted block mb-2">Pending Withdrawals</span>
+          <strong class="text-warn" style="font-size: 18px;">4,200 ₵</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-header">👥 User Management Engine</h3>
+      <div class="input-group">
+        <label class="input-label">Target Telegram ID</label>
+        <input type="number" id="admin-target" placeholder="e.g. 123456789">
+      </div>
+      <div class="flex gap-3">
+        <input type="number" id="admin-amount" placeholder="Amount (₵)" style="flex: 2; margin-bottom: 0;">
+        <button class="btn" style="flex: 1;" onclick="App.adminAction('fund')">Mint Funds</button>
+      </div>
+      <div class="flex gap-3 mt-3">
+        <button class="btn btn-warn" style="flex: 1;" onclick="App.adminAction('deduct')">Deduct Funds</button>
+        <button class="btn btn-danger" style="flex: 1;" onclick="App.adminAction('ban')">Ban User 🔨</button>
+      </div>
     </div>
   </main>
 
-  <!-- ================= 3. أزرار التنقل السفلية ================= -->
+  <div id="modal-deposit" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="mb-4 text-c text-center" data-i18n="deposit_title">Fund Your Account</h3>
+      <p class="text-sm text-muted mb-4 text-center" data-i18n="deposit_desc">Transfer USDT (TRC20) to the administration wallet. 1 USDT = 1000 ₵.</p>
+      
+      <div class="p-4 mb-4 text-center" style="background: rgba(0,0,0,0.3); border: 1px dashed var(--c-primary); border-radius: var(--radius-sm); word-break: break-all; font-family: monospace; font-size: 12px;">
+        TVjsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      </div>
+      
+      <button class="btn mb-3" onclick="App.copyText('TVjsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');" data-i18n="btn_copy_addr">Copy Address</button>
+      <button class="btn btn-outline mb-4" onclick="window.open('https://t.me/keeeeza')" data-i18n="btn_notify">Notify Admin with Proof</button>
+      <button class="btn btn-danger" onclick="App.hideModal('modal-deposit')" data-i18n="btn_cancel">Cancel</button>
+    </div>
+  </div>
+
+  <div id="modal-withdraw" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="mb-4 text-danger text-center" data-i18n="withdraw_title">Withdraw Funds</h3>
+      <div class="p-4 mb-4" style="background: rgba(239, 68, 68, 0.1); border-radius: var(--radius-sm); border: 1px solid rgba(239, 68, 68, 0.2);">
+        <p class="text-xs text-danger text-center" data-i18n="withdraw_note">Minimum withdrawal is 2 USDT (2000 ₵). Processing takes between 3 to 24 hours manually by admin.</p>
+      </div>
+      
+      <div class="input-group">
+        <label class="input-label" data-i18n="wallet_addr">Your USDT TRC20 Address</label>
+        <input type="text" placeholder="T...">
+      </div>
+      <div class="input-group">
+        <label class="input-label" data-i18n="withdraw_amount">Amount in USDT</label>
+        <input type="number" placeholder="Min: 2">
+      </div>
+      
+      <button class="btn mb-3" onclick="App.requestWithdraw()" data-i18n="btn_confirm">Submit Request</button>
+      <button class="btn btn-outline" onclick="App.hideModal('modal-withdraw')" data-i18n="btn_cancel">Cancel</button>
+    </div>
+  </div>
+
   <nav class="bottom-nav">
-    <button class="nav-btn active" onclick="switchTab('view-earn', this)" data-i18n="nav_earn">Earn</button>
-    <button class="nav-btn" onclick="switchTab('view-ads', this)" data-i18n="nav_ads">Ads</button>
-    <button class="nav-btn" onclick="switchTab('view-wallet', this)" data-i18n="nav_wallet">Wallet</button>
-    <button class="nav-btn" onclick="switchTab('view-profile', this)" data-i18n="nav_profile">Profile</button>
-    <button class="nav-btn" onclick="switchTab('view-admin', this)" data-i18n="nav_admin">Admin</button>
+    <button class="nav-btn active" onclick="App.switchTab('view-earn', this)">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+      <span data-i18n="nav_earn">Earn</span>
+    </button>
+    <button class="nav-btn" onclick="App.switchTab('view-ads', this)">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 9h-2V7h-2v5H6v2h2v5h2v-5h2v-2z"/></svg>
+      <span data-i18n="nav_ads">Ads</span>
+    </button>
+    <button class="nav-btn" onclick="App.switchTab('view-wallet', this)">
+      <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.1 1.1-2 .9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      <span data-i18n="nav_wallet">Wallet</span>
+    </button>
+    <button class="nav-btn" onclick="App.switchTab('view-profile', this)">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span data-i18n="nav_profile">Profile</span>
+    </button>
+    <button class="nav-btn hidden" id="nav-admin" onclick="App.switchTab('view-admin', this)">
+      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+      <span data-i18n="nav_admin">Admin</span>
+    </button>
   </nav>
 
-  <!-- ================= 4. العقل المدبر (التنقل + الترجمة) ================= -->
   <script>
-    // --- دالة التنقل (الجزء الأول) ---
-    function switchTab(viewId, btnEl) {
-      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-      document.getElementById(viewId).classList.add('active');
-      btnEl.classList.add('active');
-    }
+    // --- 1. SYSTEM CONSTANTS & CONFIG ---
+    const CONFIG = {
+      ADMIN_ID: 8783399033,
+      EXCHANGE_RATE: 1000, 
+      FEE_MULTIPLIER: 1.25 // 25% Fee for ad creation
+    };
 
-    // --- دالة الترجمة اللحظية (الجزء الثاني) ---
-    let currentLang = 'en'; // اللغة الافتراضية
-    
-    // القاموس المصغر
-    const translations = {
+    // --- 2. MASSIVE TRANSLATION DICTIONARY (i18n) ---
+    const DICTIONARY = {
       en: {
-        app_title: "Dollar C Platform", avail_balance: "Available Balance", tasks_coming: "Tasks (Coming in Part 3)",
-        create_ad: "Create Advertisement", ad_desc: "Publish tasks for users to complete.",
-        wallet: "Wallet", deposit: "Deposit", withdraw: "Withdraw",
-        profile: "Profile & Affiliate", invite: "Invite friends and earn 35%.",
-        admin_panel: "Admin Panel - God Mode", admin_desc: "Control users and funds.",
-        nav_earn: "Earn", nav_ads: "Ads", nav_wallet: "Wallet", nav_profile: "Profile", nav_admin: "Admin",
-        lang_btn: "عربي"
+        avail_balance: "Available Balance", available_tasks: "Available Tasks",
+        filter_all: "All Categories", filter_social: "Social Media", filter_web: "Web & Ads",
+        create_ad: "Create Campaign", ad_desc: "Boost your channel or project. Platform deducts 25% fee.",
+        ad_title: "Campaign Title", ad_url: "Target Link / Description",
+        reward_per_user: "Reward/User (₵)", target_users: "Total Users",
+        approval_type: "Approval Method", ad_type_auto: "Auto Approval (Instant)", ad_type_manual: "Manual (Requires Screenshot)",
+        total_cost: "Total Cost (incl. 25% fee):", btn_publish: "Launch Campaign 🚀",
+        wallet: "Wallet Management", btn_deposit: "⬇️ Deposit", btn_withdraw: "⬆️ Withdraw", tx_history: "Transaction History",
+        affiliate_title: "Affiliate Program", affiliate_desc: "Earn a massive 35% commission from every task your referrals complete. Lifetime earnings!",
+        your_ref_link: "Your Referral Link:", btn_copy: "Copy", total_referrals: "Total Referrals:",
+        leaderboard: "Global Leaderboard", terms_title: "Platform Terms & Rules",
+        deposit_title: "Fund Your Account", deposit_desc: "Transfer USDT (TRC20) to the administration wallet. 1 USDT = 1000 ₵.",
+        btn_copy_addr: "Copy Address", btn_notify: "Notify Admin with Proof", btn_cancel: "Cancel",
+        withdraw_title: "Withdraw Funds", withdraw_note: "Minimum withdrawal is 2 USDT (2000 ₵). Processing takes between 3 to 24 hours manually by admin.",
+        wallet_addr: "Your USDT TRC20 Address", withdraw_amount: "Amount in USDT", btn_confirm: "Submit Request",
+        nav_earn: "Earn", nav_ads: "Ads", nav_wallet: "Wallet", nav_profile: "Profile", nav_admin: "Admin", lang_btn: "عربي",
+        task_btn_do: "Complete Task", task_btn_done: "Completed ✓",
+        terms_html: "<b>1. Absolute Authority:</b> Dollar C reserves the right to modify, cancel, or change any rules, rates, or fees without notice.<br><br><b>2. Freezing & Bans:</b> The admin has the final say in banning accounts or seizing funds for suspected fraud without compensation.<br><br><b>3. Closures:</b> The platform does not guarantee continuous service and may shut down at any time without liability.<br><br><b>4. Tasks:</b> We are not responsible for rejected proofs.<br><br><b>5. Agreement:</b> By using this application, you fully surrender to these terms unconditionally."
       },
       ar: {
-        app_title: "منصة دولار C", avail_balance: "الرصيد المتاح", tasks_coming: "المهام (قادمة في الجزء 3)",
-        create_ad: "إنشاء إعلان", ad_desc: "انشر مهام للمستخدمين لإنجازها.",
-        wallet: "المحفظة", deposit: "إيداع", withdraw: "سحب",
-        profile: "الحساب والإحالة", invite: "ادعُ أصدقاءك واربح 35%.",
-        admin_panel: "لوحة الإدارة - الصلاحيات المطلقة", admin_desc: "تحكم بالمستخدمين والأموال.",
-        nav_earn: "المهام", nav_ads: "الإعلانات", nav_wallet: "المحفظة", nav_profile: "حسابي", nav_admin: "الإدارة",
-        lang_btn: "English"
+        avail_balance: "الرصيد المتاح", available_tasks: "المهام المتوفرة للربح",
+        filter_all: "كل الأقسام", filter_social: "تواصل اجتماعي", filter_web: "مواقع وإعلانات",
+        create_ad: "إنشاء حملة إعلانية", ad_desc: "قم بتكبير قناتك أو مشروعك. يرجى العلم أن المنصة تخصم 25% عمولة.",
+        ad_title: "عنوان الحملة (مثال: اشترك بقناتي)", ad_url: "الرابط المطلوب أو الوصف",
+        reward_per_user: "مكافأة كل مستخدم (₵)", target_users: "العدد المطلوب",
+        approval_type: "طريقة الموافقة", ad_type_auto: "تلقائي (بدون سكرين شوت)", ad_type_manual: "يدوي (يتطلب سكرين شوت ومراجعة)",
+        total_cost: "التكلفة الكلية (شاملة 25% عمولة):", btn_publish: "نشر الحملة الآن 🚀",
+        wallet: "إدارة المحفظة المالية", btn_deposit: "⬇️ إيداع / شحن", btn_withdraw: "⬆️ طلب سحب", tx_history: "سجل العمليات المالية",
+        affiliate_title: "برنامج شركاء الإحالة", affiliate_desc: "اربح عمولة ضخمة بقيمة 35% من أرباح أصدقائك في المهام. ربح مدى الحياة!",
+        your_ref_link: "رابط الإحالة الخاص بك:", btn_copy: "نسخ الرابط", total_referrals: "إجمالي الأصدقاء المدعوين:",
+        leaderboard: "قائمة المتصدرين عالمياً 🏆", terms_title: "القوانين والشروط الملزمة",
+        deposit_title: "شحن حسابك بالمنصة", deposit_desc: "قم بتحويل USDT TRC20 إلى محفظة الإدارة. (1 USDT يساوي 1000 ₵).",
+        btn_copy_addr: "نسخ العنوان", btn_notify: "مراسلة الإدارة بالإثبات", btn_cancel: "إغلاق",
+        withdraw_title: "طلب سحب الأرباح", withdraw_note: "الحد الأدنى للسحب هو 2 دولار (2000 ₵). تتم معالجة الطلبات يدوياً خلال 3 إلى 24 ساعة.",
+        wallet_addr: "عنوان محفظتك (USDT TRC20)", withdraw_amount: "المبلغ المراد سحبه (دولار)", btn_confirm: "تأكيد طلب السحب",
+        nav_earn: "المهام", nav_ads: "إعلان", nav_wallet: "المحفظة", nav_profile: "حسابي", nav_admin: "الإدارة", lang_btn: "English",
+        task_btn_do: "تنفيذ المهمة", task_btn_done: "تم بنجاح ✓",
+        terms_html: "<b>1. السلطة المطلقة:</b> تحتفظ الإدارة بالحق المطلق في تغيير، إلغاء، أو تعديل أي قانون، أو تسعيرة دون إنذار مسبق.<br><br><b>2. الحظر والمصادرة:</b> للإدارة الحق النهائي في حظر أي حساب ومصادرة رصيده فور الاشتباه بأي تلاعب، ولا يحق للمستخدم المطالبة بتعويض.<br><br><b>3. إغلاق المنصة:</b> لا نضمن استمرارية الخدمة، ويحق للإدارة إيقاف البوت في أي وقت دون تحمل التزامات مالية.<br><br><b>4. الإثباتات:</b> الإدارة غير مسؤولة عن رفض المعلن لإثباتك.<br><br><b>5. الإقرار:</b> استخدامك لهذا البوت يعني تنازلك وموافقتك التامة على هذه الشروط الاستبدادية."
       }
     };
 
-    function toggleLang() {
-      // تبديل المتغير
-      currentLang = currentLang === 'en' ? 'ar' : 'en';
-      
-      // تغيير اتجاه الشاشة (LTR للإنجليزية و RTL للعربية)
-      const htmlRoot = document.getElementById('html-root');
-      htmlRoot.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-      htmlRoot.lang = currentLang;
+    // --- 3. STATE MANAGEMENT & MOCK DATA ---
+    // (This mimics a real database so you can test ALL functionality instantly)
+    const State = {
+      lang: 'en',
+      user: null,
+      balance: 1450.75, // Starting mock balance
+      tasks: [
+        { id: 101, type: 'social', titleEn: 'Subscribe to Official Channel', titleAr: 'اشترك في قناة البوت الرسمية', reward: 0.5 },
+        { id: 102, type: 'web', titleEn: 'Watch Sponsor Ad (30s)', titleAr: 'شاهد إعلان الممول لمدة 30 ثانية', reward: 0.8 },
+        { id: 103, type: 'social', titleEn: 'Join Crypto Traders Group', titleAr: 'انضم لمجموعة متداولي الكريبتو', reward: 1.0 },
+        { id: 104, type: 'social', titleEn: 'Like & Retweet Pinned Post', titleAr: 'إعجاب وإعادة تغريد المنشور المثبت', reward: 0.7 },
+        { id: 105, type: 'web', titleEn: 'Sign up on Binance', titleAr: 'سجل حساب جديد في منصة باينانس', reward: 5.0 },
+        { id: 106, type: 'social', titleEn: 'Comment on YouTube Video', titleAr: 'اترك تعليقاً إيجابياً في فيديو اليوتيوب', reward: 0.6 }
+      ],
+      completedTasks: [],
+      txHistory: [
+        { type: 'in', descEn: 'Affiliate Bonus (Alex)', descAr: 'مكافأة إحالة (أليكس)', amount: 15.4 },
+        { type: 'out', descEn: 'Withdrawal to TRC20', descAr: 'سحب رصيد إلى المحفظة', amount: -2000.0 },
+        { type: 'in', descEn: 'Task #101 Completed', descAr: 'إكمال المهمة رقم 101', amount: 0.5 }
+      ],
+      leaderboard: [
+        { name: 'CryptoKing', amount: 8450 },
+        { name: 'Ali_Sudan', amount: 6230 },
+        { name: 'Sarah99', amount: 4100 },
+        { name: 'NinjaTrader', amount: 3800 }
+      ]
+    };
 
-      // تغيير اسم زر اللغة نفسه
-      document.getElementById('lang-btn').innerText = translations[currentLang].lang_btn;
-      
-      // البحث عن كل الكلمات التي تحتوي على الكود السري (data-i18n) وترجمتها فوراً
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[currentLang][key]) {
-          el.innerText = translations[currentLang][key];
+    // --- 4. CORE APPLICATION LOGIC (The "Beast") ---
+    const App = {
+      init() {
+        // Init Telegram WebApp
+        const tgApp = window.Telegram?.WebApp;
+        if(tgApp) { tgApp.expand(); tgApp.ready(); }
+        
+        // Fetch User
+        State.user = tgApp?.initDataUnsafe?.user || { id: CONFIG.ADMIN_ID, first_name: "Boss", username: "keeeeza" };
+        
+        // Populate UI Headers
+        document.getElementById('ui-name').innerText = State.user.first_name;
+        document.getElementById('ui-avatar').innerText = State.user.first_name.charAt(0).toUpperCase();
+        document.getElementById('ref-link').innerText = `https://t.me/DollarCBot?start=ref_${State.user.id}`;
+        
+        if (State.user.username) {
+          document.getElementById('ui-role').innerText = `@${State.user.username}`;
+        } else {
+          document.getElementById('ui-role').innerText = `ID: ${State.user.id}`;
         }
-      });
-    }
+
+        // God Mode Check
+        if (State.user.id === CONFIG.ADMIN_ID) {
+          document.getElementById('nav-admin').classList.remove('hidden');
+          document.getElementById('ui-role').innerText = "System Admin ⚡";
+          document.getElementById('ui-role').style.color = "var(--c-warn)";
+        }
+
+        // Bind Data to UI
+        this.updateBalance();
+        this.applyLang();
+        this.renderTasks();
+        this.renderHistory();
+        this.renderLeaderboard();
+      },
+
+      // Routing Logic
+      switchTab(viewId, btnElement) {
+        document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+        btnElement.classList.add('active');
+        this.triggerHaptic();
+      },
+
+      // Translation Engine
+      toggleLang() {
+        State.lang = State.lang === 'en' ? 'ar' : 'en';
+        document.getElementById('app-root').dir = State.lang === 'ar' ? 'rtl' : 'ltr';
+        document.getElementById('lang-btn').innerText = DICTIONARY[State.lang].lang_btn;
+        this.applyLang();
+        this.renderTasks(); // Re-render dynamic arrays
+        this.renderHistory();
+      },
+
+      applyLang() {
+        const dict = DICTIONARY[State.lang];
+        document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = dict[el.getAttribute('data-i18n')]; });
+        document.getElementById('terms-box').innerHTML = dict.terms_html;
+      },
+
+      // Financial Logic
+      updateBalance() {
+        const bal = State.balance.toFixed(2);
+        const usdt = (State.balance / CONFIG.EXCHANGE_RATE).toFixed(3);
+        document.getElementById('ui-top-balance').innerText = bal;
+        document.getElementById('main-balance').innerText = bal;
+        document.getElementById('main-usdt').innerText = usdt;
+      },
+
+      // Task Engine
+      renderTasks() {
+        const filter = document.getElementById('task-filter').value;
+        const container = document.getElementById('tasks-container');
+        container.innerHTML = '';
+        
+        let filtered = State.tasks;
+        if(filter !== 'all') filtered = State.tasks.filter(t => t.type === filter);
+        
+        filtered.forEach(task => {
+          if(State.completedTasks.includes(task.id)) return; // Hide completed tasks (Zero Accumulation Strategy)
+          
+          const title = State.lang === 'en' ? task.titleEn : task.titleAr;
+          const btnTxt = DICTIONARY[State.lang].task_btn_do;
+          
+          container.innerHTML += `
+            <div class="card" id="task-${task.id}" style="padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+              <div style="flex: 1;">
+                <h4 style="font-size: 15px; margin-bottom: 6px;">${title}</h4>
+                <span class="text-xs text-muted">ID: #${task.id} • ${task.type.toUpperCase()}</span>
+              </div>
+              <div style="text-align: center; margin-left: 10px;">
+                <div class="text-c font-bold mb-2">+${task.reward} ₵</div>
+                <button class="btn btn-sm" onclick="App.doTask(${task.id}, ${task.reward}, this)">${btnTxt}</button>
+              </div>
+            </div>`;
+        });
+      },
+
+      doTask(taskId, reward, btnEl) {
+        btnEl.disabled = true;
+        btnEl.innerHTML = `<span style="opacity:0.5">⏳</span>`;
+        btnEl.style.background = "var(--c-surface-hover)";
+        
+        // Simulate network delay
+        setTimeout(() => {
+          State.balance += reward;
+          State.completedTasks.push(taskId);
+          this.updateBalance();
+          
+          btnEl.innerText = DICTIONARY[State.lang].task_btn_done;
+          btnEl.style.background = "var(--c-primary-dark)";
+          
+          // Animate removal
+          setTimeout(() => {
+            document.getElementById(`task-${taskId}`).style.display = 'none';
+          }, 800);
+
+          if(window.Telegram?.WebApp?.HapticFeedback) {
+            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+          }
+        }, 1500);
+      },
+
+      // Advertising Engine (Calculator)
+      calculateAdCost() {
+        const reward = parseFloat(document.getElementById('ad-reward').value) || 0;
+        const count = parseInt(document.getElementById('ad-count').value) || 0;
+        const total = reward * count * CONFIG.FEE_MULTIPLIER;
+        document.getElementById('ad-total-cost').innerText = total.toFixed(2);
+      },
+
+      submitAd() {
+        const total = parseFloat(document.getElementById('ad-total-cost').innerText);
+        if(State.balance < total) {
+          this.alert(State.lang === 'en' ? "Insufficient ₵ balance to launch campaign!" : "رصيدك غير كافٍ لنشر هذه الحملة!");
+          return;
+        }
+        State.balance -= total;
+        this.updateBalance();
+        this.alert(State.lang === 'en' ? "Campaign launched successfully! Under review." : "تم إطلاق الحملة بنجاح! قيد المراجعة الإدارية.");
+      },
+
+      // History & Leaderboard
+      renderHistory() {
+        const container = document.getElementById('tx-container');
+        container.innerHTML = '';
+        State.txHistory.forEach(tx => {
+          const desc = State.lang === 'en' ? tx.descEn : tx.descAr;
+          const colorClass = tx.amount > 0 ? 'text-c' : 'text-danger';
+          const sign = tx.amount > 0 ? '+' : '';
+          container.innerHTML += `
+            <div class="list-item flex-between">
+              <span class="text-sm font-bold">${desc}</span>
+              <span class="${colorClass} font-bold">${sign}${tx.amount} ₵</span>
+            </div>`;
+        });
+      },
+
+      renderLeaderboard() {
+        const container = document.getElementById('leaderboard-container');
+        let html = '';
+        State.leaderboard.forEach((u, i) => {
+          html += `
+            <div class="list-item flex-between" style="padding: 12px 16px;">
+              <div>
+                <strong class="text-warn" style="margin-right: 10px;">#${i+1}</strong> 
+                <span class="font-bold">${u.name}</span>
+              </div>
+              <strong class="text-c">${u.amount} ₵</strong>
+            </div>`;
+        });
+        container.innerHTML = html;
+      },
+
+      // Modals
+      showModal(id) { 
+        document.getElementById(id).classList.add('active'); 
+        this.triggerHaptic();
+      },
+      hideModal(id) { 
+        document.getElementById(id).classList.remove('active'); 
+      },
+
+      requestWithdraw() {
+        this.alert(State.lang === 'en' ? "Withdrawal requested. Check history." : "تم استلام طلب السحب. راجع سجل العمليات.");
+        this.hideModal('modal-withdraw');
+      },
+
+      // Utilities
+      copyText(txt) {
+        // Native copy fallback
+        navigator.clipboard?.writeText(txt).then(() => {
+          this.alert(State.lang === 'en' ? "Copied to clipboard!" : "تم النسخ بنجاح!");
+        });
+        this.triggerHaptic();
+      },
+      copyRef() {
+        this.copyText(document.getElementById('ref-link').innerText);
+      },
+      alert(msg) {
+        if (window.Telegram?.WebApp?.showAlert) {
+          window.Telegram.WebApp.showAlert(msg);
+        } else {
+          alert(msg);
+        }
+      },
+      triggerHaptic() {
+        if(window.Telegram?.WebApp?.HapticFeedback) {
+          window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+        }
+      },
+
+      // Admin God Mode Actions
+      adminAction(type) {
+        const target = document.getElementById('admin-target').value;
+        const amount = document.getElementById('admin-amount').value;
+        
+        if (!target) { this.alert("Enter Target ID!"); return; }
+        
+        if (type === 'fund') {
+          if(!amount) return;
+          this.alert(`SYSTEM: Successfully minted and added ${amount} ₵ to User ID: ${target}`);
+        } else if (type === 'deduct') {
+          if(!amount) return;
+          this.alert(`SYSTEM: Deducted ${amount} ₵ from User ID: ${target}`);
+        } else if (type === 'ban') {
+          this.alert(`SYSTEM: User ID ${target} has been permanently banned. Funds seized. 🔨`);
+        }
+      }
+    };
+
+    // --- 5. IGNITION ---
+    window.onload = () => App.init();
+
   </script>
 </body>
 </html>
