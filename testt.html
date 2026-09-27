@@ -1,331 +1,376 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr" id="html-root">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>تطبيق أرباحك المصغر</title>
-  
-  <!-- مكتبة تيليجرام الرسمية -->
+  <title>Dollar C Platform</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- مكتبة سوبابيز السحابية -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+  
   <style>
     :root {
-      --primary: #7c3aed;
-      --primary-gradient: linear-gradient(135deg, #7c3aed, #4f46e5);
-      --bg: #0b0f19;
-      --card-bg: #161e31;
-      --text: #ffffff;
-      --text-muted: #94a3b8;
-      --success: #10b981;
-      --accent: #f59e0b;
+      --c-primary: #10b981; /* Emerald Green for Dollar C */
+      --c-primary-dark: #059669;
+      --c-bg: #0f172a;
+      --c-card: #1e293b;
+      --c-text: #f8fafc;
+      --c-muted: #94a3b8;
+      --c-danger: #ef4444;
+      --c-warn: #f59e0b;
+      --c-border: #334155;
+      --c-font: system-ui, -apple-system, sans-serif;
     }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      padding: 16px;
-      padding-bottom: 90px;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .avatar {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      background: var(--primary-gradient);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: bold;
-      border: 2px solid rgba(255,255,255,0.1);
-    }
-    .user-details h3 {
-      font-size: 16px;
-      font-weight: 700;
-    }
-    .user-details span {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-    .badge-status {
-      font-size: 11px;
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--success);
-      padding: 4px 8px;
-      border-radius: 20px;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--c-font); -webkit-tap-highlight-color: transparent; }
+    body { background: var(--c-bg); color: var(--c-text); padding-bottom: 80px; overflow-x: hidden; }
+    
+    /* Layout & Utilities */
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .flex-center { display: flex; justify-content: center; align-items: center; }
+    .gap-2 { gap: 8px; } .gap-4 { gap: 16px; }
+    .mt-2 { margin-top: 8px; } .mb-4 { margin-bottom: 16px; }
+    .text-center { text-align: center; }
+    .text-c { color: var(--c-primary); }
+    .text-danger { color: var(--c-danger); }
+    .text-sm { font-size: 12px; }
+    .text-muted { color: var(--c-muted); }
+    
+    /* UI Components */
+    .header { padding: 16px; background: var(--c-card); border-bottom: 1px solid var(--c-border); position: sticky; top: 0; z-index: 50; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--c-primary), #3b82f6); color: white; font-weight: bold; }
+    
+    .view-section { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
+    .view-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* كرت الرصيد الفخم */
-    .balance-card {
-      background: var(--primary-gradient);
-      padding: 24px 20px;
-      border-radius: 22px;
-      text-align: center;
-      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.35);
-      margin-bottom: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-    .balance-card::after {
-      content: "";
-      position: absolute;
-      top: -30px;
-      right: -30px;
-      width: 100px;
-      height: 100px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 50%;
-    }
-    .balance-title {
-      font-size: 13px;
-      opacity: 0.9;
-      margin-bottom: 6px;
-    }
-    .balance-amount {
-      font-size: 38px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      margin-bottom: 18px;
-    }
-    .balance-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
-    .btn {
-      padding: 11px 22px;
-      border-radius: 14px;
-      border: none;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 14px;
-      transition: transform 0.1s ease;
-    }
-    .btn:active {
-      transform: scale(0.96);
-    }
-    .btn-withdraw {
-      background: #ffffff;
-      color: #5b21b6;
-    }
-    .btn-deposit {
-      background: rgba(255, 255, 255, 0.18);
-      color: #ffffff;
-      backdrop-filter: blur(10px);
-    }
+    .card { background: var(--c-card); border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--c-border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    
+    /* Buttons */
+    .btn { background: var(--c-primary); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s; display: inline-flex; justify-content: center; align-items: center; gap: 8px; }
+    .btn:active { transform: scale(0.97); }
+    .btn-danger { background: var(--c-danger); }
+    .btn-warn { background: var(--c-warn); }
+    .btn-outline { background: transparent; border: 1px solid var(--c-primary); color: var(--c-primary); }
+    .btn-sm { padding: 8px 12px; font-size: 12px; width: auto; }
 
-    /* قسم المهام */
-    .section-header {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #cbd5e1;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .task-box {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    .task-info h4 {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .task-info span {
-      font-size: 12px;
-      color: var(--success);
-      font-weight: 700;
-    }
-    .task-btn {
-      background: var(--primary);
-      color: #fff;
-      padding: 9px 16px;
-      border-radius: 12px;
-      border: none;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    /* Inputs */
+    input, textarea, select { width: 100%; padding: 12px; background: var(--c-bg); border: 1px solid var(--c-border); color: white; border-radius: 10px; margin-bottom: 12px; outline: none; }
+    input:focus, textarea:focus { border-color: var(--c-primary); }
+    
+    /* Specific Cards */
+    .balance-showcase { background: linear-gradient(135deg, #064e3b, var(--c-primary-dark)); text-align: center; padding: 24px; position: relative; overflow: hidden; }
+    .balance-showcase h1 { font-size: 42px; font-weight: 900; margin: 8px 0; letter-spacing: -1px; }
+    
+    .list-item { background: var(--c-bg); border: 1px solid var(--c-border); padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    
+    /* Bottom Navigation */
+    .bottom-nav { position: fixed; bottom: 0; width: 100%; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--c-border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+    .nav-btn { background: none; border: none; color: var(--c-muted); display: flex; flex-direction: column; align-items: center; font-size: 11px; gap: 4px; cursor: pointer; transition: 0.2s; }
+    .nav-btn.active { color: var(--c-primary); }
+    .nav-btn svg { width: 22px; height: 22px; fill: currentColor; }
 
-    /* شريط التنقل السفلي */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(22, 30, 49, 0.95);
-      backdrop-filter: blur(15px);
-      display: flex;
-      justify-content: space-around;
-      padding: 12px 0 16px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .nav-link {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 11px;
-      color: var(--text-muted);
-      cursor: pointer;
-    }
-    .nav-link.active {
-      color: var(--primary);
-      font-weight: 700;
-    }
-    .nav-icon {
-      font-size: 20px;
-      margin-bottom: 2px;
-    }
+    /* RTL Support */
+    [dir="rtl"] .flex-between { flex-direction: row-reverse; }
+    [dir="rtl"] .btn { flex-direction: row-reverse; }
   </style>
 </head>
 <body>
 
-  <!-- رأس الصفحة ومعلومات المستخدم -->
-  <div class="header">
-    <div class="user-profile">
-      <div class="avatar" id="avatar-icon">👤</div>
-      <div class="user-details">
-        <h3 id="display-name">مستخدم تيليجرام</h3>
-        <span id="display-user">@username</span>
+  <!-- App Header -->
+  <header class="header flex-between">
+    <div class="flex gap-2 flex-center">
+      <div class="avatar flex-center" id="ui-avatar">U</div>
+      <div>
+        <div style="font-weight: 700; font-size: 15px;" id="ui-name">User</div>
+        <div class="text-sm text-muted" id="ui-id">@username</div>
       </div>
     </div>
-    <div class="badge-status">نشط ⚡</div>
-  </div>
-
-  <!-- كرت الرصيد -->
-  <div class="balance-card">
-    <div class="balance-title">الرصيد الكلي المتاح</div>
-    <div class="balance-amount" id="balance-val">$0.00</div>
-    <div class="balance-actions">
-      <button class="btn btn-withdraw" onclick="alertMsg('قسم السحب قيد التجهيز')">سحب ↗</button>
-      <button class="btn btn-deposit" onclick="alertMsg('الإيداع سيتاح قريباً')">شحن +</button>
+    <div class="flex gap-2">
+      <!-- Language Toggle -->
+      <button class="btn btn-sm btn-outline" onclick="app.toggleLang()" id="lang-btn">عربي</button>
+      <div style="background: rgba(16,185,129,0.1); color: var(--c-primary); padding: 6px 12px; border-radius: 20px; font-weight: bold; border: 1px solid var(--c-primary);">
+        <span id="ui-top-balance">0.00</span> ₵
+      </div>
     </div>
-  </div>
+  </header>
 
-  <!-- قائمة المهام اليومية السريعة -->
-  <div class="section-header">💼 مهام ربحية سريعة</div>
+  <!-- ==================== VIEWS ==================== -->
 
-  <div class="task-box">
-    <div class="task-info">
-      <h4>انضم لقناة البوت الرسمية</h4>
-      <span>+0.25 USD</span>
+  <!-- 1. DASHBOARD / EARN -->
+  <main id="view-earn" class="view-section active">
+    <div class="card balance-showcase">
+      <div data-i18n="available_balance" class="text-muted text-sm">Available Balance</div>
+      <h1><span id="main-balance">0.00</span> <span style="color: #6ee7b7;">₵</span></h1>
+      <div class="text-sm">≈ <span id="main-usdt">0.000</span> USDT</div>
     </div>
-    <button class="task-btn" onclick="completeTask(this, 0.25)">تنفيذ</button>
-  </div>
 
-  <div class="task-box">
-    <div class="task-info">
-      <h4>مشاركة التطبيق مع صديق</h4>
-      <span>+0.15 USD</span>
+    <div class="flex-between mb-4">
+      <h3 data-i18n="available_tasks">Available Tasks</h3>
+      <select id="task-filter" style="width: auto; margin: 0; padding: 6px;" onchange="app.renderTasks()">
+        <option value="all" data-i18n="filter_all">All</option>
+        <option value="social" data-i18n="filter_social">Social</option>
+        <option value="web" data-i18n="filter_web">Web</option>
+      </select>
     </div>
-    <button class="task-btn" onclick="completeTask(this, 0.15)">مشاركة</button>
-  </div>
 
-  <div class="task-box">
-    <div class="task-info">
-      <h4>مكافأة تسجيل الدخول اليومي</h4>
-      <span>+0.10 USD</span>
+    <!-- Tasks Container generated by JS -->
+    <div id="tasks-container"></div>
+  </main>
+
+  <!-- 2. ADVERTISE (CREATE TASKS) -->
+  <main id="view-ads" class="view-section">
+    <div class="card">
+      <h3 class="mb-4 text-c" data-i18n="create_ad_title">Create Advertisement</h3>
+      <p class="text-sm text-muted mb-4" data-i18n="create_ad_desc">Boost your channel or website. Platform fee: 25%.</p>
+      
+      <input type="text" id="ad-title" data-i18n-ph="ad_title_ph" placeholder="Task Title (e.g., Join Channel)">
+      <textarea id="ad-desc" rows="3" data-i18n-ph="ad_desc_ph" placeholder="Description or Link"></textarea>
+      
+      <div class="flex gap-4">
+        <div style="flex: 1;">
+          <label class="text-sm text-muted" data-i18n="reward_per_user">Reward/User (₵)</label>
+          <input type="number" id="ad-reward" value="1.0" step="0.1" oninput="app.calcAdCost()">
+        </div>
+        <div style="flex: 1;">
+          <label class="text-sm text-muted" data-i18n="target_users">Target Users</label>
+          <input type="number" id="ad-count" value="100" oninput="app.calcAdCost()">
+        </div>
+      </div>
+      
+      <select id="ad-type">
+        <option value="auto" data-i18n="ad_type_auto">Auto Approval (No Proof)</option>
+        <option value="manual" data-i18n="ad_type_manual">Manual (Screenshot Req.)</option>
+      </select>
+
+      <div class="list-item mt-2">
+        <span data-i18n="total_cost">Total Cost (incl. 25% fee):</span>
+        <strong class="text-danger"><span id="ad-total-cost">125.00</span> ₵</strong>
+      </div>
+      
+      <button class="btn mt-2" onclick="app.submitAd()" data-i18n="btn_publish">Publish Campaign</button>
     </div>
-    <button class="task-btn" onclick="completeTask(this, 0.10)">استلام</button>
-  </div>
+  </main>
 
-  <!-- الشريط السفلي -->
-  <div class="bottom-nav">
-    <div class="nav-link active"><span class="nav-icon">🏠</span>الرئيسية</div>
-    <div class="nav-link" onclick="alertMsg('سوق المهام قادم')"><span class="nav-icon">📋</span>المهام</div>
-    <div class="nav-link" onclick="alertMsg('المحفظة جاهزة')"><span class="nav-icon">👛</span>المحفظة</div>
-    <div class="nav-link" onclick="alertMsg('نظام الإحالات')"><span class="nav-icon">👥</span>الإحالات</div>
-  </div>
+  <!-- 3. WALLET -->
+  <main id="view-wallet" class="view-section">
+    <div class="card text-center">
+      <h3 class="mb-4 text-muted" data-i18n="wallet_title">Wallet Management</h3>
+      <div class="flex gap-4">
+        <button class="btn btn-outline" onclick="app.showModal('deposit-modal')" data-i18n="btn_deposit">Deposit</button>
+        <button class="btn" onclick="app.showModal('withdraw-modal')" data-i18n="btn_withdraw">Withdraw</button>
+      </div>
+    </div>
 
-  <script>
-    // ========================================================
-    // ⚙️ إعدادات الربط مع سوبابيز
-    // ========================================================
-    const PROJECT_REF = "kvessfcmquyeevbtnmka";
-    const SUPABASE_URL = `https://${PROJECT_REF}.supabase.co`;
+    <div class="card">
+      <h3 class="mb-4" data-i18n="tx_history">Transaction History</h3>
+      <div id="tx-history-container">
+        <!-- Generated by JS -->
+      </div>
+    </div>
+  </main>
+
+  <!-- 4. PROFILE & MORE -->
+  <main id="view-profile" class="view-section">
+    <div class="card">
+      <h3 class="mb-4 text-warn" data-i18n="affiliate_title">Affiliate Program</h3>
+      <p class="text-sm text-muted mb-4" data-i18n="affiliate_desc">Earn 35% from your friends' task earnings forever.</p>
+      <div class="list-item">
+        <span class="text-sm">Ref ID: <strong id="ref-id">...</strong></span>
+        <button class="btn btn-sm" onclick="app.copyRef()" data-i18n="btn_copy">Copy</button>
+      </div>
+      <div class="flex-between mt-2">
+        <span class="text-sm" data-i18n="total_referrals">Total Referrals:</span>
+        <strong>0</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="mb-4" data-i18n="leaderboard">Top Earners (Global)</h3>
+      <div id="leaderboard-container"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="mb-4 text-danger" data-i18n="terms_title">Platform Rules & Terms</h3>
+      <div style="height: 120px; overflow-y: scroll; font-size: 11px; color: var(--c-muted); padding-right: 10px;" id="terms-text">
+        <!-- Rendered by JS based on Lang -->
+      </div>
+    </div>
+  </main>
+
+  <!-- 5. ADMIN PANEL (GOD MODE) -->
+  <main id="view-admin" class="view-section">
+    <div style="background: var(--c-danger); color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 16px;">
+      GOD MODE: ACTIVE ⚡
+    </div>
     
-    // ضع هنا مفتاح anon الحقيقي عندما تنسخه لاحقاً (مؤقتاً شغال محلياً)
-    const SUPABASE_KEY = "dummy_token_key"; 
+    <div class="card">
+      <h3>System Treasury</h3>
+      <div class="flex gap-4 mt-2">
+        <div class="list-item" style="flex:1; flex-direction: column;">
+          <small>Platform Fees</small>
+          <strong class="text-c">+85,420 ₵</strong>
+        </div>
+        <div class="list-item" style="flex:1; flex-direction: column;">
+          <small>Pending Payouts</small>
+          <strong class="text-danger">-1,200 ₵</strong>
+        </div>
+      </div>
+    </div>
 
+    <div class="card">
+      <h3>User Management</h3>
+      <input type="number" id="admin-target-id" placeholder="Target Telegram ID">
+      <div class="flex gap-2">
+        <input type="number" id="admin-amount" placeholder="Amount (₵)" style="flex: 2; margin:0;">
+        <button class="btn" style="flex: 1; margin:0;" onclick="app.adminFund()">Add Funds</button>
+      </div>
+      <button class="btn btn-danger mt-2" onclick="app.adminBan()">Ban User 🔨</button>
+    </div>
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+  
+  <!-- Deposit Modal -->
+  <div id="deposit-modal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; padding: 20px;">
+    <div class="card" style="width: 100%; max-width: 400px; position: relative;">
+      <h3 class="mb-4" data-i18n="deposit_title">Fund Account (USDT TRC20)</h3>
+      <p class="text-sm text-muted mb-4" data-i18n="deposit_desc">Send USDT to the address below. Then notify admin with your ID.</p>
+      <input type="text" value="TYxV8... (Admin Wallet)" readonly>
+      <button class="btn mb-2" onclick="tg.showAlert('Address Copied!')" data-i18n="btn_copy">Copy Address</button>
+      <button class="btn btn-outline" onclick="window.open('https://t.me/keeeeza')" data-i18n="btn_notify_admin">Notify Admin (@keeeeza)</button>
+      <button class="btn btn-danger mt-4" onclick="app.hideModal('deposit-modal')" data-i18n="btn_close">Close</button>
+    </div>
+  </div>
+
+  <!-- Withdraw Modal -->
+  <div id="withdraw-modal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; padding: 20px;">
+    <div class="card" style="width: 100%; max-width: 400px;">
+      <h3 class="mb-4" data-i18n="withdraw_title">Request Withdrawal</h3>
+      <p class="text-sm text-danger mb-4" data-i18n="withdraw_limit">Min withdrawal: 2 USDT (2000 ₵). Processing: 3-24 hrs.</p>
+      <input type="text" data-i18n-ph="withdraw_addr_ph" placeholder="Your USDT TRC20 Address">
+      <input type="number" data-i18n-ph="withdraw_amount_ph" placeholder="Amount in USDT">
+      <button class="btn" onclick="tg.showAlert('Withdrawal Requested!')" data-i18n="btn_confirm">Confirm Request</button>
+      <button class="btn btn-outline mt-2" onclick="app.hideModal('withdraw-modal')" data-i18n="btn_close">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ==================== BOTTOM NAVIGATION ==================== -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="app.switchTab('view-earn', this)">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/></svg>
+      <span data-i18n="nav_earn">Earn</span>
+    </button>
+    <button class="nav-btn" onclick="app.switchTab('view-ads', this)">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 9h-2V7h-2v5H6v2h2v5h2v-5h2v-2z"/></svg>
+      <span data-i18n="nav_ads">Ads</span>
+    </button>
+    <button class="nav-btn" onclick="app.switchTab('view-wallet', this)">
+      <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.1 1.1-2 .9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      <span data-i18n="nav_wallet">Wallet</span>
+    </button>
+    <button class="nav-btn" onclick="app.switchTab('view-profile', this)">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span data-i18n="nav_profile">Profile</span>
+    </button>
+    <!-- Admin Tab (Hidden by default) -->
+    <button class="nav-btn hidden" id="nav-admin" onclick="app.switchTab('view-admin', this)">
+      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+      <span data-i18n="nav_admin">Admin</span>
+    </button>
+  </nav>
+
+  <!-- ==================== APPLICATION LOGIC ==================== -->
+  <script>
+    // System Constants
+    const ADMIN_ID = 8783399033;
+    const EX_RATE = 1000; // 1000 ₵ = 1 USDT
+    const PLATFORM_FEE = 1.25; // 25% Fee
+    
+    // Telegram API Initialization
     const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-    }
+    if(tg) { tg.expand(); tg.ready(); }
 
-    let currentBalance = 0.00;
-
-    // استخراج بيانات المستخدم التلقائية من تيليجرام
-    const tgUser = tg?.initDataUnsafe?.user || {
-      id: 999999,
-      first_name: "مستخدم تجريبي",
-      username: "Guest"
+    // State Management
+    const state = {
+      lang: 'en',
+      user: tg?.initDataUnsafe?.user || { id: 8783399033, first_name: "Boss", username: "keeeeza" },
+      balance: 1540.50,
+      tasks: [
+        { id: 1, type: 'social', titleEn: 'Join Official Channel', titleAr: 'انضم للقناة الرسمية', reward: 0.5 },
+        { id: 2, type: 'web', titleEn: 'Watch 30s Ad', titleAr: 'شاهد إعلان 30 ثانية', reward: 0.8 },
+        { id: 3, type: 'social', titleEn: 'Like Twitter Post', titleAr: 'إعجاب بمنشور تويتر', reward: 1.0 },
+        { id: 4, type: 'social', titleEn: 'Join Crypto Group', titleAr: 'انضم لجروب كريبتو', reward: 0.7 }
+      ]
     };
 
-    document.getElementById("display-name").innerText = tgUser.first_name;
-    document.getElementById("display-user").innerText = tgUser.username ? `@${tgUser.username}` : `#${tgUser.id}`;
-    document.getElementById("avatar-icon").innerText = (tgUser.first_name || "U")[0].toUpperCase();
-
-    // تشغيل الذاكرة ومزامنة الرصيد
-    const savedBal = localStorage.getItem("app_user_balance_" + tgUser.id);
-    if (savedBal) {
-      currentBalance = parseFloat(savedBal);
-      updateDisplay();
-    }
-
-    function updateDisplay() {
-      document.getElementById("balance-val").innerText = `$${currentBalance.toFixed(2)}`;
-    }
-
-    function completeTask(btn, reward) {
-      currentBalance += reward;
-      updateDisplay();
-      localStorage.setItem("app_user_balance_" + tgUser.id, currentBalance);
-
-      btn.innerText = "تمت بنجاح ✓";
-      btn.style.background = "var(--success)";
-      btn.disabled = true;
-
-      if (tg?.HapticFeedback) {
-        tg.HapticFeedback.notificationOccurred('success');
-      }
-    }
-
-    function alertMsg(txt) {
-      if (tg?.showAlert) {
-        tg.showAlert(txt);
-      } else {
-        alert(txt);
-      }
-    }
-  </script>
-</body>
-</html>
+    // --- TRANSLATION ENGINE (i18n) ---
+    const dict = {
+      en: {
+        available_balance: "Available Balance",
+        available_tasks: "Available Tasks",
+        filter_all: "All", filter_social: "Social", filter_web: "Web",
+        create_ad_title: "Create Advertisement",
+        create_ad_desc: "Boost your channel or website. Platform fee: 25%.",
+        ad_title_ph: "Task Title (e.g., Join Channel)",
+        ad_desc_ph: "Description or Link",
+        reward_per_user: "Reward/User (₵)",
+        target_users: "Target Users",
+        ad_type_auto: "Auto Approval (No Proof)", ad_type_manual: "Manual (Screenshot Req.)",
+        total_cost: "Total Cost (incl. 25% fee):",
+        btn_publish: "Publish Campaign",
+        wallet_title: "Wallet Management",
+        btn_deposit: "Deposit", btn_withdraw: "Withdraw",
+        tx_history: "Transaction History",
+        affiliate_title: "Affiliate Program",
+        affiliate_desc: "Earn 35% from your friends' task earnings forever.",
+        btn_copy: "Copy",
+        total_referrals: "Total Referrals:",
+        leaderboard: "Top Earners (Global)",
+        terms_title: "Platform Rules & Terms",
+        deposit_title: "Fund Account (USDT TRC20)",
+        deposit_desc: "Send USDT to the address below. Then notify admin with your ID.",
+        btn_notify_admin: "Notify Admin (@keeeeza)",
+        btn_close: "Close",
+        withdraw_title: "Request Withdrawal",
+        withdraw_limit: "Min withdrawal: 2 USDT (2000 ₵). Processing: 3-24 hrs.",
+        withdraw_addr_ph: "Your USDT TRC20 Address",
+        withdraw_amount_ph: "Amount in USDT",
+        btn_confirm: "Confirm Request",
+        nav_earn: "Earn", nav_ads: "Ads", nav_wallet: "Wallet", nav_profile: "Profile", nav_admin: "Admin",
+        terms_html: "<b>1. Absolute Authority:</b> Dollar C reserves the absolute right to modify, cancel, or change any terms, exchange rates, or commission rates at any time without notice.<br><br><b>2. Account Freezing:</b> Management has the exclusive right to ban any account or confiscate balances if unusual activity is suspected. Users have no right to claim compensation.<br><br><b>3. Task Approval:</b> Management is not responsible for tasks rejected by advertisers.<br><br><b>4. Consent:</b> By using this bot, you voluntarily agree to all the above."
+      },
+      ar: {
+        available_balance: "الرصيد المتاح",
+        available_tasks: "المهام المتوفرة",
+        filter_all: "الكل", filter_social: "تواصل اجتماعي", filter_web: "مواقع/إعلانات",
+        create_ad_title: "إنشاء إعلان جديد",
+        create_ad_desc: "قم بتكبير قناتك أو موقعك. عمولة المنصة: 25%.",
+        ad_title_ph: "عنوان المهمة (مثال: اشترك في القناة)",
+        ad_desc_ph: "وصف المهمة أو الرابط",
+        reward_per_user: "ربح المستخدم (₵)",
+        target_users: "العدد المطلوب",
+        ad_type_auto: "موافقة تلقائية (بدون إثبات)", ad_type_manual: "يدوي (يتطلب سكرين شوت)",
+        total_cost: "التكلفة الكلية (شاملة 25%):",
+        btn_publish: "نشر الحملة الإعلانية",
+        wallet_title: "إدارة المحفظة المالية",
+        btn_deposit: "إيداع / شحن", btn_withdraw: "طلب سحب",
+        tx_history: "سجل العمليات",
+        affiliate_title: "برنامج الإحالة",
+        affiliate_desc: "اربح 35% من أرباح أصدقائك مدى الحياة.",
+        btn_copy: "نسخ",
+        total_referrals: "إجمالي الدعوات:",
+        leaderboard: "قائمة المتصدرين عالمياً",
+        terms_title: "الشروط والقوانين الملزمة",
+        deposit_title: "شحن الرصيد (USDT TRC20)",
+        deposit_desc: "أرسل USDT للعنوان أدناه، ثم تواصل مع الإدارة برقمك.",
+        btn_notify_admin: "مراسلة الإدارة (@keeeeza)",
+        btn_close: "إغلاق",
+        withdraw_title: "طلب سحب أرباح",
+        withdraw_limit: "الحد الأدنى: 2 USDT (2000 ₵). المعالجة: 3-24 ساعة.",
+        withdraw_addr_ph: "عنوان محفظتك USDT TRC20",
+        withdraw_amount_ph: "المبلغ المراد سحبه (USDT)",
+        btn_confirm: "تأكيد السحب",
+        nav_earn: "المهام", nav_ads: "إعلانات", nav_wallet: "المحفظة", nav_profile: "حسابي", nav_admin: "الإدارة",
+        terms_html: "<b>1. السلطة المطلقة:</b> تحتفظ منصة Dollar C بالحق المطلق في تعديل، إلغاء، أو تغيير أي بند، أو تغيير أسعار الصرف، أو نسب العمولة في أي وقت دون إشعار.<br><br><b>2. تجميد الحسابات:</b> للإدارة الحق في حظر أي حساب أو مصادرة الأرصدة عند الاشتباه بأي نشاط غير اعتيادي.<br><br><b>3. إغلاق المنصة:</b> لا نقدم أي ضمانات باستمرارية الخدمة. يحق للإدارة إيقاف الخدمة في أي وقت 
