@@ -60,7 +60,6 @@
     .flex-row { display: flex; flex-direction: row; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .flex-center { display: flex; justify-content: center; align-items: center; }
-    .flex-wrap { display: flex; flex-wrap: wrap; }
     .gap-1 { gap: 4px; }
     .gap-2 { gap: 8px; }
     .gap-3 { gap: 12px; }
@@ -259,9 +258,6 @@
     .btn-danger {
       background: var(--c-danger);
     }
-    .btn-danger:active {
-      background: #dc2626;
-    }
     .btn-warn {
       background: var(--c-warn);
       color: #000;
@@ -270,9 +266,6 @@
       background: transparent;
       border: 2px solid var(--c-primary);
       color: var(--c-primary);
-    }
-    .btn-outline:active {
-      background: var(--c-primary-alpha);
     }
     .btn-sm {
       padding: 8px 14px;
@@ -289,10 +282,6 @@
       margin-bottom: 10px;
       transition: var(--trans-fast);
     }
-    .list-item:hover {
-      border-color: rgba(255, 255, 255, 0.15);
-      background: rgba(7, 13, 23, 0.7);
-    }
     .badge {
       display: inline-flex;
       align-items: center;
@@ -304,7 +293,6 @@
     .badge-primary { background: var(--c-primary-alpha); color: var(--c-primary); }
     .badge-danger { background: var(--c-danger-alpha); color: var(--c-danger); }
     .badge-warn { background: var(--c-warn-alpha); color: var(--c-warn); }
-    .badge-info { background: var(--c-info-alpha); color: var(--c-info); }
 
     .empty-state {
       text-align: center;
@@ -479,7 +467,7 @@
     <div class="flex gap-3 flex-center">
       <div class="user-avatar flex-center" id="ui-avatar">U</div>
       <div class="flex-col">
-        <span class="font-bold text-sm" id="ui-username">تحميل...</span>
+        <span class="font-bold text-sm" id="ui-username">مستخدم</span>
         <span class="text-xs text-muted" id="ui-badge-role">عضو مسجل</span>
       </div>
     </div>
@@ -492,7 +480,6 @@
   </header>
 
   <main id="view-earn" class="view-container active">
-    
     <div class="balance-master">
       <div class="text-muted text-xs font-bold" data-i18n="hero_balance_title">الرصيد المتاح القابل للسحب</div>
       <h1><span id="main-balance-val">0.00</span> <span style="color: #6ee7b7;">₵</span></h1>
@@ -515,7 +502,6 @@
     </div>
 
     <div id="tasks-feed-container"></div>
-
   </main>
 
   <main id="view-ads" class="view-container">
@@ -604,4 +590,13 @@
     <div class="card text-center" style="padding: 30px 16px;">
       <div class="text-xs text-muted font-bold mb-2" data-i18n="wallet_overview">المحفظة المالية والمعاملات</div>
       <h2 class="text-xl font-black mb-4"><span id="wallet-balance-num">0.00</span> ₵</h2>
-    
+      
+      <div class="flex gap-3">
+        <button class="btn btn-outline" onclick="Engine.openModal('modal-deposit')" data-i18n="btn_deposit">⬇️ شحن الرصيد</button>
+        <button class="btn" onclick="Engine.openModal('modal-withdraw')" data-i18n="btn_withdraw">⬆️ سحب الأرباح</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>?
