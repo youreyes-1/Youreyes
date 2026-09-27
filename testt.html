@@ -801,7 +801,7 @@
 
       init() {
         try {
-          const raw = SafeStorage.getItem('DollarC_Platform_Store_V10');
+          const raw = SafeStorage.getItem('DollarC_Platform_Store_V11');
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed && typeof parsed === 'object') {
@@ -824,7 +824,7 @@
       },
 
       save() {
-        try { SafeStorage.setItem('DollarC_Platform_Store_V10', JSON.stringify(this.data)); } catch(e) { console.error(e); }
+        try { SafeStorage.setItem('DollarC_Platform_Store_V11', JSON.stringify(this.data)); } catch(e) { console.error(e); }
       },
 
       getUser(id, username = '') {
@@ -1193,11 +1193,13 @@
         const mBal = document.getElementById('main-balance-val');
         const mUsdt = document.getElementById('main-balance-usdt');
         const wBal = document.getElementById('wallet-balance-num');
+        const refCountEl = document.getElementById('ui-referrals-count');
 
         if (hBal) hBal.innerText = bal;
         if (mBal) mBal.innerText = bal;
         if (mUsdt) mUsdt.innerText = usdt;
         if (wBal) wBal.innerText = bal;
+        if (refCountEl) refCountEl.innerText = u.referralsCount || 0;
       },
 
       renderTasks() {
