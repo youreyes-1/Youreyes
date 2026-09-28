@@ -571,6 +571,7 @@
         <button class="admin-tab-btn" onclick="Engine.switchAdminSubSection('admin-tasks', this)">حقن المهام</button>
         <button class="admin-tab-btn" onclick="Engine.switchAdminSubSection('admin-users', this)">المستخدمين</button>
         <button class="admin-tab-btn" onclick="Engine.switchAdminSubSection('admin-tickets', this)">التذاكر 🎫</button>
+        <button class="admin-tab-btn" onclick="Engine.switchAdminSubSection('admin-settings', this)">الإعدادات ⚙️</button>
         <button class="admin-tab-btn" id="btn-admin-subadmins" onclick="Engine.switchAdminSubSection('admin-subadmins', this)">المشرفين الفرعيين</button>
       </div>
 
@@ -662,6 +663,18 @@
         </div>
       </div>
 
+      <div id="admin-settings" class="admin-panel-section">
+        <div class="card">
+          <div class="card-header text-warn">⚙️ إعدادات محفظة الإيداع المركزية</div>
+          <p class="text-xs text-muted mb-3">يمكنك تغيير عنوان محفظة USDT (TRC20) التي سيقوم المستخدمون بالتحويل إليها عند شحن رصيدهم.</p>
+          <div class="input-group">
+            <label class="input-label">عنوان محفظة الإيداع (TRC20)</label>
+            <input type="text" id="admin-deposit-wallet-input" placeholder="TYXqJ8ZKvW...">
+          </div>
+          <button class="btn btn-warn mt-2" onclick="Engine.adminUpdateDepositWallet()">حفظ عنوان المحفظة الجديد 💾</button>
+        </div>
+      </div>
+
       <div id="admin-subadmins" class="admin-panel-section">
         <div class="card">
           <div class="card-header text-warn">👑 إدارة المشرفين الفرعيين (صلاحية الأدمن الأعلى فقط)</div>
@@ -695,13 +708,13 @@
       <h3 class="mb-3 text-c text-center" data-i18n="modal_dep_title">شحن الرصيد عبر USDT TRC20</h3>
       <p class="text-xs text-muted mb-3 text-center" data-i18n="modal_dep_desc">قم بتحويل المبلغ المطلوب إلى عنوان المحفظة التالي، ثم راسل الإدارة بالإشعار لشحنه لحسابك فوراً (1 USDT = 1000 ₵).</p>
       
-      <div class="p-3 mb-3 text-center" style="background: rgba(0,0,0,0.5); border: 1px dashed var(--c-primary); border-radius: var(--radius-sm); word-break: break-all; font-family: monospace; font-size: 13px; font-weight: bold; letter-spacing: 0.5px;">
+      <div id="modal-deposit-address-box" class="p-3 mb-3 text-center" style="background: rgba(0,0,0,0.5); border: 1px dashed var(--c-primary); border-radius: var(--radius-sm); word-break: break-all; font-family: monospace; font-size: 13px; font-weight: bold; letter-spacing: 0.5px;">
         TYXqJ8ZKvW9nmLoP3eRs7bC4dG1uHt2fKa
       </div>
 
-      <button class="btn mb-2" onclick="Engine.copyText('TYXqJ8ZKvW9nmLoP3eRs7bC4dG1uHt2fKa')" data-i18n="btn_copy_addr">نسخ عنوان المحفظة</button>
+      <button class="btn mb-2" onclick="Engine.copyDepositAddress()" data-i18n="btn_copy_addr">نسخ عنوان المحفظة</button>
       <button class="btn btn-outline mb-3" onclick="window.open('https://t.me/keeeeza', '_blank')" data-i18n="btn_notify_admin">مراسلة الإدارة بالإشعار (@keeeeza)</button>
-      <button class="btn btn-danger" onclick="Engine.closeModal('modal-deposit')" data-i18n="btn_close">إلغاء</button>
+      <button class="btn btn-danger" onclick="Engine.closeModal('modal-deposit')" data-i18n="btn_close">إغلاق</button>
     </div>
   </div>
 
@@ -773,7 +786,8 @@
       PLATFORM_FEE_MULTIPLIER: 1.25,
       AFFILIATE_PERCENT: 0.35,
       MIN_WITHDRAW_USDT: 2,
-      BOT_USERNAME: "Ta7oiilbot"
+      BOT_USERNAME: "Ta7oiilbot",
+      DEFAULT_DEPOSIT_WALLET: "TYXqJ8ZKvW9nmLoP3eRs7bC4dG1uHt2fKa"
     };
 
     const SafeStorage = {
@@ -796,12 +810,12 @@
         history: [],
         tickets: [],
         userTaskStates: {},
-        platform: { revenue: 0, totalMinted: 0 }
+        platform: { revenue: 0, totalMinted: 0, depositWallet: "TYXqJ8ZKvW9nmLoP3eRs7bC4dG1uHt2fKa" }
       },
 
       init() {
         try {
-          const raw = SafeStorage.getItem('DollarC_Platform_Store_V11');
+          const raw = SafeStorage.getItem('DollarC_Platform_Store_V12');
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed && typeof parsed === 'object') {
@@ -814,7 +828,8 @@
               if (!Array.isArray(this.data.history)) this.data.history = [];
               if (!Array.isArray(this.data.tickets)) this.data.tickets = [];
               if (!this.data.userTaskStates) this.data.userTaskStates = {};
-              if (!this.data.platform) this.data.platform = { revenue: 0, totalMinted: 0 };
+              if (!this.data.platform) this.data.platform = { revenue: 0, totalMinted: 0, depositWallet: CONFIG.DEFAULT_DEPOSIT_WALLET };
+              if (!this.data.platform.depositWallet) this.data.platform.depositWallet = CONFIG.DEFAULT_DEPOSIT_WALLET;
             }
           } else {
             this.data.tasks = [];
@@ -824,7 +839,7 @@
       },
 
       save() {
-        try { SafeStorage.setItem('DollarC_Platform_Store_V11', JSON.stringify(this.data)); } catch(e) { console.error(e); }
+        try { SafeStorage.setItem('DollarC_Platform_Store_V12', JSON.stringify(this.data)); } catch(e) { console.error(e); }
       },
 
       getUser(id, username = '') {
@@ -1028,17 +1043,23 @@
             this.currentUserObj = DB.getUser(this.currentUserId, "SupremeBoss");
           }
 
-          // --- معالجة نظام الإحالة المباشر عبر الـ Mini App Start Param ---
+          // --- نظام الإحالة المحسّن والشامل (رصد من Telegram WebApp start_param أو URL params أو Hash) ---
           let startParam = null;
-          if (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
-            startParam = tg.initDataUnsafe.start_param;
-          } else {
+          if (window.Telegram?.WebApp?.initDataUnsafe?.start_param) {
+            startParam = window.Telegram.WebApp.initDataUnsafe.start_param;
+          }
+          if (!startParam) {
             const urlParams = new URLSearchParams(window.location.search);
-            startParam = urlParams.get('startapp') || urlParams.get('ref');
+            startParam = urlParams.get('startapp') || urlParams.get('ref') || urlParams.get('tgWebAppStartParam');
+          }
+          if (!startParam && window.location.hash) {
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            startParam = hashParams.get('startapp') || hashParams.get('ref') || hashParams.get('tgWebAppStartParam');
           }
 
-          if (startParam && startParam.startsWith('ref_')) {
-            const referrerId = Number(startParam.replace('ref_', ''));
+          if (startParam) {
+            let cleanRef = startParam.toString().replace('ref_', '');
+            const referrerId = Number(cleanRef);
             if (referrerId && referrerId !== this.currentUserId) {
               const currentUser = DB.getUser(this.currentUserId);
               if (!currentUser.referredBy) {
@@ -1200,6 +1221,12 @@
         if (mUsdt) mUsdt.innerText = usdt;
         if (wBal) wBal.innerText = bal;
         if (refCountEl) refCountEl.innerText = u.referralsCount || 0;
+
+        // تحديث عنوان محفظة الإيداع في نافذة الشحن تلقائياً
+        const depBox = document.getElementById('modal-deposit-address-box');
+        if (depBox && DB.data.platform.depositWallet) {
+          depBox.innerText = DB.data.platform.depositWallet;
+        }
       },
 
       renderTasks() {
@@ -1659,9 +1686,11 @@
         const revEl = document.getElementById('stat-platform-revenue');
         const mintEl = document.getElementById('stat-total-minted');
         const pendingWdEl = document.getElementById('stat-pending-withdrawals');
+        const walletInput = document.getElementById('admin-deposit-wallet-input');
 
         if (revEl) revEl.innerText = DB.data.platform.revenue.toFixed(2) + " ₵";
         if (mintEl) mintEl.innerText = DB.data.platform.totalMinted.toFixed(2) + " ₵";
+        if (walletInput) walletInput.value = DB.data.platform.depositWallet || CONFIG.DEFAULT_DEPOSIT_WALLET;
 
         const pendingWd = DB.data.withdrawals.filter(w => w.status === 'pending');
         if (pendingWdEl) pendingWdEl.innerText = `${pendingWd.length} طلبات`;
@@ -1670,6 +1699,21 @@
         this.renderAdminProofs();
         this.renderAdminTickets();
         this.renderAdminSubAdmins();
+      },
+
+      adminUpdateDepositWallet() {
+        if (!DB.hasAdminAccess(this.currentUserId)) return;
+        const inp = document.getElementById('admin-deposit-wallet-input');
+        if (!inp) return;
+        const val = inp.value.trim();
+        if (val.length < 15) {
+          Toast.show("عنوان المحفظة غير صالح!", "error");
+          return;
+        }
+        DB.data.platform.depositWallet = val;
+        DB.save();
+        Toast.show("تم تحديث محفظة الإيداع المركزية بنجاح! 💾");
+        this.syncFinancialUI();
       },
 
       renderAdminWithdrawals() {
@@ -1988,6 +2032,11 @@
             Toast.show("تم النسخ للحافظة بنجاح!");
           }).catch(() => { this.fallbackCopy(txt); });
         } else { this.fallbackCopy(txt); }
+      },
+
+      copyDepositAddress() {
+        const addr = DB.data.platform.depositWallet || CONFIG.DEFAULT_DEPOSIT_WALLET;
+        this.copyText(addr);
       },
 
       fallbackCopy(txt) {
