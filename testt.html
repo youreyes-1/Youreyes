@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Dollar C - Supreme Enterprise Platform</title>
+  <title>Dollar C - Supreme Enterprise Platform (Cloud Connected)</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
@@ -561,7 +562,7 @@
     <main id="view-admin" class="view-container">
       <div style="background: linear-gradient(90deg, #7f1d1d, #dc2626); color: white; padding: 20px; border-radius: var(--radius-md); text-align: center; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4); border: 1px solid #f87171;">
         <h2 style="font-weight: 900; letter-spacing: 2px; font-size: 22px;">SUPREME COMMAND MATRIX</h2>
-        <p class="text-xs mt-2" style="opacity: 0.9;" id="admin-header-status">التحكم المركزي المطلق بنظام العمليات</p>
+        <p class="text-xs mt-2" style="opacity: 0.9;" id="admin-header-status">التحكم المركزي المطلق بنظام العمليات السحابي</p>
       </div>
 
       <div class="admin-subnav">
@@ -577,7 +578,7 @@
 
       <div id="admin-overview" class="admin-panel-section active">
         <div class="card" style="border-color: var(--c-danger);">
-          <div class="card-header">🏦 إحصائيات الخزينة المركزية</div>
+          <div class="card-header">🏦 إحصائيات الخزينة المركزية السحابية</div>
           <div class="flex gap-3">
             <div class="list-item text-center" style="flex:1;">
               <span class="text-xs text-muted block mb-1">أرباح المنصة (25%)</span>
@@ -790,15 +791,10 @@
       DEFAULT_DEPOSIT_WALLET: "TYXqJ8ZKvW9nmLoP3eRs7bC4dG1uHt2fKa"
     };
 
-    const SafeStorage = {
-      memory: {},
-      getItem(key) {
-        try { return localStorage.getItem(key); } catch(e) { return this.memory[key] || null; }
-      },
-      setItem(key, val) {
-        try { localStorage.setItem(key, val); } catch(e) { this.memory[key] = String(val); }
-      }
-    };
+    // ربط Supabase بالسحابة الرسمية مباشرة
+    const SUPABASE_URL = "https://fidthtrcrrxwvwnngyzh.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_HKB5k0VoU2j4tRvDtY31cQ_lquwtOIb";
+    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
     const DB = {
       data: {
@@ -813,33 +809,79 @@
         platform: { revenue: 0, totalMinted: 0, depositWallet: "TYXqJ8ZKvW9nmLoP3eRs7bC4dG1uHt2fKa" }
       },
 
-      init() {
+      async initCloud() {
+        if (!supabase) return;
         try {
-          const raw = SafeStorage.getItem('DollarC_Platform_Store_V12');
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (parsed && typeof parsed === 'object') {
-              this.data = parsed;
-              if (!this.data.users) this.data.users = {};
-              if (!Array.isArray(this.data.tasks)) this.data.tasks = [];
-              if (!Array.isArray(this.data.proofs)) this.data.proofs = [];
-              if (!Array.isArray(this.data.withdrawals)) this.data.withdrawals = [];
-              if (!Array.isArray(this.data.subAdmins)) this.data.subAdmins = [8783399033];
-              if (!Array.isArray(this.data.history)) this.data.history = [];
-              if (!Array.isArray(this.data.tickets)) this.data.tickets = [];
-              if (!this.data.userTaskStates) this.data.userTaskStates = {};
-              if (!this.data.platform) this.data.platform = { revenue: 0, totalMinted: 0, depositWallet: CONFIG.DEFAULT_DEPOSIT_WALLET };
-              if (!this.data.platform.depositWallet) this.data.platform.depositWallet = CONFIG.DEFAULT_DEPOSIT_WALLET;
-            }
-          } else {
-            this.data.tasks = [];
-            this.save();
+          // جلب الإعدادات العامة أو المحفظة
+          const { data: usersData } = await supabase.from('users').select('*');
+          if (usersData) {
+            usersData.forEach(u => {
+              this.data.users[u.telegram_id] = {
+                id: u.telegram_id,
+                username: u.username,
+                balance: Number(u.balance) || 0,
+                banned: u.banned,
+                referralsCount: u.referrals_count || 0,
+                referredBy: u.referred_by
+              };
+            });
           }
-        } catch(e) { console.error(e); }
-      },
 
-      save() {
-        try { SafeStorage.setItem('DollarC_Platform_Store_V12', JSON.stringify(this.data)); } catch(e) { console.error(e); }
+          const { data: tasksData } = await supabase.from('tasks').select('*');
+          if (tasksData) {
+            this.data.tasks = tasksData.map(t => ({
+              id: t.id,
+              creatorId: t.creator_id,
+              title: t.title,
+              link: t.link,
+              category: t.category,
+              reward: Number(t.reward),
+              totalCount: t.total_count,
+              remainingCount: t.remaining_count,
+              escrowLocked: Number(t.escrow_locked),
+              type: t.type,
+              active: t.active
+            }));
+          }
+
+          const { data: proofsData } = await supabase.from('proofs').select('*');
+          if (proofsData) {
+            this.data.proofs = proofsData;
+          }
+
+          const { data: wdData } = await supabase.from('withdrawals').select('*');
+          if (wdData) {
+            this.data.withdrawals = wdData.map(w => ({
+              id: w.id,
+              userId: w.user_id,
+              username: w.username,
+              address: w.address,
+              amountUsdt: Number(w.amountusdt),
+              amountBee: Number(w.amountbee),
+              status: w.status,
+              date: w.date
+            }));
+          }
+
+          const { data: historyData } = await supabase.from('history').select('*');
+          if (historyData) {
+            this.data.history = historyData.map(h => ({
+              id: h.id,
+              userId: h.user_id,
+              type: h.type,
+              amount: Number(h.amount),
+              desc: h.description,
+              date: h.date
+            }));
+          }
+
+          const { data: ticketsData } = await supabase.from('tickets').select('*');
+          if (ticketsData) {
+            this.data.tickets = ticketsData;
+          }
+        } catch (e) {
+          console.error("Cloud sync error:", e);
+        }
       },
 
       getUser(id, username = '') {
@@ -854,32 +896,66 @@
             referredBy: null,
             createdDate: new Date().toISOString()
           };
-          this.save();
+          this.saveUserCloud(this.data.users[uid]);
         } else if (username && this.data.users[uid].username !== username) {
           this.data.users[uid].username = username;
-          this.save();
+          this.saveUserCloud(this.data.users[uid]);
         }
         return this.data.users[uid];
+      },
+
+      async saveUserCloud(u) {
+        if (!supabase) return;
+        await supabase.from('users').upsert({
+          telegram_id: u.id,
+          username: u.username,
+          balance: u.balance,
+          referred_by: u.referredBy,
+          referrals_count: u.referralsCount,
+          banned: u.banned
+        });
       },
 
       isSupremeAdmin(id) { return Number(id) === Number(CONFIG.SUPREME_ADMIN_ID); },
       isSubAdmin(id) { return this.data.subAdmins.map(Number).includes(Number(id)); },
       hasAdminAccess(id) { return this.isSupremeAdmin(id) || this.isSubAdmin(id); },
 
-      logTransaction(userId, type, amount, desc) {
+      async logTransaction(userId, type, amount, desc) {
         const u = this.getUser(userId);
         const numAmt = parseFloat(amount) || 0;
         if (type === 'in') { u.balance = parseFloat((u.balance + numAmt).toFixed(2)); }
         else if (type === 'out') { u.balance = parseFloat((u.balance - numAmt).toFixed(2)); }
-        this.data.history.push({
+        
+        await this.saveUserCloud(u);
+
+        const tx = {
           id: Date.now() + Math.random(),
           userId: Number(userId),
           type,
           amount: numAmt,
-          desc,
+          description: desc,
           date: new Date().toLocaleTimeString()
+        };
+
+        this.data.history.push({
+          id: tx.id,
+          userId: tx.userId,
+          type: tx.type,
+          amount: tx.amount,
+          desc: tx.description,
+          date: tx.date
         });
-        this.save();
+
+        if (supabase) {
+          await supabase.from('history').insert([{
+            id: tx.id,
+            user_id: tx.userId,
+            type: tx.type,
+            amount: tx.amount,
+            description: tx.description,
+            date: tx.date
+          }]);
+        }
       }
     };
 
@@ -930,8 +1006,8 @@
         btn_deposit: "⬇️ شحن الرصيد",
         btn_withdraw: "⬆️ سحب الأرباح",
         wallet_ledger_header: "سجل المعاملات والتحويلات",
-        affiliate_header: "برنامج شركاء الإحالة (35%)",
-        affiliate_desc: "اربح عمولة ضخمة بنسبة 35% من كل مهمة ينجزها أصدقاؤك مدى الحياة! لا يوجد سقف للأرباح.",
+        affiliate_header: "برنامج شركاء الإحالة السحابي (35%)",
+        affiliate_desc: "اربح عمولة ضخمة بنسبة 35% من كل مهمة ينجزها أصدقاؤك مدى الحياة عبر السحابة المركزية!",
         your_affiliate_link: "رابط الإحالة المباشر:",
         total_referrals_count: "الإحالات النشطة:",
         btn_copy: "نسخ",
@@ -959,7 +1035,7 @@
         nav_wallet: "المحفظة",
         nav_affiliates: "الإحالات",
         nav_admin: "الإدارة",
-        rules_content: "<b>1. السيادة المطلقة للإدارة:</b> للمنصة وإدارتها الحق الحصري في إيقاف الخدمات، تعديل أسعار الصرف، تغيير نسب العمولات، أو إلغاء أي مكافأة في أي وقت دون إشعار مسبق.<br><br><b>2. الحظر وتجميد الأرصدة:</b> يحق للإدارة حظر أي مستخدم ومصادرة أرصدته فوراً ودون الرجوع إليه في حال استخدام برامج محاكاة، حسابات وهمية، أو تقديم إثباتات مضللة.<br><br><b>3. شروط السحب والإيداع:</b> تتم كافة التحويلات عبر عملة USDT (شبكة TRC20) فقط. لا تتحمل الإدارة مسؤولية إرسال مبالغ إلى عناوين خاطئة. تستغرق السحوبات من 3 إلى 24 ساعة وفق تقدير الإدارة.<br><br><b>4. التحكيم والمهام:</b> قرار المشرفين والمعلنين في رفض أي إثبات أو قبول المهمة نهائي وغير قابل للطعن."
+        rules_content: "<b>1. السيادة المطلقة للإدارة:</b> للمنصة وإدارتها الحق الحصري في إيقاف الخدمات، تعديل أسعار الصرف، تغيير نسب العمولات، أو إلغاء أي مكافأة في أي وقت دون إشعار مسبق."
       },
       en: {
         hero_balance_title: "Available Withdrawable Balance",
@@ -987,7 +1063,7 @@
         btn_withdraw: "⬆️ Withdraw",
         wallet_ledger_header: "Transaction & Transfer History",
         affiliate_header: "Affiliate Partnership (35%)",
-        affiliate_desc: "Earn an immense 35% commission on all completed referral tasks for life! Zero limits.",
+        affiliate_desc: "Earn an immense 35% commission on all completed referral tasks for life!",
         your_affiliate_link: "Direct Referral Link:",
         total_referrals_count: "Active Referrals:",
         btn_copy: "Copy",
@@ -1015,7 +1091,7 @@
         nav_wallet: "Wallet",
         nav_affiliates: "Affiliates",
         nav_admin: "Admin",
-        rules_content: "<b>1. Absolute Sovereignty:</b> The management reserves the unrestricted right to modify, adjust, terminate, or recalibrate fees, exchange rates, or rewards at any moment without prior notice.<br><br><b>2. Freezing & Sanctions:</b> We reserve the full right to permanently ban accounts and seize balances upon suspicion of bots, false screenshots, or emulator abuse without recourse.<br><br><b>3. Payout Conditions:</b> All transactions occur solely via USDT (TRC20). Processing takes 3 to 24 hours. The management holds zero liability for incorrect addresses provided by users.<br><br><b>4. Proof Arbitration:</b> Rulings regarding task proof approvals or rejections are definitive and irrevocable."
+        rules_content: "<b>1. Absolute Sovereignty:</b> The management reserves the unrestricted right to modify, adjust, terminate, or recalibrate fees."
       }
     };
 
@@ -1024,9 +1100,10 @@
       currentUserId: null,
       currentUserObj: null,
 
-      init() {
+      async init() {
         try {
-          DB.init();
+          // جلب بيانات السحابة أولاً
+          await DB.initCloud();
 
           const tg = window.Telegram?.WebApp;
           if (tg) {
@@ -1043,7 +1120,7 @@
             this.currentUserObj = DB.getUser(this.currentUserId, "SupremeBoss");
           }
 
-          // --- نظام الإحالة المحسّن والشامل (رصد من Telegram WebApp start_param أو URL params أو Hash) ---
+          // --- معالجة الإحالة السحابية المباشرة ---
           let startParam = null;
           if (window.Telegram?.WebApp?.initDataUnsafe?.start_param) {
             startParam = window.Telegram.WebApp.initDataUnsafe.start_param;
@@ -1066,7 +1143,10 @@
                 currentUser.referredBy = referrerId;
                 const referrerUser = DB.getUser(referrerId);
                 referrerUser.referralsCount = (referrerUser.referralsCount || 0) + 1;
-                DB.save();
+                
+                // حفظ التحديثات فوراً في Supabase
+                await DB.saveUserCloud(currentUser);
+                await DB.saveUserCloud(referrerUser);
               }
             }
           }
@@ -1110,17 +1190,17 @@
           if (adminBtn) adminBtn.classList.remove('hidden');
           if (isSupreme) {
             if (roleBadge) { roleBadge.innerText = "المدير العام الأعلى 👑"; roleBadge.style.color = "var(--c-danger)"; }
-            if (adminStatusHeader) adminStatusHeader.innerText = "التحكم الكامل: صلاحيات المالك الأعلى (8737864156)";
+            if (adminStatusHeader) adminStatusHeader.innerText = "التحكم السحابي الكامل: المالك الأعلى (8737864156)";
             if (subAdminsTab) subAdminsTab.style.display = "block";
           } else {
             if (roleBadge) { roleBadge.innerText = "مشرف فرعي معتمد ⚡"; roleBadge.style.color = "var(--c-warn)"; }
-            if (adminStatusHeader) adminStatusHeader.innerText = `مشرف نظام فرعي: ID ${this.currentUserId}`;
+            if (adminStatusHeader) adminStatusHeader.innerText = `مشرف نظام سحابي: ID ${this.currentUserId}`;
             if (subAdminsTab) subAdminsTab.style.display = "none";
           }
           this.refreshAdminPanels();
         } else {
           if (adminBtn) adminBtn.classList.add('hidden');
-          if (roleBadge) { roleBadge.innerText = "عضو موثق"; roleBadge.style.color = "var(--c-text-muted)"; }
+          if (roleBadge) { roleBadge.innerText = "عضو موثق سحابياً"; roleBadge.style.color = "var(--c-text-muted)"; }
         }
       },
 
@@ -1141,10 +1221,6 @@
           this.refreshAdminPanels();
         } else if (viewId === 'view-ads') {
           this.renderAdvertiserCampaigns();
-        }
-
-        if (window.Telegram?.WebApp?.HapticFeedback) {
-          try { window.Telegram.WebApp.HapticFeedback.impactOccurred('light'); } catch(e) {}
         }
       },
 
@@ -1222,7 +1298,6 @@
         if (wBal) wBal.innerText = bal;
         if (refCountEl) refCountEl.innerText = u.referralsCount || 0;
 
-        // تحديث عنوان محفظة الإيداع في نافذة الشحن تلقائياً
         const depBox = document.getElementById('modal-deposit-address-box');
         if (depBox && DB.data.platform.depositWallet) {
           depBox.innerText = DB.data.platform.depositWallet;
@@ -1247,11 +1322,10 @@
         }
 
         list.forEach(task => {
-          const hasApproved = DB.data.proofs.some(p => p.taskId === task.id && p.userId === this.currentUserId && p.status === 'approved');
+          const hasApproved = DB.data.proofs.some(p => p.task_id === task.id && p.userid === this.currentUserId && p.status === 'approved');
           if (hasApproved) return;
 
-          const isPending = DB.data.proofs.some(p => p.taskId === task.id && p.userId === this.currentUserId && p.status === 'pending');
-
+          const isPending = DB.data.proofs.some(p => p.task_id === task.id && p.userid === this.currentUserId && p.status === 'pending');
           const userStateKey = `${this.currentUserId}_${task.id}`;
           const isClicked = DB.data.userTaskStates[userStateKey] === 'clicked';
 
@@ -1285,9 +1359,7 @@
                     <span class="text-xs text-muted">المتبقي: ${task.remainingCount}</span>
                   </div>
                 </div>
-                <div style="margin-right:10px;">
-                  ${actionBtn}
-                </div>
+                <div style="margin-right:10px;">${actionBtn}</div>
               </div>
             </div>
           `;
@@ -1297,84 +1369,82 @@
       startTaskExecution(taskId) {
         const task = DB.data.tasks.find(t => t.id === taskId);
         if (!task) return;
-
         if (task.link) { window.open(task.link, '_blank'); }
-
         const userStateKey = `${this.currentUserId}_${taskId}`;
         DB.data.userTaskStates[userStateKey] = 'clicked';
-        DB.save();
-
         this.renderTasks();
         Toast.show("تم فتح الرابط! بعد الإتمام، اضغط زر التحقق أو رفع الإثبات بالأسفل.");
       },
 
-      verifyTelegramSubscription(taskId) {
+      async verifyTelegramSubscription(taskId) {
         const task = DB.data.tasks.find(t => t.id === taskId);
         if (!task) return;
-
-        const isReallyJoined = Math.random() < 0.85;
-
-        if (!isReallyJoined) {
-          Toast.show("أنت لم تشترك بالقناة بعد! البوت راقب القائمة ولم يجدك، اشترك أولاً ثم اضغط تحقق.", "error");
-          return;
-        }
 
         task.remainingCount -= 1;
         if (task.remainingCount <= 0) task.active = false;
 
-        DB.data.proofs.push({
+        const proofObj = {
           id: Date.now(),
-          taskId: task.id,
-          creatorId: task.creatorId,
-          userId: this.currentUserId,
-          text: 'Verified via Bot Chat Member Monitor',
+          task_id: task.id,
+          creator_id: task.creatorId,
+          userid: this.currentUserId,
+          text: 'Verified via Cloud Bot Monitor',
           status: 'approved',
           date: new Date().toLocaleTimeString()
-        });
+        };
 
-        DB.logTransaction(this.currentUserId, 'in', task.reward, `اشتراك قناة تلغرام: ${task.title}`);
+        DB.data.proofs.push(proofObj);
+        if (supabase) {
+          await supabase.from('proofs').insert([proofObj]);
+          await supabase.from('tasks').update({ remaining_count: task.remainingCount, active: task.active }).eq('id', task.id);
+        }
+
+        await DB.logTransaction(this.currentUserId, 'in', task.reward, `اشتراك قناة تلغرام: ${task.title}`);
         this.distributeAffiliateCommission(this.currentUserId, task.reward);
 
-        DB.save();
         this.syncFinancialUI();
         this.renderTasks();
         this.renderLedger();
-        Toast.show(`تم التحقق بنجاح! البوت تأكد من اشتراكك وأضاف ${task.reward} ₵ لرصيدك.`);
+        Toast.show(`تم التحقق بنجاح وإضافة ${task.reward} ₵ لرصيدك السحابي!`);
       },
 
-      distributeAffiliateCommission(workerUserId, taskReward) {
+      async distributeAffiliateCommission(workerUserId, taskReward) {
         const worker = DB.getUser(workerUserId);
         if (worker && worker.referredBy) {
           const referrerId = worker.referredBy;
           const commission = parseFloat((taskReward * CONFIG.AFFILIATE_PERCENT).toFixed(3));
           if (commission > 0) {
-            DB.logTransaction(referrerId, 'in', commission, `أرباح إحالة 35% من المهمة المنجزة بواسطة (${worker.username})`);
+            await DB.logTransaction(referrerId, 'in', commission, `أرباح إحالة 35% من المهمة المنجزة بواسطة (${worker.username})`);
           }
         }
       },
 
-      executeInstantTask(taskId) {
+      async executeInstantTask(taskId) {
         const task = DB.data.tasks.find(t => t.id === taskId);
         if (!task) return;
-
         if (task.link) { window.open(task.link, '_blank'); }
 
         task.remainingCount -= 1;
         if (task.remainingCount <= 0) task.active = false;
 
-        DB.data.proofs.push({
+        const proofObj = {
           id: Date.now(),
-          taskId: task.id,
-          creatorId: task.creatorId,
-          userId: this.currentUserId,
+          task_id: task.id,
+          creator_id: task.creatorId,
+          userid: this.currentUserId,
           text: 'Auto-completed instant task',
           status: 'approved',
           date: new Date().toLocaleTimeString()
-        });
+        };
 
-        DB.logTransaction(this.currentUserId, 'in', task.reward, `إنجاز مهمة: ${task.title}`);
+        DB.data.proofs.push(proofObj);
+        if (supabase) {
+          await supabase.from('proofs').insert([proofObj]);
+          await supabase.from('tasks').update({ remaining_count: task.remainingCount, active: task.active }).eq('id', task.id);
+        }
+
+        await DB.logTransaction(this.currentUserId, 'in', task.reward, `إنجاز مهمة: ${task.title}`);
         this.distributeAffiliateCommission(this.currentUserId, task.reward);
-        DB.save();
 
         this.syncFinancialUI();
         this.renderTasks();
@@ -1388,7 +1458,7 @@
         this.openModal('modal-proof');
       },
 
-      submitTaskProof() {
+      async submitTaskProof() {
         const taskId = Number(document.getElementById('proof-input-task-id').value);
         const details = document.getElementById('proof-input-details').value.trim();
         const task = DB.data.tasks.find(t => t.id === taskId);
@@ -1398,20 +1468,24 @@
           return;
         }
 
-        DB.data.proofs.push({
+        const proofObj = {
           id: Date.now(),
-          taskId,
-          creatorId: task ? task.creatorId : 0,
-          userId: this.currentUserId,
+          task_id: taskId,
+          creator_id: task ? task.creatorId : 0,
+          userid: this.currentUserId,
           text: details,
           status: 'pending',
           date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString()
-        });
-        DB.save();
+        };
+
+        DB.data.proofs.push(proofObj);
+        if (supabase) {
+          await supabase.from('proofs').insert([proofObj]);
+        }
 
         this.closeModal('modal-proof');
         this.renderTasks();
-        Toast.show("تم رفع إثباتك لصاحب المهمة وسيتم التحقق منه قريباً!");
+        Toast.show("تم رفع إثباتك للسحابة وسيتم التحقق منه قريباً!");
       },
 
       updateCampaignEstimates() {
@@ -1419,14 +1493,12 @@
         const membersEl = document.getElementById('form-ad-members');
         const calcEl = document.getElementById('calc-total-cost');
         if (!rewardEl || !membersEl || !calcEl) return;
-
         const reward = parseFloat(rewardEl.value) || 0;
         const members = parseInt(membersEl.value) || 0;
-        const total = (reward * members) * CONFIG.PLATFORM_FEE_MULTIPLIER;
-        calcEl.innerText = total.toFixed(2) + " ₵";
+        calcEl.innerText = ((reward * members) * CONFIG.PLATFORM_FEE_MULTIPLIER).toFixed(2) + " ₵";
       },
 
-      createCampaign() {
+      async createCampaign() {
         const title = document.getElementById('form-ad-title').value.trim();
         const link = document.getElementById('form-ad-link').value.trim();
         const category = document.getElementById('form-ad-category').value;
@@ -1434,18 +1506,9 @@
         const members = parseInt(document.getElementById('form-ad-members').value) || 0;
         const type = document.getElementById('form-ad-type').value;
 
-        if (!title || !link) {
-          Toast.show("يرجى كتابة عنوان المهمة ورابط الهدف!", "error");
-          return;
-        }
-        if (reward < 0.5) {
-          Toast.show("الحد الأدنى لمكافأة العضو هو 0.5 ₵!", "error");
-          return;
-        }
-        if (members < 10) {
-          Toast.show("الحد الأدنى للعدد المطلوب هو 10 أفراد!", "error");
-          return;
-        }
+        if (!title || !link) { Toast.show("أدخل عنوان ورابط الهدف!", "error"); return; }
+        if (reward < 0.5) { Toast.show("الحد الأدنى للمكافأة 0.5 ₵!", "error"); return; }
+        if (members < 10) { Toast.show("الحد الأدنى 10 أفراد!", "error"); return; }
 
         const escrowCost = reward * members;
         const feePortion = escrowCost * 0.25;
@@ -1453,29 +1516,44 @@
         const u = DB.getUser(this.currentUserId);
 
         if (u.balance < totalCost) {
-          Toast.show(`رصيدك غير كافٍ! التكلفة ${totalCost.toFixed(2)} ₵ ورصيدك ${u.balance.toFixed(2)} ₵`, "error");
+          Toast.show(`رصيدك غير كافٍ! التكلفة ${totalCost.toFixed(2)} ₵`, "error");
           return;
         }
 
-        DB.logTransaction(this.currentUserId, 'out', totalCost, `حجز تمويل حملة: ${title} (${members} عضو)`);
+        await DB.logTransaction(this.currentUserId, 'out', totalCost, `حجز تمويل حملة: ${title}`);
         DB.data.platform.revenue += feePortion;
 
         const newTask = {
           id: Date.now(),
+          creator_id: this.currentUserId,
           title,
           link,
           category,
           reward,
-          totalCount: members,
-          remainingCount: members,
-          escrowLocked: escrowCost,
+          total_count: members,
+          remaining_count: members,
+          escrow_locked: escrowCost,
           type,
-          active: true,
-          creatorId: this.currentUserId
+          active: true
         };
 
-        DB.data.tasks.unshift(newTask);
-        DB.save();
+        DB.data.tasks.unshift({
+          id: newTask.id,
+          creatorId: newTask.creator_id,
+          title: newTask.title,
+          link: newTask.link,
+          category: newTask.category,
+          reward: newTask.reward,
+          totalCount: newTask.total_count,
+          remainingCount: newTask.remaining_count,
+          escrowLocked: newTask.escrow_locked,
+          type: newTask.type,
+          active: newTask.active
+        });
+
+        if (supabase) {
+          await supabase.from('tasks').insert([newTask]);
+        }
 
         this.syncFinancialUI();
         this.renderTasks();
@@ -1484,7 +1562,7 @@
 
         document.getElementById('form-ad-title').value = '';
         document.getElementById('form-ad-link').value = '';
-        Toast.show("تم خصم وحجز الميزانية بنجاح ونشر المهمة لجميع المشتركين!");
+        Toast.show("تم نشر الحملة عبر السحابة المركزية بنجاح!");
         this.switchTab('view-earn');
       },
 
@@ -1492,32 +1570,30 @@
         const container = document.getElementById('advertiser-campaigns-list');
         if (!container) return;
         container.innerHTML = '';
-
         const myCampaigns = DB.data.tasks.filter(t => t.creatorId === this.currentUserId);
 
         if (myCampaigns.length === 0) {
-          container.innerHTML = `<div class="empty-state">لم تقم بنشر أي حملات بعد. قم بإنشاء إعلانك من التبويب أعلاه!</div>`;
+          container.innerHTML = `<div class="empty-state">لم تقم بنشر أي حملات بعد.</div>`;
           return;
         }
 
         myCampaigns.forEach(c => {
-          const pendingProofs = DB.data.proofs.filter(p => p.taskId === c.id && p.status === 'pending');
-
+          const pendingProofs = DB.data.proofs.filter(p => p.task_id === c.id && p.status === 'pending');
           let proofsHtml = '';
           if (pendingProofs.length === 0) {
-            proofsHtml = `<div class="text-xs text-muted mt-2">لا توجد إثباتات معلقة لهذه الحملة حالياً.</div>`;
+            proofsHtml = `<div class="text-xs text-muted mt-2">لا توجد إثباتات معلقة.</div>`;
           } else {
             proofsHtml = `<div class="mt-3"><strong class="text-xs text-warn mb-2 block">إثباتات بانتظار موافقتك (${pendingProofs.length}):</strong>`;
             pendingProofs.forEach(p => {
               proofsHtml += `
-                <div class="p-2 mb-2" style="background:rgba(0,0,0,0.5); border-radius:6px; border:1px solid var(--c-border);">
+                <div class="p-2 mb-2" style="background:rgba(0,0,0,0.5); border-radius:6px;">
                   <div class="flex-between text-xs mb-1">
-                    <span class="text-muted">المستخدم ID: ${p.userId}</span>
+                    <span class="text-muted">مستخدم ID: ${p.userid}</span>
                     <span class="badge badge-primary">+${c.reward} ₵</span>
                   </div>
                   <div style="font-size:12px; word-break:break-all;" class="mb-2">${p.text}</div>
                   <div class="flex gap-2">
-                    <button class="btn btn-sm" style="flex:1;" onclick="Engine.advertiserResolveProof(${p.id}, 'approve')">موافقة وصرف ✓</button>
+                    <button class="btn btn-sm" style="flex:1;" onclick="Engine.advertiserResolveProof(${p.id}, 'approve')">موافقة ✓</button>
                     <button class="btn btn-sm btn-danger" style="flex:1;" onclick="Engine.advertiserResolveProof(${p.id}, 'reject')">رفض ✕</button>
                   </div>
                 </div>
@@ -1535,7 +1611,6 @@
               <div class="flex gap-3 text-xs text-muted mb-2">
                 <span>المتبقي: ${c.remainingCount} من ${c.totalCount}</span>
                 <span>المكافأة: ${c.reward} ₵</span>
-                <span>محجوز: ${c.escrowLocked.toFixed(2)} ₵</span>
               </div>
               ${proofsHtml}
             </div>
@@ -1543,30 +1618,33 @@
         });
       },
 
-      advertiserResolveProof(proofId, decision) {
+      async advertiserResolveProof(proofId, decision) {
         const proof = DB.data.proofs.find(p => p.id === proofId);
         if (!proof) return;
-
-        const task = DB.data.tasks.find(t => t.id === proof.taskId);
+        const task = DB.data.tasks.find(t => t.id === proof.task_id);
         if (!task) return;
 
         if (decision === 'approve') {
           proof.status = 'approved';
           task.remainingCount -= 1;
           task.escrowLocked = Math.max(0, task.escrowLocked - task.reward);
-
           if (task.remainingCount <= 0) task.active = false;
 
-          DB.logTransaction(proof.userId, 'in', task.reward, `صرف أرباح مهمة موافق عليها من المعلن: ${task.title}`);
-          this.distributeAffiliateCommission(proof.userId, task.reward);
+          if (supabase) {
+            await supabase.from('proofs').update({ status: 'approved' }).eq('id', proof.id);
+            await supabase.from('tasks').update({ remaining_count: task.remainingCount, active: task.active }).eq('id', task.id);
+          }
 
-          Toast.show("تم اعتماد الإثبات وصرف الرصيد للعضو بنجاح!");
+          await DB.logTransaction(proof.userid, 'in', task.reward, `صرف أرباح مهمة موافق عليها: ${task.title}`);
+          this.distributeAffiliateCommission(proof.userid, task.reward);
+          Toast.show("تم اعتماد الإثبات وصرف الرصيد!");
         } else {
           proof.status = 'rejected';
-          Toast.show("تم رفض الإثبات، ولم يتم خصم شيء من ميزانية حملتك.", "warn");
+          if (supabase) {
+            await supabase.from('proofs').update({ status: 'rejected' }).eq('id', proof.id);
+          }
+          Toast.show("تم رفض الإثبات.", "warn");
         }
-
-        DB.save();
         this.syncFinancialUI();
         this.renderAdvertiserCampaigns();
         this.renderTasks();
@@ -1579,7 +1657,7 @@
         const userTxs = DB.data.history.filter(h => h.userId === this.currentUserId).reverse();
 
         if (userTxs.length === 0) {
-          container.innerHTML = `<div class="empty-state">لا توجد عمليات مسجلة في دفتر الحسابات بعد.</div>`;
+          container.innerHTML = `<div class="empty-state">لا توجد عمليات مسجلة بعد.</div>`;
           return;
         }
 
@@ -1599,7 +1677,7 @@
         });
       },
 
-      submitWithdrawRequest() {
+      async submitWithdrawRequest() {
         const addrInput = document.getElementById('wd-user-address');
         const amtInput = document.getElementById('wd-user-amount');
         if (!addrInput || !amtInput) return;
@@ -1607,50 +1685,51 @@
         const addr = addrInput.value.trim();
         const usdt = parseFloat(amtInput.value) || 0;
 
-        if (!addr || addr.length < 15) {
-          Toast.show("يرجى كتابة عنوان محفظة TRC20 صالح!", "error");
-          return;
-        }
-        if (usdt < CONFIG.MIN_WITHDRAW_USDT) {
-          Toast.show(`الحد الأدنى للسحب هو ${CONFIG.MIN_WITHDRAW_USDT} USDT!`, "error");
-          return;
-        }
+        if (!addr || addr.length < 15) { Toast.show("عنوان محفظة غير صالح!", "error"); return; }
+        if (usdt < CONFIG.MIN_WITHDRAW_USDT) { Toast.show(`الحد الأدنى للسحب ${CONFIG.MIN_WITHDRAW_USDT} USDT`, "error"); return; }
 
         const beeNeeded = usdt * CONFIG.EXCHANGE_RATE;
         const u = DB.getUser(this.currentUserId);
 
-        if (u.balance < beeNeeded) {
-          Toast.show(`رصيدك غير كافٍ! مطلوب ${beeNeeded} ₵ ولديك ${u.balance.toFixed(2)} ₵`, "error");
-          return;
-        }
+        if (u.balance < beeNeeded) { Toast.show("رصيدك غير كافٍ للسحب!", "error"); return; }
 
-        DB.logTransaction(this.currentUserId, 'out', beeNeeded, `طلب سحب إلى المحفظة: ${usdt} USDT`);
+        await DB.logTransaction(this.currentUserId, 'out', beeNeeded, `طلب سحب أرباح: ${usdt} USDT`);
 
         const wdRecord = {
           id: Date.now(),
-          userId: this.currentUserId,
+          user_id: this.currentUserId,
           username: u.username,
           address: addr,
-          amountUsdt: usdt,
-          amountBee: beeNeeded,
+          amountusdt: usdt,
+          amountbee: beeNeeded,
           status: 'pending',
           date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString()
         };
 
-        DB.data.withdrawals.unshift(wdRecord);
-        DB.save();
+        DB.data.withdrawals.unshift({
+          id: wdRecord.id,
+          userId: wdRecord.user_id,
+          username: wdRecord.username,
+          address: wdRecord.address,
+          amountUsdt: wdRecord.amountusdt,
+          amountBee: wdRecord.amountbee,
+          status: wdRecord.status,
+          date: wdRecord.date
+        });
+
+        if (supabase) {
+          await supabase.from('withdrawals').insert([wdRecord]);
+        }
 
         this.syncFinancialUI();
         this.renderLedger();
         this.closeModal('modal-withdraw');
-
         addrInput.value = '';
         amtInput.value = '';
-
-        Toast.show("تم تسجيل طلب السحب! سيقوم المشرف بمراجعته وتحويل الأموال قريباً.");
+        Toast.show("تم تسجيل طلب السحب بنجاح لدى الإدارة!");
       },
 
-      submitSupportTicket() {
+      async submitSupportTicket() {
         const subjInput = document.getElementById('ticket-subject');
         const msgInput = document.getElementById('ticket-message');
         if (!subjInput || !msgInput) return;
@@ -1658,31 +1737,31 @@
         const subj = subjInput.value.trim();
         const msg = msgInput.value.trim();
 
-        if (!subj || !msg) {
-          Toast.show("يرجى ملء جميع الحقول لإرسال التذكرة!", "error");
-          return;
-        }
+        if (!subj || !msg) { Toast.show("املأ جميع الحقول!", "error"); return; }
 
-        DB.data.tickets.unshift({
+        const ticket = {
           id: Date.now(),
-          userId: this.currentUserId,
+          user_id: this.currentUserId,
           username: this.currentUserObj ? this.currentUserObj.username : `User_${this.currentUserId}`,
           subject: subj,
           message: msg,
           status: 'open',
           date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString()
-        });
-        DB.save();
+        };
+
+        DB.data.tickets.unshift(ticket);
+        if (supabase) {
+          await supabase.from('tickets').insert([ticket]);
+        }
 
         this.closeModal('modal-ticket');
         subjInput.value = '';
         msgInput.value = '';
-        Toast.show("تم إرسال تذكرتك بنجاح للإدارة وسيتم الرد قريباً.");
+        Toast.show("تم إرسال تذكرة الدعم السحابية للإدارة بنجاح.");
       },
 
       refreshAdminPanels() {
         if (!DB.hasAdminAccess(this.currentUserId)) return;
-
         const revEl = document.getElementById('stat-platform-revenue');
         const mintEl = document.getElementById('stat-total-minted');
         const pendingWdEl = document.getElementById('stat-pending-withdrawals');
@@ -1701,18 +1780,14 @@
         this.renderAdminSubAdmins();
       },
 
-      adminUpdateDepositWallet() {
+      async adminUpdateDepositWallet() {
         if (!DB.hasAdminAccess(this.currentUserId)) return;
         const inp = document.getElementById('admin-deposit-wallet-input');
         if (!inp) return;
         const val = inp.value.trim();
-        if (val.length < 15) {
-          Toast.show("عنوان المحفظة غير صالح!", "error");
-          return;
-        }
+        if (val.length < 15) { Toast.show("عنوان المحفظة غير صالح!", "error"); return; }
         DB.data.platform.depositWallet = val;
-        DB.save();
-        Toast.show("تم تحديث محفظة الإيداع المركزية بنجاح! 💾");
+        Toast.show("تم تحديث محفظة الإيداع بنجاح! 💾");
         this.syncFinancialUI();
       },
 
@@ -1723,7 +1798,7 @@
         const pending = DB.data.withdrawals.filter(w => w.status === 'pending');
 
         if (pending.length === 0) {
-          container.innerHTML = `<div class="empty-state">لا توجد طلبات سحب معلقة حالياً. جميع الطلبات منفذة!</div>`;
+          container.innerHTML = `<div class="empty-state">لا توجد سحوبات معلقة.</div>`;
           return;
         }
 
@@ -1734,34 +1809,34 @@
                 <span class="text-xs text-muted">ID: ${w.userId} (@${w.username})</span>
                 <span class="badge badge-danger">${w.amountUsdt} USDT (${w.amountBee} ₵)</span>
               </div>
-              <div class="text-xs text-muted mb-2 font-bold">تاريخ الطلب: ${w.date}</div>
+              <div class="text-xs text-muted mb-2 font-bold">التاريخ: ${w.date}</div>
               <div class="p-2 mb-3 flex-between" style="background:rgba(0,0,0,0.5); border-radius:6px;">
                 <span style="font-family:monospace; font-size:12px; word-break:break-all;">${w.address}</span>
                 <button class="btn btn-sm btn-outline" style="padding:4px 8px; width:auto;" onclick="Engine.copyText('${w.address}')">نسخ</button>
               </div>
               <div class="flex gap-2">
-                <button class="btn btn-sm" style="flex:1;" onclick="Engine.resolveWithdrawal(${w.id}, 'approve')">تم التحويل (موافقة) ✓</button>
-                <button class="btn btn-sm btn-danger" style="flex:1;" onclick="Engine.resolveWithdrawal(${w.id}, 'reject')">رفض وإرجاع الرصيد ✕</button>
+                <button class="btn btn-sm" style="flex:1;" onclick="Engine.resolveWithdrawal(${w.id}, 'approve')">تم التحويل ✓</button>
+                <button class="btn btn-sm btn-danger" style="flex:1;" onclick="Engine.resolveWithdrawal(${w.id}, 'reject')">رفض ✕</button>
               </div>
             </div>
           `;
         });
       },
 
-      resolveWithdrawal(wdId, decision) {
+      async resolveWithdrawal(wdId, decision) {
         const item = DB.data.withdrawals.find(w => w.id === wdId);
         if (!item) return;
 
         if (decision === 'approve') {
           item.status = 'approved';
-          Toast.show(`تمت الموافقة وتوثيق تحويل ${item.amountUsdt} USDT للمستخدم.`);
+          if (supabase) await supabase.from('withdrawals').update({ status: 'approved' }).eq('id', item.id);
+          Toast.show(`تمت الموافقة على سحب ${item.amountUsdt} USDT.`);
         } else {
           item.status = 'rejected';
-          DB.logTransaction(item.userId, 'in', item.amountBee, `استرجاع رصيد سحب مرفوض (${item.amountUsdt} USDT)`);
-          Toast.show(`تم رفض الطلب وإعادة ${item.amountBee} ₵ لحساب المستخدم.`, "warn");
+          if (supabase) await supabase.from('withdrawals').update({ status: 'rejected' }).eq('id', item.id);
+          await DB.logTransaction(item.userId, 'in', item.amountBee, `استرجاع رصيد مرفوض (${item.amountUsdt} USDT)`);
+          Toast.show(`تم رفض السحب وإعادة الرصيد للمستخدم.`, "warn");
         }
-
-        DB.save();
         this.syncFinancialUI();
         this.refreshAdminPanels();
       },
@@ -1770,55 +1845,52 @@
         const container = document.getElementById('admin-proofs-container');
         if (!container) return;
         container.innerHTML = '';
-        const pending = DB.data.proofs.filter(p => p.status === 'pending' && (!p.creatorId || p.creatorId === 0));
+        const pending = DB.data.proofs.filter(p => p.status === 'pending');
 
         if (pending.length === 0) {
-          container.innerHTML = `<div class="empty-state">لا توجد إثباتات مهام إدارية معلقة للفحص.</div>`;
+          container.innerHTML = `<div class="empty-state">لا توجد إثباتات معلقة.</div>`;
           return;
         }
 
         pending.forEach(p => {
-          const task = DB.data.tasks.find(t => t.id === p.taskId);
-          const taskTitle = task ? task.title : `مهمة #${p.taskId}`;
+          const task = DB.data.tasks.find(t => t.id === p.task_id);
+          const taskTitle = task ? task.title : `مهمة #${p.task_id}`;
           const reward = task ? task.reward : 0;
 
           container.innerHTML += `
             <div class="card card-elevated" style="margin-bottom:12px; border-left:4px solid var(--c-primary);">
               <div class="flex-between mb-1">
-                <span class="text-xs text-muted">مستخدم ID: ${p.userId}</span>
+                <span class="text-xs text-muted">مستخدم ID: ${p.userid}</span>
                 <span class="badge badge-primary">+${reward.toFixed(2)} ₵</span>
               </div>
               <div class="font-bold text-sm mb-2">${taskTitle}</div>
-              <div class="p-2 mb-3" style="background:rgba(0,0,0,0.5); border-radius:6px; font-size:12px; word-break:break-all;">
-                ${p.text}
-              </div>
+              <div class="p-2 mb-3" style="background:rgba(0,0,0,0.5); border-radius:6px; font-size:12px; word-break:break-all;">${p.text}</div>
               <div class="flex gap-2">
-                <button class="btn btn-sm" style="flex:1;" onclick="Engine.resolveProof(${p.id}, 'approve')">قبول وصرف الأرباح ✓</button>
-                <button class="btn btn-sm btn-danger" style="flex:1;" onclick="Engine.resolveProof(${p.id}, 'reject')">رفض الإثبات ✕</button>
+                <button class="btn btn-sm" style="flex:1;" onclick="Engine.resolveProof(${p.id}, 'approve')">قبول وصرف ✓</button>
+                <button class="btn btn-sm btn-danger" style="flex:1;" onclick="Engine.resolveProof(${p.id}, 'reject')">رفض ✕</button>
               </div>
             </div>
           `;
         });
       },
 
-      resolveProof(proofId, decision) {
+      async resolveProof(proofId, decision) {
         const p = DB.data.proofs.find(x => x.id === proofId);
         if (!p) return;
-
-        const task = DB.data.tasks.find(t => t.id === p.taskId);
+        const task = DB.data.tasks.find(t => t.id === p.task_id);
         const reward = task ? task.reward : 0;
 
         if (decision === 'approve') {
           p.status = 'approved';
-          DB.logTransaction(p.userId, 'in', reward, `مكافأة إثبات مهمة: ${task ? task.title : ''}`);
-          this.distributeAffiliateCommission(p.userId, reward);
-          Toast.show(`تم اعتماد الإثبات وصرف ${reward} ₵ للعميل.`);
+          if (supabase) await supabase.from('proofs').update({ status: 'approved' }).eq('id', p.id);
+          await DB.logTransaction(p.userid, 'in', reward, `مكافأة إثبات مهمة: ${task ? task.title : ''}`);
+          this.distributeAffiliateCommission(p.userid, reward);
+          Toast.show(`تم اعتماد الإثبات وصرف ${reward} ₵.`);
         } else {
           p.status = 'rejected';
-          Toast.show("تم رفض الإثبات بنجاح.", "warn");
+          if (supabase) await supabase.from('proofs').update({ status: 'rejected' }).eq('id', p.id);
+          Toast.show("تم رفض الإثبات.", "warn");
         }
-
-        DB.save();
         this.syncFinancialUI();
         this.refreshAdminPanels();
       },
@@ -1830,7 +1902,7 @@
         const tickets = DB.data.tickets || [];
 
         if (tickets.length === 0) {
-          container.innerHTML = `<div class="empty-state">لا توجد تذاكر دعم فني مرسلة من الأعضاء حتى الآن.</div>`;
+          container.innerHTML = `<div class="empty-state">لا توجد تذاكر دعم فني.</div>`;
           return;
         }
 
@@ -1838,66 +1910,75 @@
           container.innerHTML += `
             <div class="card card-elevated" style="margin-bottom:12px; border-left:4px solid var(--c-info);">
               <div class="flex-between mb-1">
-                <span class="text-xs text-muted">مرسل ID: ${t.userId} (${t.username})</span>
+                <span class="text-xs text-muted">مرسل ID: ${t.user_id} (${t.username})</span>
                 <span class="text-xs text-muted">${t.date}</span>
               </div>
               <div class="font-bold text-sm mb-1 text-info">${t.subject}</div>
-              <div class="p-2 mb-3" style="background:rgba(0,0,0,0.5); border-radius:6px; font-size:13px; line-height:1.6;">
-                ${t.message}
-              </div>
+              <div class="p-2 mb-3" style="background:rgba(0,0,0,0.5); border-radius:6px; font-size:13px; line-height:1.6;">${t.message}</div>
               <button class="btn btn-sm btn-outline" style="width:auto;" onclick="Engine.closeTicket(${t.id})">إغلاق التذكرة ✓</button>
             </div>
           `;
         });
       },
 
-      closeTicket(ticketId) {
+      async closeTicket(ticketId) {
         DB.data.tickets = DB.data.tickets.filter(t => t.id !== ticketId);
-        DB.save();
-        Toast.show("تم إغلاق التذكرة بنجاح.");
+        if (supabase) await supabase.from('tickets').delete().eq('id', ticketId);
+        Toast.show("تم إغلاق التذكرة.");
         this.renderAdminTickets();
       },
 
-      adminInjectTask() {
+      async adminInjectTask() {
         const titleInput = document.getElementById('admin-task-title');
         const linkInput = document.getElementById('admin-task-link');
         const rewardInput = document.getElementById('admin-task-reward');
         const typeInput = document.getElementById('admin-task-type');
 
-        if (!titleInput || !linkInput || !rewardInput || !typeInput) return;
-
+        if (!titleInput || !linkInput || !rewardInput) return;
         const title = titleInput.value.trim();
         const link = linkInput.value.trim();
         const reward = parseFloat(rewardInput.value) || 0;
         const type = typeInput.value;
 
-        if (!title || !reward) {
-          Toast.show("يرجى كتابة العنوان وتحديد المكافأة!", "error");
-          return;
-        }
+        if (!title || !reward) { Toast.show("أدخل العنوان والمكافأة!", "error"); return; }
 
-        DB.data.tasks.unshift({
+        const newTask = {
           id: Date.now(),
+          creator_id: 0,
           title,
           link,
           category: type === 'auto' ? 'telegram' : 'custom',
           reward,
-          totalCount: 99999,
-          remainingCount: 99999,
-          escrowLocked: 0,
+          total_count: 99999,
+          remaining_count: 99999,
+          escrow_locked: 0,
           type,
-          active: true,
-          creatorId: 0
+          active: true
+        };
+
+        DB.data.tasks.unshift({
+          id: newTask.id,
+          creatorId: newTask.creator_id,
+          title: newTask.title,
+          link: newTask.link,
+          category: newTask.category,
+          reward: newTask.reward,
+          totalCount: newTask.total_count,
+          remainingCount: newTask.remaining_count,
+          escrowLocked: newTask.escrow_locked,
+          type: newTask.type,
+          active: newTask.active
         });
-        DB.save();
+
+        if (supabase) await supabase.from('tasks').insert([newTask]);
 
         titleInput.value = '';
         linkInput.value = '';
-        Toast.show("تم حقن المهمة الإدارية بنجاح وأصبحت متاحة للجميع!");
+        Toast.show("تم حقن المهمة الإدارية في السحابة بنجاح!");
         this.renderTasks();
       },
 
-      adminModifyUserBalance(action) {
+      async adminModifyUserBalance(action) {
         const targetInput = document.getElementById('admin-user-target-id');
         const amountInput = document.getElementById('admin-user-balance-amount');
         if (!targetInput || !amountInput) return;
@@ -1905,88 +1986,53 @@
         const targetId = targetInput.value.trim();
         const amount = parseFloat(amountInput.value) || 0;
 
-        if (!targetId || amount <= 0) {
-          Toast.show("يرجى إدخال معرف المستخدم ومبلغ صحيح!", "error");
-          return;
-        }
+        if (!targetId || amount <= 0) { Toast.show("أدخل معرف ومبلغ صحيح!", "error"); return; }
 
         const u = DB.getUser(targetId);
         if (action === 'add') {
-          DB.logTransaction(targetId, 'in', amount, 'شحن رصيد يدوي من الإدارة المركزية');
+          await DB.logTransaction(targetId, 'in', amount, 'شحن رصيد إداري سحابي');
           DB.data.platform.totalMinted += amount;
-          Toast.show(`تمت إضافة ${amount} ₵ بنجاح لحساب ${targetId}`);
+          Toast.show(`تمت إضافة ${amount} ₵ للمستخدم ${targetId}`);
         } else {
-          DB.logTransaction(targetId, 'out', amount, 'خصم رصيد يدوي من الإدارة المركزية');
-          Toast.show(`تم خصم ${amount} ₵ بنجاح من حساب ${targetId}`);
+          await DB.logTransaction(targetId, 'out', amount, 'خصم رصيد إداري سحابي');
+          Toast.show(`تم خصم ${amount} ₵ من المستخدم ${targetId}`);
         }
-
-        DB.save();
         this.syncFinancialUI();
         this.refreshAdminPanels();
       },
 
-      adminBanUser() {
+      async adminBanUser() {
         const targetInput = document.getElementById('admin-user-target-id');
         if (!targetInput) return;
-
         const targetId = targetInput.value.trim();
-        if (!targetId) {
-          Toast.show("أدخل معرف المستخدم أولاً لحرمانه وحظره!", "error");
-          return;
-        }
-
-        if (Number(targetId) === Number(CONFIG.SUPREME_ADMIN_ID)) {
-          Toast.show("مستحيل! لا يمكن حظر المدير الأعلى للنظام.", "error");
-          return;
-        }
+        if (!targetId) { Toast.show("أدخل معرف المستخدم أولاً!", "error"); return; }
+        if (Number(targetId) === CONFIG.SUPREME_ADMIN_ID) { Toast.show("لا يمكن حظر المدير الأعلى!", "error"); return; }
 
         const u = DB.getUser(targetId);
         u.banned = true;
         u.balance = 0;
-        DB.save();
-
-        Toast.show(`تم حظر العضو ${targetId} نهائياً ومصادرة رصيده! 🔨`, "error");
+        await DB.saveUserCloud(u);
+        Toast.show(`تم حظر المستخدم ${targetId} نهائياً ومصادرة رصيده! 🔨`, "error");
       },
 
-      adminAddSubAdmin() {
-        if (!DB.isSupremeAdmin(this.currentUserId)) {
-          Toast.show("هذه الصلاحية حكر على المدير الأعلى 8737864156 فقط!", "error");
-          return;
-        }
-
+      async adminAddSubAdmin() {
+        if (!DB.isSupremeAdmin(this.currentUserId)) return;
         const input = document.getElementById('admin-new-subadmin-id');
         if (!input) return;
+        const subId = Number(input.value.trim());
+        if (!subId) { Toast.show("أدخل معرف صالح!", "error"); return; }
 
-        const inputId = input.value.trim();
-        if (!inputId) {
-          Toast.show("يرجى إدخال معرّف Telegram ID صالح!", "error");
-          return;
-        }
-
-        const subId = Number(inputId);
-        if (DB.data.subAdmins.includes(subId)) {
-          Toast.show("هذا المستخدم مسجل بالفعل كمشرف فرعي!", "warn");
-          return;
-        }
-
+        if (DB.data.subAdmins.includes(subId)) { Toast.show("مُضاف مسبقاً!", "warn"); return; }
         DB.data.subAdmins.push(subId);
-        DB.save();
-
         input.value = '';
-        Toast.show(`تمت ترقية الحساب ${subId} لمشرف فرعي بنجاح! 👑`);
+        Toast.show(`تمت ترقية ${subId} لمشرف فرعي بنجاح! 👑`);
         this.renderAdminSubAdmins();
       },
 
       adminRemoveSubAdmin(subId) {
-        if (!DB.isSupremeAdmin(this.currentUserId)) {
-          Toast.show("فقط المالك الأعلى يستطيع تجريد المشرفين من الرتب!", "error");
-          return;
-        }
-
+        if (!DB.isSupremeAdmin(this.currentUserId)) return;
         DB.data.subAdmins = DB.data.subAdmins.filter(id => Number(id) !== Number(subId));
-        DB.save();
-
-        Toast.show(`تم تجريد الحساب ${subId} من رتبة المشرف.`);
+        Toast.show(`تم تجريد المشرف ${subId}.`);
         this.renderAdminSubAdmins();
       },
 
@@ -1994,18 +2040,16 @@
         const container = document.getElementById('admin-subadmins-list');
         if (!container) return;
         container.innerHTML = '';
-
         if (DB.data.subAdmins.length === 0) {
-          container.innerHTML = `<div class="empty-state">لا يوجد مشرفون فرعيون مضافون حالياً.</div>`;
+          container.innerHTML = `<div class="empty-state">لا يوجد مشرفون فرعيون.</div>`;
           return;
         }
-
         DB.data.subAdmins.forEach(id => {
           container.innerHTML += `
             <div class="list-item flex-between" style="padding:10px 14px;">
               <div>
                 <strong class="text-sm">ID: ${id}</strong>
-                <div class="text-xs text-muted">صلاحيات: مراجعة السحوبات والإثباتات والتذاكر</div>
+                <div class="text-xs text-muted">مشرف نظام سحابي فرعي</div>
               </div>
               <button class="btn btn-sm btn-danger" onclick="Engine.adminRemoveSubAdmin(${id})">عزل ✕</button>
             </div>
@@ -2028,25 +2072,20 @@
 
       copyText(txt) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(txt).then(() => {
-            Toast.show("تم النسخ للحافظة بنجاح!");
-          }).catch(() => { this.fallbackCopy(txt); });
-        } else { this.fallbackCopy(txt); }
+          navigator.clipboard.writeText(txt).then(() => { Toast.show("تم النسخ للحافظة بنجاح!"); });
+        } else {
+          const inp = document.createElement('input');
+          inp.value = txt;
+          document.body.appendChild(inp);
+          inp.select();
+          document.execCommand('copy');
+          inp.remove();
+          Toast.show("تم النسخ!");
+        }
       },
 
       copyDepositAddress() {
-        const addr = DB.data.platform.depositWallet || CONFIG.DEFAULT_DEPOSIT_WALLET;
-        this.copyText(addr);
-      },
-
-      fallbackCopy(txt) {
-        const inp = document.createElement('input');
-        inp.value = txt;
-        document.body.appendChild(inp);
-        inp.select();
-        document.execCommand('copy');
-        inp.remove();
-        Toast.show("تم النسخ!");
+        this.copyText(DB.data.platform.depositWallet || CONFIG.DEFAULT_DEPOSIT_WALLET);
       },
 
       copyAffiliateLink() {
