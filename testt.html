@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Dollar C - Supreme Enterprise Platform (Cloud Connected)</title>
+  <title>Dollar C - Supreme Enterprise Platform</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -522,10 +522,10 @@
     <main id="view-affiliates" class="view-container">
       <div class="card" style="border-color: rgba(245, 158, 11, 0.4); background: linear-gradient(180deg, rgba(245, 158, 11, 0.08), transparent);">
         <div class="card-header text-warn">
-          <span>🤝</span> <span data-i18n="affiliate_header">برنامج شركاء الإحالة (35%)</span>
+          <span>🤝</span> <span data-i18n="affiliate_header">برنامج شركاء الإحالة السحابي (35%)</span>
         </div>
         <p class="text-xs text-muted mb-3" data-i18n="affiliate_desc">
-          اربح عمولة ضخمة بنسبة 35% من كل مهمة ينجزها أصدقاؤك مدى الحياة! لا يوجد سقف للأرباح.
+          اربح عمولة ضخمة بنسبة 35% من كل مهمة ينجزها أصدقاؤك مدى الحياة عبر السحابة المركزية!
         </p>
 
         <div class="list-item flex-between" style="background: rgba(0,0,0,0.4);">
@@ -562,7 +562,7 @@
     <main id="view-admin" class="view-container">
       <div style="background: linear-gradient(90deg, #7f1d1d, #dc2626); color: white; padding: 20px; border-radius: var(--radius-md); text-align: center; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4); border: 1px solid #f87171;">
         <h2 style="font-weight: 900; letter-spacing: 2px; font-size: 22px;">SUPREME COMMAND MATRIX</h2>
-        <p class="text-xs mt-2" style="opacity: 0.9;" id="admin-header-status">التحكم المركزي المطلق بنظام العمليات السحابي</p>
+        <p class="text-xs mt-2" style="opacity: 0.9;" id="admin-header-status">التحكم السحابي الكامل: المالك الأعلى (8737864156)</p>
       </div>
 
       <div class="admin-subnav">
@@ -791,10 +791,24 @@
       DEFAULT_DEPOSIT_WALLET: "TYXqJ8ZKvW9nmLoP3eRs7bC4dG1uHt2fKa"
     };
 
-    // ربط Supabase بالسحابة الرسمية مباشرة
     const SUPABASE_URL = "https://fidthtrcrrxwvwnngyzh.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_HKB5k0VoU2j4tRvDtY31cQ_lquwtOIb";
-    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    let supabase = null;
+    try {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch(e) { console.error("Supabase init error:", e); }
+
+    const SafeStorage = {
+      memory: {},
+      getItem(key) {
+        try { return localStorage.getItem(key); } catch(e) { return this.memory[key] || null; }
+      },
+      setItem(key, val) {
+        try { localStorage.setItem(key, val); } catch(e) { this.memory[key] = String(val); }
+      }
+    };
 
     const DB = {
       data: {
@@ -812,9 +826,8 @@
       async initCloud() {
         if (!supabase) return;
         try {
-          // جلب الإعدادات العامة أو المحفظة
-          const { data: usersData } = await supabase.from('users').select('*');
-          if (usersData) {
+          const { data: usersData, error: uErr } = await supabase.from('users').select('*');
+          if (!uErr && usersData) {
             usersData.forEach(u => {
               this.data.users[u.telegram_id] = {
                 id: u.telegram_id,
@@ -827,8 +840,8 @@
             });
           }
 
-          const { data: tasksData } = await supabase.from('tasks').select('*');
-          if (tasksData) {
+          const { data: tasksData, error: tErr } = await supabase.from('tasks').select('*');
+          if (!tErr && tasksData) {
             this.data.tasks = tasksData.map(t => ({
               id: t.id,
               creatorId: t.creator_id,
@@ -844,13 +857,11 @@
             }));
           }
 
-          const { data: proofsData } = await supabase.from('proofs').select('*');
-          if (proofsData) {
-            this.data.proofs = proofsData;
-          }
+          const { data: proofsData, error: pErr } = await supabase.from('proofs').select('*');
+          if (!pErr && proofsData) { this.data.proofs = proofsData; }
 
-          const { data: wdData } = await supabase.from('withdrawals').select('*');
-          if (wdData) {
+          const { data: wdData, error: wErr } = await supabase.from('withdrawals').select('*');
+          if (!wErr && wdData) {
             this.data.withdrawals = wdData.map(w => ({
               id: w.id,
               userId: w.user_id,
@@ -863,8 +874,8 @@
             }));
           }
 
-          const { data: historyData } = await supabase.from('history').select('*');
-          if (historyData) {
+          const { data: historyData, error: hErr } = await supabase.from('history').select('*');
+          if (!hErr && historyData) {
             this.data.history = historyData.map(h => ({
               id: h.id,
               userId: h.user_id,
@@ -875,12 +886,10 @@
             }));
           }
 
-          const { data: ticketsData } = await supabase.from('tickets').select('*');
-          if (ticketsData) {
-            this.data.tickets = ticketsData;
-          }
+          const { data: ticketsData, error: tkErr } = await supabase.from('tickets').select('*');
+          if (!tkErr && ticketsData) { this.data.tickets = ticketsData; }
         } catch (e) {
-          console.error("Cloud sync error:", e);
+          console.error("Cloud sync warning (falling back to local):", e);
         }
       },
 
@@ -906,14 +915,16 @@
 
       async saveUserCloud(u) {
         if (!supabase) return;
-        await supabase.from('users').upsert({
-          telegram_id: u.id,
-          username: u.username,
-          balance: u.balance,
-          referred_by: u.referredBy,
-          referrals_count: u.referralsCount,
-          banned: u.banned
-        });
+        try {
+          await supabase.from('users').upsert({
+            telegram_id: u.id,
+            username: u.username,
+            balance: u.balance,
+            referred_by: u.referredBy,
+            referrals_count: u.referralsCount,
+            banned: u.banned
+          });
+        } catch(e) { console.error("saveUserCloud error:", e); }
       },
 
       isSupremeAdmin(id) { return Number(id) === Number(CONFIG.SUPREME_ADMIN_ID); },
@@ -947,14 +958,16 @@
         });
 
         if (supabase) {
-          await supabase.from('history').insert([{
-            id: tx.id,
-            user_id: tx.userId,
-            type: tx.type,
-            amount: tx.amount,
-            description: tx.description,
-            date: tx.date
-          }]);
+          try {
+            await supabase.from('history').insert([{
+              id: tx.id,
+              user_id: tx.userId,
+              type: tx.type,
+              amount: tx.amount,
+              description: tx.description,
+              date: tx.date
+            }]);
+          } catch(e) { console.error("logTransaction cloud error:", e); }
         }
       }
     };
@@ -1102,8 +1115,11 @@
 
       async init() {
         try {
-          // جلب بيانات السحابة أولاً
-          await DB.initCloud();
+          try {
+            await DB.initCloud();
+          } catch (cloudErr) {
+            console.warn("Cloud init skipped/failed, proceeding locally:", cloudErr);
+          }
 
           const tg = window.Telegram?.WebApp;
           if (tg) {
@@ -1122,33 +1138,36 @@
 
           // --- معالجة الإحالة السحابية المباشرة ---
           let startParam = null;
-          if (window.Telegram?.WebApp?.initDataUnsafe?.start_param) {
-            startParam = window.Telegram.WebApp.initDataUnsafe.start_param;
-          }
-          if (!startParam) {
-            const urlParams = new URLSearchParams(window.location.search);
-            startParam = urlParams.get('startapp') || urlParams.get('ref') || urlParams.get('tgWebAppStartParam');
-          }
-          if (!startParam && window.location.hash) {
-            const hashParams = new URLSearchParams(window.location.hash.substring(1));
-            startParam = hashParams.get('startapp') || hashParams.get('ref') || hashParams.get('tgWebAppStartParam');
-          }
+          try {
+            if (window.Telegram?.WebApp?.initDataUnsafe?.start_param) {
+              startParam = window.Telegram.WebApp.initDataUnsafe.start_param;
+            }
+            if (!startParam) {
+              const urlParams = new URLSearchParams(window.location.search);
+              startParam = urlParams.get('startapp') || urlParams.get('ref') || urlParams.get('tgWebAppStartParam');
+            }
+            if (!startParam && window.location.hash) {
+              const hashParams = new URLSearchParams(window.location.hash.substring(1));
+              startParam = hashParams.get('startapp') || hashParams.get('ref') || hashParams.get('tgWebAppStartParam');
+            }
 
-          if (startParam) {
-            let cleanRef = startParam.toString().replace('ref_', '');
-            const referrerId = Number(cleanRef);
-            if (referrerId && referrerId !== this.currentUserId) {
-              const currentUser = DB.getUser(this.currentUserId);
-              if (!currentUser.referredBy) {
-                currentUser.referredBy = referrerId;
-                const referrerUser = DB.getUser(referrerId);
-                referrerUser.referralsCount = (referrerUser.referralsCount || 0) + 1;
-                
-                // حفظ التحديثات فوراً في Supabase
-                await DB.saveUserCloud(currentUser);
-                await DB.saveUserCloud(referrerUser);
+            if (startParam) {
+              let cleanRef = startParam.toString().replace('ref_', '');
+              const referrerId = Number(cleanRef);
+              if (referrerId && referrerId !== this.currentUserId) {
+                const currentUser = DB.getUser(this.currentUserId);
+                if (!currentUser.referredBy) {
+                  currentUser.referredBy = referrerId;
+                  const referrerUser = DB.getUser(referrerId);
+                  referrerUser.referralsCount = (referrerUser.referralsCount || 0) + 1;
+                  
+                  await DB.saveUserCloud(currentUser);
+                  await DB.saveUserCloud(referrerUser);
+                }
               }
             }
+          } catch(refErr) {
+            console.error("Referral parsing error:", refErr);
           }
 
           const usernameDisplay = this.currentUserObj.username || `User_${this.currentUserId}`;
@@ -1221,6 +1240,10 @@
           this.refreshAdminPanels();
         } else if (viewId === 'view-ads') {
           this.renderAdvertiserCampaigns();
+        }
+
+        if (window.Telegram?.WebApp?.HapticFeedback) {
+          try { window.Telegram.WebApp.HapticFeedback.impactOccurred('light'); } catch(e) {}
         }
       },
 
@@ -1395,8 +1418,10 @@
 
         DB.data.proofs.push(proofObj);
         if (supabase) {
-          await supabase.from('proofs').insert([proofObj]);
-          await supabase.from('tasks').update({ remaining_count: task.remainingCount, active: task.active }).eq('id', task.id);
+          try {
+            await supabase.from('proofs').insert([proofObj]);
+            await supabase.from('tasks').update({ remaining_count: task.remainingCount, active: task.active }).eq('id', task.id);
+          } catch(e) {}
         }
 
         await DB.logTransaction(this.currentUserId, 'in', task.reward, `اشتراك قناة تلغرام: ${task.title}`);
@@ -1439,8 +1464,10 @@
 
         DB.data.proofs.push(proofObj);
         if (supabase) {
-          await supabase.from('proofs').insert([proofObj]);
-          await supabase.from('tasks').update({ remaining_count: task.remainingCount, active: task.active }).eq('id', task.id);
+          try {
+            await supabase.from('proofs').insert([proofObj]);
+            await supabase.from('tasks').update({ remaining_count: task.remainingCount, active: task.active }).eq('id', task.id);
+          } catch(e) {}
         }
 
         await DB.logTransaction(this.currentUserId, 'in', task.reward, `إنجاز مهمة: ${task.title}`);
@@ -1480,7 +1507,7 @@
 
         DB.data.proofs.push(proofObj);
         if (supabase) {
-          await supabase.from('proofs').insert([proofObj]);
+          try { await supabase.from('proofs').insert([proofObj]); } catch(e) {}
         }
 
         this.closeModal('modal-proof');
@@ -1552,7 +1579,7 @@
         });
 
         if (supabase) {
-          await supabase.from('tasks').insert([newTask]);
+          try { await supabase.from('tasks').insert([newTask]); } catch(e) {}
         }
 
         this.syncFinancialUI();
@@ -1631,8 +1658,10 @@
           if (task.remainingCount <= 0) task.active = false;
 
           if (supabase) {
-            await supabase.from('proofs').update({ status: 'approved' }).eq('id', proof.id);
-            await supabase.from('tasks').update({ remaining_count: task.remainingCount, active: task.active }).eq('id', task.id);
+            try {
+              await supabase.from('proofs').update({ status: 'approved' }).eq('id', proof.id);
+              await supabase.from('tasks').update({ remaining_count: task.remainingCount, active: task.active }).eq('id', task.id);
+            } catch(e) {}
           }
 
           await DB.logTransaction(proof.userid, 'in', task.reward, `صرف أرباح مهمة موافق عليها: ${task.title}`);
@@ -1641,7 +1670,7 @@
         } else {
           proof.status = 'rejected';
           if (supabase) {
-            await supabase.from('proofs').update({ status: 'rejected' }).eq('id', proof.id);
+            try { await supabase.from('proofs').update({ status: 'rejected' }).eq('id', proof.id); } catch(e) {}
           }
           Toast.show("تم رفض الإثبات.", "warn");
         }
@@ -1718,7 +1747,7 @@
         });
 
         if (supabase) {
-          await supabase.from('withdrawals').insert([wdRecord]);
+          try { await supabase.from('withdrawals').insert([wdRecord]); } catch(e) {}
         }
 
         this.syncFinancialUI();
@@ -1751,7 +1780,7 @@
 
         DB.data.tickets.unshift(ticket);
         if (supabase) {
-          await supabase.from('tickets').insert([ticket]);
+          try { await supabase.from('tickets').insert([ticket]); } catch(e) {}
         }
 
         this.closeModal('modal-ticket');
@@ -1829,11 +1858,11 @@
 
         if (decision === 'approve') {
           item.status = 'approved';
-          if (supabase) await supabase.from('withdrawals').update({ status: 'approved' }).eq('id', item.id);
+          if (supabase) { try { await supabase.from('withdrawals').update({ status: 'approved' }).eq('id', item.id); } catch(e) {} }
           Toast.show(`تمت الموافقة على سحب ${item.amountUsdt} USDT.`);
         } else {
           item.status = 'rejected';
-          if (supabase) await supabase.from('withdrawals').update({ status: 'rejected' }).eq('id', item.id);
+          if (supabase) { try { await supabase.from('withdrawals').update({ status: 'rejected' }).eq('id', item.id); } catch(e) {} }
           await DB.logTransaction(item.userId, 'in', item.amountBee, `استرجاع رصيد مرفوض (${item.amountUsdt} USDT)`);
           Toast.show(`تم رفض السحب وإعادة الرصيد للمستخدم.`, "warn");
         }
@@ -1882,13 +1911,13 @@
 
         if (decision === 'approve') {
           p.status = 'approved';
-          if (supabase) await supabase.from('proofs').update({ status: 'approved' }).eq('id', p.id);
+          if (supabase) { try { await supabase.from('proofs').update({ status: 'approved' }).eq('id', p.id); } catch(e) {} }
           await DB.logTransaction(p.userid, 'in', reward, `مكافأة إثبات مهمة: ${task ? task.title : ''}`);
           this.distributeAffiliateCommission(p.userid, reward);
           Toast.show(`تم اعتماد الإثبات وصرف ${reward} ₵.`);
         } else {
           p.status = 'rejected';
-          if (supabase) await supabase.from('proofs').update({ status: 'rejected' }).eq('id', p.id);
+          if (supabase) { try { await supabase.from('proofs').update({ status: 'rejected' }).eq('id', p.id); } catch(e) {} }
           Toast.show("تم رفض الإثبات.", "warn");
         }
         this.syncFinancialUI();
@@ -1923,7 +1952,7 @@
 
       async closeTicket(ticketId) {
         DB.data.tickets = DB.data.tickets.filter(t => t.id !== ticketId);
-        if (supabase) await supabase.from('tickets').delete().eq('id', ticketId);
+        if (supabase) { try { await supabase.from('tickets').delete().eq('id', ticketId); } catch(e) {} }
         Toast.show("تم إغلاق التذكرة.");
         this.renderAdminTickets();
       },
@@ -1970,7 +1999,7 @@
           active: newTask.active
         });
 
-        if (supabase) await supabase.from('tasks').insert([newTask]);
+        if (supabase) { try { await supabase.from('tasks').insert([newTask]); } catch(e) {} }
 
         titleInput.value = '';
         linkInput.value = '';
