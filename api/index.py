@@ -7,11 +7,11 @@ import random
 import re
 import traceback
 
-# ================= الإعدادات الأساسية =================
-TOKEN = "8960593021:AAFkF-8Cvt_jsOHJmNUyBGWMvzmE0hIbMbk"
+# ================= الإعدادات الأساسية والتوكين الجديد =================
+TOKEN = "8960593021:AAFEn0HioVC4K2S_LkJWVgqJVMYYJt-xF4Q"
 OWNER_ID = 6610111288
 BOT_USERNAME = "Dogcoinibot"
-DB_PATH = "/tmp/doge_final_v3.db"
+DB_PATH = "/tmp/doge_final_v4.db"
 MIN_WITHDRAW = 0.01
 
 LANG = {
@@ -64,7 +64,7 @@ LANG = {
         'captcha_fail': "❌ Verification failed! Please try again.",
         'phone_req': "🔒 <b>Security Check:</b>\n\nPlease share your phone number to verify your identity.",
         'phone_err': "❌ Registration from your region is currently disabled.",
-        'sub_req': "⚠️ <b>Action Required!</b>\n\nYou must join our official channels to activate your miner.",
+        'sub_req': "⚠️️ <b>Action Required!</b>\n\nYou must join our official channels to activate your miner.",
         'main_menu': "⛏ <b>Active Mining Servers</b>\n\n💰 Live Balance: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ Hash Power: <code>{speed:.8f}</code> DOGE/Day\n👥 Team Size: <code>{refs}</code>\n\n<i>🟢 Server Status: Online & Stable.</i>",
         'team_msg': "👥 <b>Partner Program:</b>\n\nEarn a <b>30%</b> mining speed boost for every verified referral.\n\n📊 Team Members: <code>{refs}</code>\n🔗 Your Referral Link:\n<code>{link}</code>",
         'withdraw_err': "❌ Balance is below the minimum threshold ({min} DOGE).",
@@ -191,7 +191,7 @@ def process_message(msg):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
-    is_admin = c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,)).fetchone() is not None
+    is_admin = c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,)).fetchone() is not None or user_id == OWNER_ID
 
     c.execute("SELECT phone, captcha_passed, state, balance, lang, referrer_id FROM users WHERE user_id = ?", (user_id,))
     user = c.fetchone()
@@ -234,14 +234,15 @@ def process_message(msg):
         conn.close()
         return
 
-    # 3. التحقق من القنوات الإجبارية
-    c.execute("SELECT url, ch_id FROM channels WHERE type = 'main'")
-    for ch_url, ch_id in c.fetchall():
-        if ch_id and not check_sub(user_id, ch_id):
-            markup = {"inline_keyboard": [[{"text": "📢 Join / اشترك", "url": ch_url}], [{"text": "✅ Check / تحقق", "callback_data": "check_main_sub"}]]}
-            send_msg(chat_id, get_text(lang, 'sub_req'), markup)
-            conn.close()
-            return
+    # 3. التحقق من القنوات الإجبارية (يُستثنى منها المالك والمشرفون تماماً ليتمكنوا من الدخول للأدمن)
+    if not is_admin:
+        c.execute("SELECT url, ch_id FROM channels WHERE type = 'main'")
+        for ch_url, ch_id in c.fetchall():
+            if ch_id and not check_sub(user_id, ch_id):
+                markup = {"inline_keyboard": [[{"text": "📢 Join / اشترك", "url": ch_url}], [{"text": "✅ Check / تحقق", "callback_data": "check_main_sub"}]]}
+                send_msg(chat_id, get_text(lang, 'sub_req'), markup)
+                conn.close()
+                return
 
     system_btns = [get_text(lang, k) for k in ['btn_refresh', 'btn_withdraw', 'btn_team', 'btn_tasks', 'btn_speed_ch', 'btn_lang', 'btn_about', 'btn_stats', 'btn_calc', 'btn_support', 'btn_admin']]
 
@@ -352,7 +353,7 @@ def process_message(msg):
         conn.close()
         return
 
-    # 5. معالجة حالات الإدخال النصي والتوجيهات
+    # 5. معالجة حالات الإدخال النصي
     if state == 'wait_wallet':
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
@@ -424,7 +425,6 @@ def process_message(msg):
         target_title = "القناة الرسمية"
         target_link = ""
 
-        # فحص إذا كانت الرسالة موجهة (Forward) من قناة خاصة
         if 'forward_from_chat' in msg:
             f_chat = msg['forward_from_chat']
             target_ch_id = str(f_chat['id'])
@@ -432,7 +432,6 @@ def process_message(msg):
             target_link = f_chat.get('username', '')
             target_link = f"https://t.me/{target_link}" if target_link else "https://t.me"
         else:
-            # إرسال نصي عادي: يوزر أو رابط
             cleaned = text.strip()
             if cleaned.startswith("https://t.me/"):
                 u_part = cleaned.replace("https://t.me/", "").replace("/", "")
@@ -445,7 +444,6 @@ def process_message(msg):
                 target_ch_id = cleaned
                 target_link = f"https://t.me/{cleaned}"
 
-        # التحقق من أن البوت مشرف
         test = call_api("getChat", {"chat_id": target_ch_id})
         if test and test.get('ok'):
             target_title = test['result'].get('title', target_title)
@@ -603,7 +601,7 @@ def process_callback(cq):
         row = ('ar', 0, 0)
 
     lang, ref_id, cap_passed = row
-    is_admin = c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,)).fetchone() is not None
+    is_admin = c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,)).fetchone() is not None or user_id == OWNER_ID
 
     if data == "cap_ok":
         now = int(time.time())
@@ -660,7 +658,7 @@ def process_callback(cq):
     elif data == "admin_add_speed_ch" and is_admin:
         c.execute("UPDATE users SET state = 'admin_add_speed_ch' WHERE user_id = ?", (user_id,))
         conn.commit()
-        send_msg(chat_id, "📢 <b>إضافة قناة لزيادة السرعة (+10%):</b>\n\n1️⃣ ارفع البوت مشرفاً فيها أولاً.\n2️⃣ إذا كانت خاصة: قم بـ <b>توجيه (Forward)</b> أي رسالة منها هنا مباشرة!\n3️⃣ إذا كانت عامة: أرسل: <code>الاسم @channel</code>")
+        send_msg(chat_id, "📢 <b>إضافة قناة لزيادة السرعة (+10%):</b>\n\n1️⃣ ارفع البوت مشرفاً فيها أولاً.\n2️⃣ إذا كانت خاصة: قم بـ <b>توجيه (Forward)</b> أي رسالة منها هنا مباشرة!\n3️⃣ إذا كانت عامة: أرسل يوزرها أو رابطها.")
 
     elif data == "admin_add_shortlink" and is_admin:
         c.execute("UPDATE users SET state = 'admin_add_shortlink' WHERE user_id = ?", (user_id,))
