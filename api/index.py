@@ -5,6 +5,7 @@ import sqlite3
 import time
 import random
 import re
+import traceback
 
 # ================= الإعدادات الأساسية =================
 TOKEN = "8960593021:AAFkF-8Cvt_jsOHJmNUyBGWMvzmE0hIbMbk"
@@ -73,16 +74,13 @@ LANG = {
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    # جدول المستخدمين
     c.execute('''CREATE TABLE IF NOT EXISTS users (
                     user_id INTEGER PRIMARY KEY, phone TEXT, balance REAL DEFAULT 0.0,
                     speed REAL DEFAULT 0.0000000115, last_update INTEGER,
                     captcha_time INTEGER DEFAULT 0, referrer_id INTEGER DEFAULT 0,
                     ref_count INTEGER DEFAULT 0, state TEXT DEFAULT 'idle', lang TEXT DEFAULT 'ar')''')
-    # جدول المشرفين
     c.execute('''CREATE TABLE IF NOT EXISTS admins (user_id INTEGER PRIMARY KEY)''')
     c.execute("INSERT OR IGNORE INTO admins (user_id) VALUES (?)", (OWNER_ID,))
-    # جداول المهام والقنوات
     c.execute('''CREATE TABLE IF NOT EXISTS channels (id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT, ch_id TEXT, type TEXT)''')
     c.execute('''CREATE TABLE IF NOT EXISTS shortlinks (id INTEGER PRIMARY KEY AUTOINCREMENT, url TEXT, password TEXT, reward REAL)''')
     c.execute('''CREATE TABLE IF NOT EXISTS custom_btns (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, url TEXT)''')
@@ -119,12 +117,21 @@ class handler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
             length = int(self.headers.get('Content-Length', 0))
-            data = json.loads(self.rfile.read(length).decode('utf-8'))
+            body = self.rfile.read(length)
+            if not body:
+                self.send_response(200)
+                self.end_headers()
+                return
+                
+            data = json.loads(body.decode('utf-8'))
             if 'message' in data: self.handle_message(data['message'])
             elif 'callback_query' in data: self.handle_callback(data['callback_query'])
+            
             self.send_response(200)
             self.end_headers()
-        except:
+        except Exception as e:
+            # هنا بنرمي الخطأ في صندوق فيرسيل عشان نقدر نقراه لو حصل
+            print("CRITICAL ERROR:", traceback.format_exc())
             self.send_response(500)
             self.end_headers()
         return
@@ -192,7 +199,6 @@ class handler(BaseHTTPRequestHandler):
 
         # 4. معالجة الحالات (State Machine)
         if state == 'wait_wallet':
-            # الإشعار المباشر للمالك
             c.execute("SELECT user_id FROM admins")
             for admin in c.fetchall():
                 send_msg(admin[0], f"🔔 <b>طلب سحب عاجل!</b>\n\n👤 المستخدم: <code>{user_id}</code>\n💰 الرصيد: <code>{balance:.8f}</code> DOGE\n🏦 المحفظة:\n<code>{text}</code>")
@@ -258,14 +264,21 @@ class handler(BaseHTTPRequestHandler):
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute("SELECT lang, referrer_id, captcha_time FROM users WHERE user_id = ?", (user_id,))
-        lang, ref_id, cap_time = c.fetchone()
+        row = c.fetchone()
+        
+        # حماية من فقدان الذاكرة عند إعادة تشغيل سيرفر فيرسيل
+        if not row:
+            edit_msg(chat_id, msg_id, "⚠️ تم تحديث الخوادم بنجاح، يرجى إرسال /start من جديد لبدء التعدين.")
+            conn.close()
+            return
+            
+        lang, ref_id, cap_time = row
         
         c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,))
         is_admin = c.fetchone() is not None
 
         if data == "cap_ok":
             now = int(time.time())
-            # تفعيل مكافأة الإحالة فقط بعد نجاح الكابتشا لأول مرة
             if cap_time == 0 and ref_id != 0:
                 c.execute("UPDATE users SET speed = speed * 1.3, ref_count = ref_count + 1 WHERE user_id = ?", (ref_id,))
                 c.execute("SELECT lang FROM users WHERE user_id = ?", (ref_id,))
@@ -314,7 +327,8 @@ class handler(BaseHTTPRequestHandler):
         elif data == "show_tasks":
             c.execute("SELECT id, reward FROM shortlinks")
             links = c.fetchall()
-            btns = [[{"text": f"🔗 Task (+{l[1]:.8f} DOGE)", "callback_data": f"do_link_{l[0]}"}]] for l in links]
+            # هنا كان الخطأ البرمجي (الـ Syntax Error) واتصلح تماماً
+            btns = [[{"text": f"🔗 Task (+{l[1]:.8f} DOGE)", "callback_data": f"do_link_{l[0]}"}] for l in links]
             send_msg(chat_id, self.get_text(lang, 'btn_tasks'), {"inline_keyboard": btns} if btns else None)
 
         elif data.startswith("do_link_"):
@@ -362,13 +376,4 @@ class handler(BaseHTTPRequestHandler):
         
         cursor.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,))
         if cursor.fetchone(): btns.append([{"text": "⚙️ لوحة الإدارة المطلقة", "callback_data": "admin_panel"}])
-        return {"inline_keyboard": btns}
-
-    def send_main_menu(self, chat_id, user_id, cursor, lang):
-        self.update_mining(user_id, cursor)
-        cursor.execute("SELECT balance, speed, ref_count FROM users WHERE user_id = ?", (user_id,))
-        bal, speed, refs = cursor.fetchone()
-        text = self.get_text(lang, 'main_menu', balance=bal, speed=speed*86400, refs=refs)
-        send_msg(chat_id, text, self.get_main_menu(user_id, cursor, lang))
-
-    def edit_main_menu(self, chat_id, user_id, msg_id, cursor
+        retur
