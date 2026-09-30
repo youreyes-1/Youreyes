@@ -393,4 +393,119 @@ def process_message(msg):
     elif state == 'admin_wait_admin_id' and user_id == OWNER_ID:
         try:
             new_admin_id = int(text)
-            c.execute("INSERT OR IGNORE
+            c.execute("INSERT OR IGNORE INTO admins (user_id) VALUES (?)", (new_admin_id,))
+            c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
+            conn.commit()
+            send_msg(chat_id, f"✅ تم تعيين المستخدم <code>{new_admin_id}</code> كمشرف بنجاح.")
+        except Exception:
+            send_msg(chat_id, "❌ الآيدي غير صحيح.")
+        conn.close()
+        return
+
+    # الأوامر الافتراضية
+    if text == "/start":
+        send_msg(chat_id, "✅", get_reply_keyboard(lang, is_admin))
+        send_main_menu(chat_id, user_id, c, conn, lang)
+    elif text == "/admin" and is_admin:
+        send_admin_panel(chat_id, lang)
+
+    conn.close()
+
+# ================= معالجة نقرات أزرار الـ Inline (الكابتشا والمهام) =================
+def process_callback(cq):
+    chat_id = cq['message']['chat']['id']
+    user_id = cq['from']['id']
+    data = cq.get('data', '')
+    msg_id = cq['message']['message_id']
+    cq_id = cq['id']
+
+    call_api("answerCallbackQuery", {"callback_query_id": cq_id})
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT lang, referrer_id, captcha_time FROM users WHERE user_id = ?", (user_id,))
+    row = c.fetchone()
+
+    if not row:
+        c.execute("INSERT OR IGNORE INTO users (user_id, last_update) VALUES (?, ?)", (user_id, int(time.time())))
+        conn.commit()
+        row = ('ar', 0, 0)
+
+    lang, ref_id, cap_time = row
+    is_admin = c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,)).fetchone() is not None
+
+    if data == "cap_ok":
+        now = int(time.time())
+        # تفعيل مكافأة الإحالة إذا كان أول إكمال للكابتشا
+        if cap_time == 0 and ref_id and ref_id != 0:
+            c.execute("UPDATE users SET speed = speed * 1.3, ref_count = ref_count + 1 WHERE user_id = ?", (ref_id,))
+            ref_row = c.execute("SELECT lang FROM users WHERE user_id = ?", (ref_id,)).fetchone()
+            if ref_row:
+                send_msg(ref_id, get_text(ref_row[0], 'ref_notify'))
+
+        c.execute("UPDATE users SET captcha_time = ? WHERE user_id = ?", (now, user_id))
+        conn.commit()
+
+        # إزالة رسالة الكابتشا وإظهار الكيبورد السفلي والمنجم
+        delete_msg(chat_id, msg_id)
+        send_msg(chat_id, "✅ " + get_text(lang, 'captcha_ok'), get_reply_keyboard(lang, is_admin))
+        send_main_menu(chat_id, user_id, c, conn, lang)
+
+    elif data == "cap_fail":
+        delete_msg(chat_id, msg_id)
+        send_msg(chat_id, get_text(lang, 'captcha_fail'))
+        send_captcha(chat_id, lang)
+
+    elif data == "check_main_sub":
+        send_main_menu(chat_id, user_id, c, conn, lang)
+
+    elif data.startswith("do_link_"):
+        link_id = int(data.split("_")[2])
+        c.execute("UPDATE users SET state = ? WHERE user_id = ?", (f"wait_pass_{link_id}", user_id))
+        conn.commit()
+        send_msg(chat_id, "🔑 أرسل الرمز السري الآن هنا:")
+
+    elif data == "admin_add_bal" and is_admin:
+        c.execute("UPDATE users SET state = 'admin_wait_bal_id' WHERE user_id = ?", (user_id,))
+        conn.commit()
+        send_msg(chat_id, "💰 أرسل <b>الآيدي (ID)</b> الخاص بالمستخدم:")
+
+    elif data == "admin_add_admin" and user_id == OWNER_ID:
+        c.execute("UPDATE users SET state = 'admin_wait_admin_id' WHERE user_id = ?", (user_id,))
+        conn.commit()
+        send_msg(chat_id, "👑 أرسل <b>الآيدي (ID)</b> الخاص بالمشرف الجديد:")
+
+    conn.close()
+
+# تهيئة قاعدة البيانات عند بدء التشغيل
+init_db()
+
+# ================= ممر فيرسيل (Vercel Serverless Gateway) =================
+class handler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
+            if body:
+                data = json.loads(body.decode('utf-8'))
+                if 'message' in data:
+                    process_message(data['message'])
+                elif 'callback_query' in data:
+                    process_callback(data['callback_query'])
+        except Exception:
+            err = traceback.format_exc()
+            try:
+                send_msg(OWNER_ID, f"⚠️ <b>Crash Trace:</b>\n<code>{err[-600:]}</code>")
+            except Exception:
+                pass
+
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"OK")
+        return
+
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"System is active.")
+        return
