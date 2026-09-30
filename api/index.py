@@ -11,10 +11,10 @@ import traceback
 TOKEN = "8960593021:AAFkF-8Cvt_jsOHJmNUyBGWMvzmE0hIbMbk"
 OWNER_ID = 6610111288
 BOT_USERNAME = "Dogcoinibot"
-DB_PATH = "/tmp/doge_bot_v8.db"
+DB_PATH = "/tmp/doge_final_v1.db"
 MIN_WITHDRAW = 0.01
 
-# ================= قاموس اللغات والتلاعب النفسي =================
+# ================= قاموس اللغات الآمن =================
 LANG = {
     'ar': {
         'btn_refresh': "🔄 تحديث الأرباح",
@@ -35,19 +35,19 @@ LANG = {
         'phone_err': "❌ عذراً، الأرقام من هذه المنطقة الجغرافية غير مدعومة حالياً.",
         'sub_req': "⚠️ <b>تنبيه أمني!</b>\n\nيجب عليك الاشتراك في قنوات الشركة الرسمية لتفعيل حسابك.",
         'main_menu': "⛏ <b>خوادم التعدين النشطة</b>\n\n💰 الرصيد المباشر: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ قوة التعدين: <code>{speed:.8f}</code> DOGE/يوم\n👥 أعضاء الفريق: <code>{refs}</code>\n\n<i>🟢 حالة الخادم: متصل ومستقر.</i>",
-        'team_msg': "👥 <b>برنامج الشركاء (Referral):</b>\n\nكل عضو تقوم بدعوته يزيد من سرعة تعدينك بنسبة <b>30%</b> فور إكماله التحقق والكابتشا.\n\n📊 عدد أعضاء فريقك: <code>{refs}</code>\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
+        'team_msg': "👥 <b>برنامج الشركاء (Referral):</b>\n\nكل عضو تدعوه يزيد سرعة تعدينك بنسبة <b>30%</b> فور إكماله الكابتشا.\n\n📊 فريقك: <code>{refs}</code> عضو\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
         'withdraw_err': "❌ رصيدك الحالي أقل من الحد الأدنى للسحب ({min} DOGE).",
         'withdraw_req': "💸 <b>بوابة السحب الآمنة:</b>\nأرسل الآن عنوان محفظة <b>Dogecoin (FaucetPay)</b> الخاصة بك لجدولة الدفعة:",
-        'withdraw_done': "✅ <b>تم استلام طلب السحب!</b>\nتم تحويل الطلب لقسم المراجعة المالية، ستصلك الدفعة قريباً.",
-        'ref_notify': "🎉 <b>أخبار ممتازة!</b>\nسجل عضو جديد عبر رابطك وتجاوز الكابتشا بنجاح. تمت زيادة سرعة تعدينك بنسبة 30%!",
+        'withdraw_done': "✅ <b>تم استلام طلب السحب!</b>\nالطلب قيد المراجعة المالية، ستصلك الدفعة قريباً.",
+        'ref_notify': "🎉 <b>أخبار ممتازة!</b>\nسجل عضو جديد عبر رابطك وتجاوز الكابتشا. تمت زيادة سرعة تعدينك بنسبة 30%!",
         'task_msg': "🔗 <b>المهام الإعلانية:</b>\nاضغط على المهمة، تخطى الإعلانات، ثم انسخ الرمز السري وأرسله هنا:",
         'task_ok': "🎉 <b>عملية ناجحة!</b> تمت إضافة {reward:.8f} DOGE لحسابك.",
-        'task_err': "❌ <b>رمز التحقق غير صحيح!</b> يرجى التأكد والمحاولة مجدداً.",
-        'about_text': "🏢 <b>عن شركة DogeCore Solutions:</b>\n\nنحن شركة رائدة في التعدين السحابي المؤسسي، يقع مقرنا الرئيسي في <b>وارسو، بولندا</b>. نعتمد في عملياتنا على مناخ أوروبا الشرقية لتبريد مزارع خوادم الـ (ASIC)، مما يقلل تكاليف التشغيل ويسمح لنا بتقديم عوائد يومية مجانية لمستخدمينا حول العالم.",
-        'stats_text': "📊 <b>إحصائيات الشبكة المباشرة:</b>\n\n👤 إجمالي عمال التعدين: <code>1,452,890+</code>\n⚡ قوة الهاش الإجمالية: <code>45.2 TH/s</code>\n💸 إجمالي السحوبات (اليوم): <code>12,450 DOGE</code>\n🟢 وقت التشغيل (Uptime): <code>99.98%</code>",
-        'calc_text': "🧮 <b>حاسبة الأرباح المتوقعة:</b>\n\nإذا قمت بدعوة 10 أشخاص = زيادة 300% في سرعة التعدين!\nإذا قمت بدعوة 50 شخص = أرباح يومية قادرة على تحقيق دخل سلبي مستمر.\n\n<i>نصيحة: شارك رابطك في منصات التواصل لمضاعفة أرباحك أضعافاً مضاعفة.</i>",
-        'support_text': "📞 <b>مركز خدمة العملاء:</b>\n\nنظراً للضغط الهائل من المستخدمين الجدد، يستغرق الرد من فريق الدعم من 24 إلى 48 ساعة.\nيرجى مراجعة قسم (عن الشركة) أولاً.",
-        'admin_panel': "👑 <b>مركز القيادة (المالك والمشرفين):</b>\nاختر العملية المطلوبة لضبط إعدادات النظام:",
+        'task_err': "❌ <b>رمز التحقق غير صحيح!</b> حاول مجدداً.",
+        'about_text': "🏢 <b>عن شركة DogeCore Solutions:</b>\n\nنحن شركة رائدة في التعدين السحابي المؤسسي، يقع مقرنا الرئيسي في <b>وارسو، بولندا</b>. نعتمد على مناخ أوروبا الشرقية لتبريد مزارع خوادم الـ (ASIC)، مما يقلل تكاليف التشغيل ويسمح لنا بتقديم عوائد يومية مجانية للمستخدمين حول العالم.",
+        'stats_text': "📊 <b>إحصائيات الشبكة المباشرة:</b>\n\n👤 إجمالي عمال التعدين: <code>1,452,890+</code>\n⚡ قوة الهاش: <code>45.2 TH/s</code>\n💸 إجمالي سحوبات اليوم: <code>12,450 DOGE</code>\n🟢 وقت التشغيل: <code>99.98%</code>",
+        'calc_text': "🧮 <b>حاسبة الأرباح:</b>\n\n10 دعوات = زيادة 300% في سرعة التعدين!\n50 دعوة = دخل يومي مستقر ومستمر.",
+        'support_text': "📞 <b>مركز خدمة العملاء:</b>\n\nنظراً للضغط المرتفع، يستغرق الرد من فريق الدعم من 24 إلى 48 ساعة.",
+        'admin_panel': "👑 <b>مركز القيادة (المالك والمشرفين):</b>\nاختر العملية المطلوبة:",
     },
     'en': {
         'btn_refresh': "🔄 Refresh Data",
@@ -70,21 +70,21 @@ LANG = {
         'main_menu': "⛏ <b>Active Mining Servers</b>\n\n💰 Live Balance: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ Hash Power: <code>{speed:.8f}</code> DOGE/Day\n👥 Team Size: <code>{refs}</code>\n\n<i>🟢 Server Status: Online & Stable.</i>",
         'team_msg': "👥 <b>Partner Program:</b>\n\nEarn a <b>30%</b> mining speed boost for every verified referral.\n\n📊 Team Members: <code>{refs}</code>\n🔗 Your Referral Link:\n<code>{link}</code>",
         'withdraw_err': "❌ Balance is below the minimum threshold ({min} DOGE).",
-        'withdraw_req': "💸 <b>Secure Withdrawal:</b>\nSend your <b>Dogecoin (FaucetPay)</b> wallet address to schedule a payout:",
-        'withdraw_done': "✅ <b>Request Logged!</b>\nYour payout is under review by our financial team.",
-        'ref_notify': "🎉 <b>Great News!</b>\nA new user joined via your link and completed the captcha. Mining speed increased by 30%!",
-        'task_msg': "🔗 <b>Advertising Tasks:</b>\nComplete the link to find the hidden code, then send it here:",
+        'withdraw_req': "💸 <b>Secure Withdrawal:</b>\nSend your <b>Dogecoin (FaucetPay)</b> wallet address:",
+        'withdraw_done': "✅ <b>Request Logged!</b>\nYour payout is under review.",
+        'ref_notify': "🎉 <b>Great News!</b>\nA new user joined via your link. Speed increased by 30%!",
+        'task_msg': "🔗 <b>Advertising Tasks:</b>\nComplete the link to find the code, then send it here:",
         'task_ok': "🎉 <b>Success!</b> {reward:.8f} DOGE added.",
-        'task_err': "❌ <b>Invalid Code!</b> Please try again.",
-        'about_text': "🏢 <b>About DogeCore Solutions:</b>\n\nBased in <b>Warsaw, Poland</b>, we are pioneers in enterprise cloud mining. We leverage naturally cooled server farms in Eastern Europe to reduce operational costs and deliver steady daily yields worldwide.",
-        'stats_text': "📊 <b>Live Network Stats:</b>\n\n👤 Total Miners: <code>1,452,890+</code>\n⚡ Total Hashrate: <code>45.2 TH/s</code>\n💸 Paid Today: <code>12,450 DOGE</code>\n🟢 Uptime: <code>99.98%</code>",
-        'calc_text': "🧮 <b>Profit Calculator:</b>\n\nInvite 10 friends = 300% Speed Boost!\nInvite 50 friends = Sustainable passive daily income.",
-        'support_text': "📞 <b>Customer Support:</b>\n\nDue to exceptionally high traffic, response times are currently 24-48 hours.",
-        'admin_panel': "👑 <b>Command Center:</b>\nSelect an administrative action below:",
+        'task_err': "❌ <b>Invalid Code!</b> Try again.",
+        'about_text': "🏢 <b>About DogeCore Solutions:</b>\n\nBased in <b>Warsaw, Poland</b>, we provide enterprise cloud mining solutions powered by cold-climate ASIC server facilities.",
+        'stats_text': "📊 <b>Live Network Stats:</b>\n\n👤 Total Miners: <code>1,452,890+</code>\n⚡ Hashrate: <code>45.2 TH/s</code>\n💸 Paid Today: <code>12,450 DOGE</code>\n🟢 Uptime: <code>99.98%</code>",
+        'calc_text': "🧮 <b>Profit Calculator:</b>\n\n10 Invites = 300% Speed Boost!\n50 Invites = Passive daily earnings.",
+        'support_text': "📞 <b>Customer Support:</b>\n\nResponse time is currently 24-48 hours.",
+        'admin_panel': "👑 <b>Command Center:</b>\nSelect an administrative action:",
     }
 }
 
-# ================= قاعدة البيانات والدوال العامة المستقلة =================
+# ================= الدوال الأساسية المستقلة =================
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -104,7 +104,7 @@ def call_api(method, payload):
     api_url = f"https://api.telegram.org/bot{TOKEN}/{method}"
     req = urllib.request.Request(api_url, data=json.dumps(payload).encode('utf-8'), headers={'Content-Type': 'application/json'})
     try:
-        res = urllib.request.urlopen(req)
+        res = urllib.request.urlopen(req, timeout=5)
         return json.loads(res.read().decode('utf-8'))
     except Exception:
         return None
@@ -182,7 +182,7 @@ def send_admin_panel(chat_id, lang):
     ]
     send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
 
-# ================= معالجة الرسائل العادية =================
+# ================= معالجة الرسائل =================
 def process_message(msg):
     chat_id = msg['chat']['id']
     user_id = msg['from']['id']
@@ -208,7 +208,7 @@ def process_message(msg):
     phone, captcha_time, state, balance, lang, ref_id = user
     bal_float = float(balance or 0.0)
 
-    # 1. التحقق من رقم الهاتف
+    # 1. التحقق من الرقم
     if not phone:
         if 'contact' in msg:
             p = msg['contact'].get('phone_number', '')
@@ -243,7 +243,7 @@ def process_message(msg):
             conn.close()
             return
 
-    # 4. معالجة نقرات أزرار الكيبورد السفلي
+    # 4. أزرار الكيبورد السفلي
     if text == get_text(lang, 'btn_refresh'):
         send_main_menu(chat_id, user_id, c, conn, lang)
         conn.close()
@@ -315,7 +315,7 @@ def process_message(msg):
         conn.close()
         return
 
-    # 5. معالجة حالات الإدخال النصي
+    # 5. حالات الإدخال النصي
     system_btns = [get_text(lang, k) for k in ['btn_refresh', 'btn_withdraw', 'btn_team', 'btn_tasks', 'btn_lang', 'btn_about', 'btn_stats', 'btn_calc', 'btn_support', 'btn_admin']]
 
     if state == 'wait_wallet':
@@ -365,7 +365,7 @@ def process_message(msg):
             target_id = int(text)
             c.execute("UPDATE users SET state = ? WHERE user_id = ?", (f'admin_wait_bal_amt_{target_id}', user_id))
             conn.commit()
-            send_msg(chat_id, f"✅ تم تحديد المستخدم: <code>{target_id}</code>\nأرسل الآن المبلغ المراد إضافته (مثال: 0.5):")
+            send_msg(chat_id, f"✅ تم تحديد المستخدم: <code>{target_id}</code>\nأرسل الآن المبلغ المراد إضافته:")
         except Exception:
             send_msg(chat_id, "❌ الآيدي غير صحيح.")
         conn.close()
@@ -402,7 +402,7 @@ def process_message(msg):
         conn.close()
         return
 
-    # الأوامر الافتراضية
+    # الأوامر
     if text == "/start":
         send_msg(chat_id, "✅", get_reply_keyboard(lang, is_admin))
         send_main_menu(chat_id, user_id, c, conn, lang)
@@ -411,7 +411,7 @@ def process_message(msg):
 
     conn.close()
 
-# ================= معالجة نقرات أزرار الـ Inline (الكابتشا والمهام) =================
+# ================= معالجة نقرات الأزرار =================
 def process_callback(cq):
     chat_id = cq['message']['chat']['id']
     user_id = cq['from']['id']
@@ -436,7 +436,6 @@ def process_callback(cq):
 
     if data == "cap_ok":
         now = int(time.time())
-        # تفعيل مكافأة الإحالة إذا كان أول إكمال للكابتشا
         if cap_time == 0 and ref_id and ref_id != 0:
             c.execute("UPDATE users SET speed = speed * 1.3, ref_count = ref_count + 1 WHERE user_id = ?", (ref_id,))
             ref_row = c.execute("SELECT lang FROM users WHERE user_id = ?", (ref_id,)).fetchone()
@@ -446,7 +445,6 @@ def process_callback(cq):
         c.execute("UPDATE users SET captcha_time = ? WHERE user_id = ?", (now, user_id))
         conn.commit()
 
-        # إزالة رسالة الكابتشا وإظهار الكيبورد السفلي والمنجم
         delete_msg(chat_id, msg_id)
         send_msg(chat_id, "✅ " + get_text(lang, 'captcha_ok'), get_reply_keyboard(lang, is_admin))
         send_main_menu(chat_id, user_id, c, conn, lang)
@@ -477,10 +475,9 @@ def process_callback(cq):
 
     conn.close()
 
-# تهيئة قاعدة البيانات عند بدء التشغيل
 init_db()
 
-# ================= ممر فيرسيل (Vercel Serverless Gateway) =================
+# ================= ممر Vercel المباشر =================
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
@@ -507,5 +504,5 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(b"System is active.")
+        self.wfile.write(b"Active")
         return
