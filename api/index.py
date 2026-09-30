@@ -7,11 +7,11 @@ import random
 import re
 import traceback
 
-# ================= الإعدادات الأساسية والتوكين الجديد =================
+# ================= الإعدادات الأساسية =================
 TOKEN = "8960593021:AAFEn0HioVC4K2S_LkJWVgqJVMYYJt-xF4Q"
 OWNER_ID = 6610111288
 BOT_USERNAME = "Dogcoinibot"
-DB_PATH = "/tmp/doge_final_v4.db"
+DB_PATH = "/tmp/doge_final_v5.db"
 MIN_WITHDRAW = 0.01
 
 LANG = {
@@ -27,12 +27,9 @@ LANG = {
         'btn_support': "📞 الدعم الفني",
         'btn_lang': "🌐 English",
         'btn_admin': "👑 الإدارة (للمشرفين)",
-        'phone_btn': "📱 مشاركة جهة الاتصال (إجباري)",
         'captcha_msg': "🤖 <b>نظام الحماية (Anti-Bot):</b>\n\nاضغط على الرمز المختلف (🔴) للبدء في جمع Dogecoin.",
         'captcha_ok': "تم التحقق البشري بنجاح! مرحباً بك في المنجم.",
         'captcha_fail': "❌ فشل التحقق الأمني! حاول مجدداً.",
-        'phone_req': "🔒 <b>خطوة أمنية أخيرة:</b>\n\nلضمان عدم استخدام حسابات وهمية، يرجى مشاركة رقم هاتفك للتوثيق.",
-        'phone_err': "❌ عذراً، الأرقام من هذه المنطقة الجغرافية غير مدعومة حالياً.",
         'sub_req': "⚠️ <b>تنبيه أمني!</b>\n\nيجب عليك الاشتراك في قنوات المنظومة الرسمية أولاً لتفعيل حسابك.",
         'main_menu': "⛏ <b>خوادم التعدين النشطة</b>\n\n💰 الرصيد المباشر: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ قوة التعدين: <code>{speed:.8f}</code> DOGE/يوم\n👥 أعضاء الفريق: <code>{refs}</code>\n\n<i>🟢 حالة الخادم: متصل ومستقر.</i>",
         'team_msg': "👥 <b>برنامج الشركاء (Referral):</b>\n\nكل عضو تدعوه يزيد سرعة تعدينك بنسبة <b>30%</b> فور تجاوزه الكابتشا.\n\n📊 فريقك: <code>{refs}</code> عضو\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
@@ -58,13 +55,10 @@ LANG = {
         'btn_support': "📞 Support",
         'btn_lang': "🌐 العربية",
         'btn_admin': "👑 Admin Panel",
-        'phone_btn': "📱 Share Contact (Required)",
         'captcha_msg': "🤖 <b>Anti-Bot System:</b>\n\nClick the unique symbol (🔴) to authenticate.",
         'captcha_ok': "Human verification successful! Welcome to the mine.",
         'captcha_fail': "❌ Verification failed! Please try again.",
-        'phone_req': "🔒 <b>Security Check:</b>\n\nPlease share your phone number to verify your identity.",
-        'phone_err': "❌ Registration from your region is currently disabled.",
-        'sub_req': "⚠️️ <b>Action Required!</b>\n\nYou must join our official channels to activate your miner.",
+        'sub_req': "⚠️ <b>Action Required!</b>\n\nYou must join our official channels to activate your miner.",
         'main_menu': "⛏ <b>Active Mining Servers</b>\n\n💰 Live Balance: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ Hash Power: <code>{speed:.8f}</code> DOGE/Day\n👥 Team Size: <code>{refs}</code>\n\n<i>🟢 Server Status: Online & Stable.</i>",
         'team_msg': "👥 <b>Partner Program:</b>\n\nEarn a <b>30%</b> mining speed boost for every verified referral.\n\n📊 Team Members: <code>{refs}</code>\n🔗 Your Referral Link:\n<code>{link}</code>",
         'withdraw_err': "❌ Balance is below the minimum threshold ({min} DOGE).",
@@ -84,7 +78,7 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS users (
-                    user_id INTEGER PRIMARY KEY, phone TEXT, balance REAL DEFAULT 0.0,
+                    user_id INTEGER PRIMARY KEY, balance REAL DEFAULT 0.0,
                     speed REAL DEFAULT 0.0000000115, last_update INTEGER,
                     captcha_passed INTEGER DEFAULT 0, referrer_id INTEGER DEFAULT 0,
                     ref_count INTEGER DEFAULT 0, state TEXT DEFAULT 'idle', lang TEXT DEFAULT 'ar')''')
@@ -193,7 +187,13 @@ def process_message(msg):
 
     is_admin = c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,)).fetchone() is not None or user_id == OWNER_ID
 
-    c.execute("SELECT phone, captcha_passed, state, balance, lang, referrer_id FROM users WHERE user_id = ?", (user_id,))
+    # استثناء فوري للمالك والمشرفين من الكابتشا والإجبار
+    if is_admin:
+        c.execute("INSERT OR IGNORE INTO users (user_id, last_update, captcha_passed) VALUES (?, ?, 1)", (user_id, int(time.time())))
+        c.execute("UPDATE users SET captcha_passed = 1 WHERE user_id = ?", (user_id,))
+        conn.commit()
+
+    c.execute("SELECT captcha_passed, state, balance, lang, referrer_id FROM users WHERE user_id = ?", (user_id,))
     user = c.fetchone()
     now = int(time.time())
 
@@ -201,40 +201,20 @@ def process_message(msg):
         ref_id = 0
         if text.startswith("/start ") and text.split(" ")[1].isdigit():
             ref_id = int(text.split(" ")[1])
-        c.execute("INSERT INTO users (user_id, last_update, referrer_id) VALUES (?, ?, ?)", (user_id, now, ref_id))
+        c.execute("INSERT INTO users (user_id, last_update, referrer_id, captcha_passed) VALUES (?, ?, ?, ?)", (user_id, now, ref_id, 1 if is_admin else 0))
         conn.commit()
-        user = (None, 0, 'idle', 0.0, 'ar', ref_id)
+        user = (1 if is_admin else 0, 'idle', 0.0, 'ar', ref_id)
 
-    phone, captcha_passed, state, balance, lang, ref_id = user
+    captcha_passed, state, balance, lang, ref_id = user
     bal_float = float(balance or 0.0)
 
-    # 1. التحقق من الهاتف
-    if not phone:
-        if 'contact' in msg:
-            p = msg['contact'].get('phone_number', '')
-            if not p.startswith('+'):
-                p = '+' + p
-            if re.match(r'^\+(1|3|4|61)', p) and not p.startswith('+7'):
-                send_msg(chat_id, get_text(lang, 'phone_err'), {"remove_keyboard": True})
-                conn.close()
-                return
-            c.execute("UPDATE users SET phone = ? WHERE user_id = ?", (p, user_id))
-            conn.commit()
-            send_msg(chat_id, "✅", {"remove_keyboard": True})
-            send_captcha(chat_id, lang)
-        else:
-            markup = {"keyboard": [[{"text": get_text(lang, 'phone_btn'), "request_contact": True}]], "resize_keyboard": True}
-            send_msg(chat_id, get_text(lang, 'phone_req'), markup)
-        conn.close()
-        return
-
-    # 2. الكابتشا مرة واحدة في العمر
-    if captcha_passed == 0:
+    # 1. الكابتشا مرة واحدة في العمر فقط (ويُستثنى منها المالك والمشرفين)
+    if captcha_passed == 0 and not is_admin:
         send_captcha(chat_id, lang)
         conn.close()
         return
 
-    # 3. التحقق من القنوات الإجبارية (يُستثنى منها المالك والمشرفون تماماً ليتمكنوا من الدخول للأدمن)
+    # 2. التحقق من القنوات الإجبارية (باستثناء المالك والمشرفين)
     if not is_admin:
         c.execute("SELECT url, ch_id FROM channels WHERE type = 'main'")
         for ch_url, ch_id in c.fetchall():
@@ -246,7 +226,7 @@ def process_message(msg):
 
     system_btns = [get_text(lang, k) for k in ['btn_refresh', 'btn_withdraw', 'btn_team', 'btn_tasks', 'btn_speed_ch', 'btn_lang', 'btn_about', 'btn_stats', 'btn_calc', 'btn_support', 'btn_admin']]
 
-    # 4. معالجة أزرار الكيبورد
+    # 3. معالجة أزرار الكيبورد
     if text == get_text(lang, 'btn_refresh'):
         send_main_menu(chat_id, user_id, c, conn, lang)
         conn.close()
@@ -353,7 +333,7 @@ def process_message(msg):
         conn.close()
         return
 
-    # 5. معالجة حالات الإدخال النصي
+    # 4. معالجة الحالات النصية
     if state == 'wait_wallet':
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
@@ -393,7 +373,6 @@ def process_message(msg):
         conn.close()
         return
 
-    # حالات لوحة الإدارة
     elif state == 'admin_broadcast' and is_admin:
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
@@ -413,7 +392,6 @@ def process_message(msg):
         conn.close()
         return
 
-    # إضافة قناة إجبارية (يدعم التوجيه أو إرسال المعرف)
     elif state == 'admin_add_main_ch' and is_admin:
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
@@ -456,7 +434,6 @@ def process_message(msg):
         conn.close()
         return
 
-    # إضافة قناة زيادة السرعة
     elif state == 'admin_add_speed_ch' and is_admin:
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
@@ -503,7 +480,6 @@ def process_message(msg):
         conn.close()
         return
 
-    # إضافة مهمة رابط مختصر
     elif state == 'admin_add_shortlink' and is_admin:
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
@@ -671,7 +647,7 @@ def process_callback(cq):
         if not ch_list:
             send_msg(chat_id, "لا توجد قنوات مسجلة حالياً.")
         else:
-            send_msg(chat_id, "🗑️ <b>اضغط على القناة التي تريد حذفها فوراً:</b>")
+            send_msg(chat_id, "🗑️️ <b>اضغط على القناة التي تريد حذفها فوراً:</b>")
             for ch in ch_list:
                 ch_id_pk, name, c_type = ch
                 t_label = "إجبارية" if c_type == 'main' else "سرعة"
@@ -690,7 +666,7 @@ def process_callback(cq):
         if not t_list:
             send_msg(chat_id, "لا توجد مهام روابط مسجلة حالياً.")
         else:
-            send_msg(chat_id, "🗑️ <b>اضغط على المهمة التي تريد حذفها فوراً:</b>")
+            send_msg(chat_id, "🗑️️ <b>اضغط على المهمة التي تريد حذفها فوراً:</b>")
             for t in t_list:
                 t_pk, desc = t
                 del_btn = {"inline_keyboard": [[{"text": f"❌ حذف المهمة: {desc[:20]}...", "callback_data": f"del_task_{t_pk}"}]]}
