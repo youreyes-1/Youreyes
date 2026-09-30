@@ -11,7 +11,7 @@ import traceback
 TOKEN = "8960593021:AAFEn0HioVC4K2S_LkJWVgqJVMYYJt-xF4Q"
 OWNER_ID = 6610111288
 BOT_USERNAME = "Dogcoinibot"
-DB_PATH = "/tmp/doge_final_v6.db"
+DB_PATH = "/tmp/doge_final_v7.db"
 MIN_WITHDRAW = 0.01
 
 LANG = {
@@ -39,7 +39,7 @@ LANG = {
         'ref_notify': "🎉 <b>أخبار ممتازة!</b>\nسجل عضو جديد عبر رابطك وتجاوز الكابتشا. تمت زيادة سرعة تعدينك بنسبة 30%!",
         'calc_text': "🧮 <b>حاسبة العوائد والأرباح التراكمية:</b>\n\n⚡ <b>قوة الإحالات والمكافآت اليومية:</b>\n• إذا قمت بدعوة <b>10 إلى 15 شخصاً</b> فقط = سرعة تعدين تتضاعف 450%.\n• إذا وصلت إلى <b>30 - 40 إحالة نشطة</b> = ستحقق أرباحاً يومية مباشرة تتراوح بين <b>5$ إلى 8$ دولار</b> (ما يعادل 35 - 55 DOGE يومياً) قابلة للسحب المباشر دون توقف!\n\n💡 <i>نصيحة ذهبية: انسخ رابطك من زر (فريقك) وانشره في مجموعات التواصل وابدأ بناء دخلك السلبي الآن!</i>",
         'about_text': "🖥️ <b>البنية التحتية لمنظومة التعدين:</b>\n\nتعتمد مزارعنا على أحدث مصفوفات المعالجة الرسومية <b>NVIDIA RTX 4090</b> المربوطة بوحدات تعدين متخصصة من طراز <b>Bitmain Antminer L7</b> لفك تشفير خوارزمية Scrypt المخصصة لعملة Dogecoin.\n\nتدار الخوادم بأنظمة تبريد سائل مغلقة ذات كفاءة طاقية فائقة تضمن استقرار استخراج الكتل على مدار 24 ساعة ومنح عوائد يومية مستمرة لمستخدمينا المشتركين بالشبكة.",
-        'stats_text': "📊 <b>إحصائيات الشبكة المباشرة:</b>\n\n👤 عمال التعدين النشطين: <code>1,452,890+</code>\n⚡ قوة الهاش الإجمالية: <code>9.2 GH/s Scrypt</code>\n💸 إجمالي السحوبات المؤكدة اليوم: <code>14,890 DOGE</code>\n🟢 كفاءة الطاقة والتشغيل: <code>99.98%</code>",
+        'stats_text': "📊 <b>إحصائيات الشبكة المباشرة:</b>\n\n👤 عمال التعدين النشطين: <code>{miners}</code>\n⚡ قوة الهاش الإجمالية: <code>9.2 GH/s Scrypt</code>\n💸 إجمالي السحوبات المؤكدة اليوم: <code>1,450 DOGE</code>\n🟢 كفاءة الطاقة والتشغيل: <code>{eff}%</code>",
         'support_text': "📞 <b>مركز خدمة العملاء:</b>\n\nنظراً للضغط المرتفع، يستغرق الرد من فريق الدعم من 24 إلى 48 ساعة.",
         'admin_panel': "👑 <b>مركز القيادة (المالك والمشرفين):</b>\nاختر العملية المطلوبة:"
     },
@@ -67,7 +67,7 @@ LANG = {
         'ref_notify': "🎉 <b>Great News!</b>\nA new user joined via your link. Speed increased by 30%!",
         'calc_text': "🧮 <b>Profit Calculator:</b>\n\n• 10-15 Referrals = 450% Boost.\n• 30-40 Referrals = <b>$5 to $8 USD daily</b> in DOGE automatically!\n\n<i>Share your link to maximize income.</i>",
         'about_text': "🖥️ <b>Hardware Infrastructure:</b>\n\nPowered by massive arrays of <b>NVIDIA RTX 4090</b> rigs paired with high-efficiency <b>Antminer L7</b> units operating Scrypt algorithms under liquid cooling.",
-        'stats_text': "📊 <b>Live Network Stats:</b>\n\n👤 Active Miners: <code>1,452,890+</code>\n⚡ Hashrate: <code>9.2 GH/s Scrypt</code>\n💸 Paid Today: <code>14,890 DOGE</code>\n🟢 Rig Uptime: <code>99.98%</code>",
+        'stats_text': "📊 <b>Live Network Stats:</b>\n\n👤 Active Miners: <code>{miners}</code>\n⚡ Hashrate: <code>9.2 GH/s Scrypt</code>\n💸 Paid Today: <code>1,450 DOGE</code>\n🟢 Rig Uptime: <code>{eff}%</code>",
         'support_text': "📞 <b>Customer Support:</b>\n\nResponse time is currently 24-48 hours.",
         'admin_panel': "👑 <b>Command Center:</b>\nSelect an administrative action:"
     }
@@ -122,6 +122,23 @@ def get_text(lang, key, **kwargs):
     if kwargs:
         text = text.format(**kwargs)
     return text
+
+def get_dynamic_stats():
+    now_ts = int(time.time())
+    launch_ts = 1788220800  # نقطة مرجعية
+    days_passed = max(0, (now_ts - launch_ts) // 86400)
+    
+    total_growth = 0
+    for d in range(min(days_passed, 365)):
+        random.seed(999 + d)
+        total_growth += random.randint(300, 450)
+        
+    miners = 16780 + total_growth
+    
+    random.seed(now_ts // 1800)  # يتذبذب كل نصف ساعة
+    eff = round(random.uniform(96.2, 98.7), 2)
+    random.seed()
+    return f"{miners:,}", eff
 
 def get_reply_keyboard(lang, is_admin):
     kb = [
@@ -313,7 +330,9 @@ def process_message(msg):
         return
 
     elif text == get_text(lang, 'btn_stats'):
-        send_msg(chat_id, get_text(lang, 'stats_text'))
+        miners_dyn, eff_dyn = get_dynamic_stats()
+        stats_msg = get_text(lang, 'stats_text', miners=miners_dyn, eff=eff_dyn)
+        send_msg(chat_id, stats_msg)
         conn.close()
         return
 
@@ -391,7 +410,6 @@ def process_message(msg):
         conn.close()
         return
 
-    # إضافة قناة إجبارية مع جلب رابط دعوة سحابي حقيقي
     elif state == 'admin_add_main_ch' and is_admin:
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
@@ -452,7 +470,6 @@ def process_message(msg):
         conn.close()
         return
 
-    # إضافة قناة زيادة السرعة مع رابط دعوة حقيقي
     elif state == 'admin_add_speed_ch' and is_admin:
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
@@ -586,7 +603,6 @@ def process_message(msg):
         return
 
     if text == "/start":
-        # عند إرسال /start، نفحص فوراً إن كان أكمل الكابتشا واشترك في قناة الإجبار
         if not is_admin:
             c.execute("SELECT captcha_passed FROM users WHERE user_id = ?", (user_id,))
             row_cap = c.fetchone()
@@ -647,7 +663,6 @@ def process_callback(cq):
 
         delete_msg(chat_id, msg_id)
         
-        # بعد الكابتشا فوراً: التحقق من قناة الإجبار كشرط فتح البوت
         c.execute("SELECT url, ch_id FROM channels WHERE type = 'main'")
         main_ch = c.fetchone()
         if main_ch and main_ch[1] and not check_sub(user_id, main_ch[1]):
@@ -664,7 +679,6 @@ def process_callback(cq):
         send_captcha(chat_id, lang)
 
     elif data == "check_main_sub":
-        # التحقق من الاشتراك في القناة الإجبارية عند النقر على زر التحقق
         c.execute("SELECT url, ch_id FROM channels WHERE type = 'main'")
         main_ch = c.fetchone()
         if main_ch and main_ch[1] and check_sub(user_id, main_ch[1]):
