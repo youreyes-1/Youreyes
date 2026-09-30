@@ -11,7 +11,7 @@ import traceback
 TOKEN = "8960593021:AAFEn0HioVC4K2S_LkJWVgqJVMYYJt-xF4Q"
 OWNER_ID = 6610111288
 BOT_USERNAME = "Dogcoinibot"
-DB_PATH = "/tmp/doge_final_v8.db"
+DB_PATH = "/tmp/doge_final_v9.db"
 
 LANG = {
     'ar': {
@@ -297,13 +297,14 @@ def process_message(msg):
         if not links:
             send_msg(chat_id, "📋 لا توجد مهام روابط حالياً، انتظر تحديث الإدارة.")
         else:
-            # ترتييب عشوائي فريد لكل مستخدم بناءً على الآيدي الخاص به
+            # خلط المهام عشوائياً لكل مستخدم بناءً على الآيدي الخاص به لتجنب تسريب الكود بين الأصدقاء
             rnd = random.Random(user_id)
             rnd.shuffle(links)
             
-            send_msg(chat_id, "📋 <b>قائمة المهام المربحة (روابط مختصرة):</b>\nتخطى الرابط واجلب كلمة السر لتحصل على مكافأتك فوراً (كل مهمة تتجدد كل 24 ساعة):")
-            for idx, l in enumerate(links, 1):
+            send_msg(chat_id, "📋 <b>قائمة المهام المربحة (روابط مختصرة):</b>\nتخطى الرابط واجلب كلمة السر لتحصل على مكافأتك فوراً (كل مهمة تتجدد كل 24 ساعة لكل مستخدم على حدة):")
+            for l in links:
                 task_id, desc, link_url, reward = l
+                # التحقق هل أنجز هذه المهمة هذا المستخدم تحديداً خلال الـ 24 ساعة الماضية
                 c.execute("SELECT claimed_at FROM claimed_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id))
                 row_c = c.fetchone()
                 if row_c and (now - row_c[0] < 86400):
@@ -312,10 +313,10 @@ def process_message(msg):
                 else:
                     status = f"المكافأة: <code>{reward:.8f}</code> DOGE"
                     markup = {"inline_keyboard": [
-                        [{"text": f"🔗 فتح الرابط {idx}", "url": link_url}],
-                        [{"text": f"🔑 إدخال كلمة سر المهمة {idx}", "callback_data": f"enter_pass_{task_id}"}]
+                        [{"text": "🔗 فتح الرابط", "url": link_url}],
+                        [{"text": "🔑 إدخال كلمة سر المهمة", "callback_data": f"enter_pass_{task_id}"}]
                     ]}
-                msg_body = f"📌 <b>مهمة رقم {idx}:</b> {desc}\n💰 {status}"
+                msg_body = f"📌 <b>{desc}</b>\n💰 {status}"
                 send_msg(chat_id, msg_body, markup)
         conn.close()
         return
@@ -726,7 +727,7 @@ def process_callback(cq):
         task_id = data.split("_")[2]
         c.execute("UPDATE users SET state = ? WHERE user_id = ?", (f"wait_pass_{task_id}", user_id))
         conn.commit()
-        send_msg(chat_id, f"🔑 <b>أرسل الآن كلمة السر الخاصة بالمهمة رقم {task_id}:</b>")
+        send_msg(chat_id, f"🔑 <b>أرسل الآن كلمة السر الخاصة بالمهمة:</b>")
 
     elif data.startswith("verify_speed_"):
         ch_id_pk = int(data.split("_")[2])
