@@ -11,7 +11,7 @@ import traceback
 TOKEN = "8960593021:AAFkF-8Cvt_jsOHJmNUyBGWMvzmE0hIbMbk"
 OWNER_ID = 6610111288
 BOT_USERNAME = "Dogcoinibot"
-DB_PATH = "/tmp/doge_bot_v5.db"
+DB_PATH = "/tmp/doge_bot_v6.db"
 MIN_WITHDRAW = 0.01
 
 # ================= قاموس اللغات والتلاعب النفسي =================
@@ -40,9 +40,9 @@ LANG = {
         'task_msg': "🔗 <b>المهام الإعلانية:</b>\nاضغط على المهمة، تخطى الإعلانات، ثم انسخ الرمز السري وأرسله هنا:",
         'task_ok': "🎉 <b>عملية ناجحة!</b> تمت إضافة {reward:.8f} DOGE لحسابك.",
         'task_err': "❌ <b>رمز التحقق غير صحيح!</b> يرجى التأكد والمحاولة مجدداً.",
-        'about_text': "🏢 <b>عن شركة DogeCore Solutions:</b>\n\nنحن شركة رائدة في مجال التعدين السحابي، يقع مقرنا الرئيسي في مدينة <b>وارسو، بولندا</b>. نعتمد في عملياتنا على مناخ أوروبا الشرقية البارد لتبريد مزارع خوادم الـ (ASIC) الخاصة بنا، مما يقلل تكاليف التشغيل ويسمح لنا بتقديم عوائد يومية مجانية ومستقرة لمستخدمينا حول العالم.\n\n<i>رؤيتنا: ديمقراطية العملات الرقمية للجميع.</i>",
+        'about_text': "🏢 <b>عن شركة DogeCore Solutions:</b>\n\nنحن شركة رائدة في مجال التعدين السحابي، يقع مقرنا الرئيسي في مدينة <b>وارسو، بولندا</b>. نعتمد في عملياتنا على مناخ أوروبا الشرقية البارد لتبريد مزارع خوادم الـ (ASIC) الخاصة بنا، مما يقلل تكاليف التشغيل ويسمح لنا بتقديم عوائد يومية مجانية ومستقرة لمستخدمينا حول العالم.",
         'stats_text': "📊 <b>إحصائيات الشبكة المباشرة:</b>\n\n👤 إجمالي عمال التعدين: <code>1,452,890+</code>\n⚡ قوة الهاش الإجمالية: <code>45.2 TH/s</code>\n💸 إجمالي السحوبات (اليوم): <code>12,450 DOGE</code>\n🟢 وقت التشغيل (Uptime): <code>99.98%</code>",
-        'calc_text': "🧮 <b>حاسبة الأرباح المتوقعة:</b>\n\nإذا قمت بدعوة 10 أشخاص = زيادة 300% في سرعة التعدين!\nإذا قمت بدعوة 50 شخص = أرباح يومية قادرة على تحقيق دخل سلبي مستمر.\n\n<i>نصيحة: شارك رابطك في جروبات الفيسبوك والتيليجرام لمضاعفة أرباحك أضعافاً مضاعفة.</i>",
+        'calc_text': "🧮 <b>حاسبة الأرباح المتوقعة:</b>\n\nإذا قمت بدعوة 10 أشخاص = زيادة 300% في سرعة التعدين!\nإذا قمت بدعوة 50 شخص = أرباح يومية قادرة على تحقيق دخل سلبي مستمر.",
         'support_text': "📞 <b>مركز خدمة العملاء:</b>\n\nنظراً للضغط الهائل من المستخدمين الجدد، قد يستغرق الرد من فريق الدعم من 24 إلى 48 ساعة.\nيرجى التأكد من قراءة قسم (عن الشركة) قبل التواصل.",
         'admin_panel': "👑 <b>مركز القيادة (المالك والمشرفين):</b>\nاختر العملية المطلوبة لضبط إعدادات النظام:",
     },
@@ -70,9 +70,9 @@ LANG = {
         'task_msg': "🔗 <b>Advertising Tasks:</b>\nComplete the link to find the hidden code, then send it here:",
         'task_ok': "🎉 <b>Success!</b> {reward:.8f} DOGE added.",
         'task_err': "❌ <b>Invalid Code!</b> Please try again.",
-        'about_text': "🏢 <b>About DogeCore Solutions:</b>\n\nBased in <b>Warsaw, Poland</b>, we are pioneers in cloud mining. We leverage Eastern Europe's cold climate to naturally cool our ASIC server farms, drastically reducing operational costs. This efficiency allows us to provide stable, free daily yields to our global user base.",
+        'about_text': "🏢 <b>About DogeCore Solutions:</b>\n\nBased in <b>Warsaw, Poland</b>, we are pioneers in cloud mining. We leverage Eastern Europe's cold climate to naturally cool our ASIC server farms, drastically reducing operational costs.",
         'stats_text': "📊 <b>Live Network Stats:</b>\n\n👤 Total Miners: <code>1,452,890+</code>\n⚡ Total Hashrate: <code>45.2 TH/s</code>\n💸 Paid Today: <code>12,450 DOGE</code>\n🟢 Uptime: <code>99.98%</code>",
-        'calc_text': "🧮 <b>Profit Calculator:</b>\n\nInvite 10 friends = 300% Speed Boost!\nInvite 50 friends = Sustainable passive daily income.\n\n<i>Tip: Share your link on social media to multiply your earnings rapidly.</i>",
+        'calc_text': "🧮 <b>Profit Calculator:</b>\n\nInvite 10 friends = 300% Speed Boost!\nInvite 50 friends = Sustainable passive daily income.",
         'support_text': "📞 <b>Customer Support:</b>\n\nDue to exceptionally high traffic, our support team may take 24-48 hours to respond. Thank you for your patience.",
         'admin_panel': "👑 <b>Command Center:</b>\nSelect an administrative action below:",
     }
@@ -145,7 +145,6 @@ class handler(BaseHTTPRequestHandler):
         if kwargs: text = text.format(**kwargs)
         return text
 
-    # بناء الكيبورد السفلي (معمارية الأزرار الجديدة)
     def get_reply_keyboard(self, lang, is_admin):
         kb = [
             [{"text": self.get_text(lang, 'btn_refresh')}],
@@ -154,10 +153,8 @@ class handler(BaseHTTPRequestHandler):
             [{"text": self.get_text(lang, 'btn_stats')}, {"text": self.get_text(lang, 'btn_about')}],
             [{"text": self.get_text(lang, 'btn_support')}, {"text": self.get_text(lang, 'btn_lang')}]
         ]
-        # إضافة زر الإدارة فقط للمشرفين
         if is_admin:
             kb.insert(0, [{"text": self.get_text(lang, 'btn_admin')}])
-            
         return {"keyboard": kb, "resize_keyboard": True}
 
     def handle_message(self, msg):
@@ -185,7 +182,6 @@ class handler(BaseHTTPRequestHandler):
         phone, captcha_time, state, balance, lang, ref_id = user
         bal_float = float(balance or 0)
 
-        # 1. التحقق من الرقم 
         if not phone:
             if 'contact' in msg:
                 p = msg['contact'].get('phone_number', '')
@@ -202,12 +198,10 @@ class handler(BaseHTTPRequestHandler):
                 send_msg(chat_id, self.get_text(lang, 'phone_req'), markup)
             return
 
-        # 2. الكابتشا
         if now - captcha_time > 3600:
             self.send_captcha(chat_id, lang)
             return
 
-        # 3. التحقق من القنوات الإجبارية
         c.execute("SELECT url, ch_id FROM channels WHERE type = 'main'")
         for ch_url, ch_id in c.fetchall():
             if not check_sub(user_id, ch_id):
@@ -215,7 +209,6 @@ class handler(BaseHTTPRequestHandler):
                 send_msg(chat_id, self.get_text(lang, 'sub_req'), markup)
                 return
 
-        # ================= معالجة أزرار الكيبورد السفلي =================
         if text == self.get_text(lang, 'btn_refresh'):
             self.send_main_menu(chat_id, user_id, c, conn, lang, is_admin)
             return
@@ -273,12 +266,10 @@ class handler(BaseHTTPRequestHandler):
             send_msg(chat_id, self.get_text(lang, 'support_text'))
             return
             
-        # فتح لوحة التحكم الشفافة من الكيبورد السفلي للمشرفين فقط
         elif text == self.get_text(lang, 'btn_admin') and is_admin:
             self.send_admin_panel(chat_id, lang)
             return
 
-        # ================= معالجة الحالات (السحب والمهام والإدارة) =================
         system_btns = [self.get_text(lang, k) for k in ['btn_refresh', 'btn_withdraw', 'btn_team', 'btn_tasks', 'btn_lang', 'btn_about', 'btn_stats', 'btn_calc', 'btn_support', 'btn_admin']]
         
         if state == 'wait_wallet':
@@ -314,7 +305,6 @@ class handler(BaseHTTPRequestHandler):
                 send_msg(chat_id, self.get_text(lang, 'task_err'))
             return
 
-        # إدارة الرصيد اليدوي
         elif state == 'admin_wait_bal_id' and is_admin:
             if text in system_btns:
                 c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
@@ -365,4 +355,20 @@ class handler(BaseHTTPRequestHandler):
         
         if not row:
             send_msg(chat_id, "⚠️ يرجى إرسال /start من جديد.")
-            c
+            conn.close()
+            return
+            
+        lang, ref_id, cap_time = row
+        is_admin = c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,)).fetchone() is not None
+
+        if data == "cap_ok":
+            now = int(time.time())
+            if cap_time == 0 and ref_id != 0:
+                c.execute("UPDATE users SET speed = speed * 1.3, ref_count = ref_count + 1 WHERE user_id = ?", (ref_id,))
+                ref_lang = c.execute("SELECT lang FROM users WHERE user_id = ?", (ref_id,)).fetchone()
+                if ref_lang: send_msg(ref_id, self.get_text(ref_lang[0], 'ref_notify'))
+
+            c.execute("UPDATE users SET captcha_time = ? WHERE user_id = ?", (now, user_id))
+            conn.commit()
+            
+            call_a
