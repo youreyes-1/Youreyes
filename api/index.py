@@ -11,7 +11,7 @@ import traceback
 TOKEN = "8960593021:AAFkF-8Cvt_jsOHJmNUyBGWMvzmE0hIbMbk"
 OWNER_ID = 6610111288
 BOT_USERNAME = "Dogcoinibot"
-DB_PATH = "/tmp/doge_bot_v2.db"
+DB_PATH = "/tmp/doge_bot_v3.db" # غيرنا الاسم عشان نمسح الذاكرة المعلقة
 MIN_WITHDRAW = 0.01
 
 # ================= قاموس اللغات (Localization) =================
@@ -70,7 +70,6 @@ LANG = {
     }
 }
 
-# ================= قاعدة البيانات =================
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -89,7 +88,6 @@ def init_db():
 
 init_db()
 
-# ================= دوال التيليجرام =================
 def call_api(method, payload):
     api_url = f"https://api.telegram.org/bot{TOKEN}/{method}"
     req = urllib.request.Request(api_url, data=json.dumps(payload).encode('utf-8'), headers={'Content-Type': 'application/json'})
@@ -112,7 +110,6 @@ def check_sub(user_id, channel_id):
         return res['result']['status'] in ['member', 'administrator', 'creator']
     return False
 
-# ================= المحرك الأساسي =================
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
@@ -124,15 +121,21 @@ class handler(BaseHTTPRequestHandler):
                 return
                 
             data = json.loads(body.decode('utf-8'))
-            if 'message' in data: self.handle_message(data['message'])
-            elif 'callback_query' in data: self.handle_callback(data['callback_query'])
             
-            self.send_response(200)
-            self.end_headers()
-        except Exception as e:
-            print("CRITICAL ERROR:", traceback.format_exc())
-            self.send_response(500)
-            self.end_headers()
+            # رادار الأخطاء المباشر للمالك
+            if 'message' in data: 
+                try: self.handle_message(data['message'])
+                except Exception: send_msg(OWNER_ID, f"⚠️ <b>Crash Report (MSG):</b>\n<code>{traceback.format_exc()[-800:]}</code>")
+            elif 'callback_query' in data: 
+                try: self.handle_callback(data['callback_query'])
+                except Exception: send_msg(OWNER_ID, f"⚠️ <b>Crash Report (BTN):</b>\n<code>{traceback.format_exc()[-800:]}</code>")
+                
+        except Exception:
+            pass
+            
+        # إجبار السيرفر على الرد بـ 200 لمنع حظر تيليجرام
+        self.send_response(200)
+        self.end_headers()
         return
 
     def get_text(self, lang, key, **kwargs):
@@ -165,25 +168,25 @@ class handler(BaseHTTPRequestHandler):
 
         phone, captcha_time, state, balance, lang, ref_id = user
 
-        # 1. التحقق من الرقم 
+        # 1. نظام التحقق من الرقم (بدون أخطاء)
         if not phone:
-            if 'contact' in msg and msg['contact']['user_id'] == user_id:
-                p = msg['contact']['phone_number']
+            if 'contact' in msg:
+                p = msg['contact'].get('phone_number', '')
                 if not p.startswith('+'): p = '+' + p
                 if re.match(r'^\+(1|3|4|61)', p) and not p.startswith('+7'):
                     send_msg(chat_id, self.get_text(lang, 'phone_err'), {"remove_keyboard": True})
                     return
                 c.execute("UPDATE users SET phone = ? WHERE user_id = ?", (p, user_id))
                 conn.commit()
-                # إزالة الزر المستفز فوراً
-                send_msg(chat_id, "✅ تم حفظ الرقم بنجاح.", {"remove_keyboard": True})
+                # مسح الكيبورد الإجباري فوراً
+                send_msg(chat_id, "✅ تم حفظ الرقم وإزالة القائمة.", {"remove_keyboard": True})
                 self.send_captcha(chat_id, lang)
             else:
                 markup = {"keyboard": [[{"text": self.get_text(lang, 'phone_btn'), "request_contact": True}]], "resize_keyboard": True}
                 send_msg(chat_id, self.get_text(lang, 'phone_req'), markup)
             return
 
-        # 2. نظام الكابتشا
+        # 2. الكابتشا
         if now - captcha_time > 3600:
             self.send_captcha(chat_id, lang)
             return
@@ -202,7 +205,7 @@ class handler(BaseHTTPRequestHandler):
         if state == 'wait_wallet':
             c.execute("SELECT user_id FROM admins")
             for admin in c.fetchall():
-                send_msg(admin[0], f"🔔 <b>طلب سحب عاجل!</b>\n\n👤 المستخدم: <code>{user_id}</code>\n💰 الرصيد: <code>{float(balance):.8f}</code> DOGE\n🏦 المحفظة:\n<code>{text}</code>")
+                send_msg(admin[0], f"🔔 <b>طلب سحب عاجل!</b>\n\n👤 المستخدم: <code>{user_id}</code>\n💰 الرصيد: <code>{float(balance or 0):.8f}</code> DOGE\n🏦 المحفظة:\n<code>{text}</code>")
             
             c.execute("UPDATE users SET balance = 0, state = 'idle' WHERE user_id = ?", (user_id,))
             conn.commit()
@@ -215,9 +218,9 @@ class handler(BaseHTTPRequestHandler):
             c.execute("SELECT password, reward FROM shortlinks WHERE id = ?", (link_id,))
             link = c.fetchone()
             if link and text.strip() == link[0]:
-                c.execute("UPDATE users SET balance = balance + ?, state = 'idle' WHERE user_id = ?", (float(link[1]), user_id))
+                c.execute("UPDATE users SET balance = balance + ?, state = 'idle' WHERE user_id = ?", (float(link[1] or 0), user_id))
                 conn.commit()
-                send_msg(chat_id, self.get_text(lang, 'task_ok', reward=float(link[1])))
+                send_msg(chat_id, self.get_text(lang, 'task_ok', reward=float(link[1] or 0)))
             else:
                 c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
                 conn.commit()
@@ -268,7 +271,7 @@ class handler(BaseHTTPRequestHandler):
         row = c.fetchone()
         
         if not row:
-            edit_msg(chat_id, msg_id, "⚠️ يرجى إرسال /start من جديد.")
+            edit_msg(chat_id, msg_id, "⚠️ يرجى إرسال /start من جديد لبدء التعدين.")
             conn.close()
             return
             
@@ -309,7 +312,7 @@ class handler(BaseHTTPRequestHandler):
         elif data == "req_withdraw":
             self.update_mining(user_id, c, conn)
             c.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
-            bal = float(c.fetchone()[0])
+            bal = float(c.fetchone()[0] or 0)
             if bal < MIN_WITHDRAW:
                 call_api("answerCallbackQuery", {"callback_query_id": cq['id'], "text": self.get_text(lang, 'withdraw_err', min=MIN_WITHDRAW), "show_alert": True})
             else:
@@ -319,14 +322,14 @@ class handler(BaseHTTPRequestHandler):
 
         elif data == "show_team":
             c.execute("SELECT ref_count FROM users WHERE user_id = ?", (user_id,))
-            refs = int(c.fetchone()[0])
+            refs = int(c.fetchone()[0] or 0)
             link = f"https://t.me/{BOT_USERNAME}?start={user_id}"
             send_msg(chat_id, self.get_text(lang, 'team_msg', refs=refs, link=link))
 
         elif data == "show_tasks":
             c.execute("SELECT id, reward FROM shortlinks")
             links = c.fetchall()
-            btns = [[{"text": f"🔗 Task (+{float(l[1]):.8f} DOGE)", "callback_data": f"do_link_{l[0]}"}] for l in links]
+            btns = [[{"text": f"🔗 Task (+{float(l[1] or 0):.8f} DOGE)", "callback_data": f"do_link_{l[0]}"}] for l in links]
             send_msg(chat_id, self.get_text(lang, 'btn_tasks'), {"inline_keyboard": btns} if btns else None)
 
         elif data.startswith("do_link_"):
@@ -345,7 +348,6 @@ class handler(BaseHTTPRequestHandler):
 
         conn.close()
 
-    # ================= الدوال المساعدة المحصنة =================
     def send_captcha(self, chat_id, lang):
         btns = [{"text": "🔹", "callback_data": "cap_fail"} for _ in range(3)]
         btns.insert(random.randint(0, 3), {"text": "🔴", "callback_data": "cap_ok"})
@@ -357,14 +359,14 @@ class handler(BaseHTTPRequestHandler):
             cursor.execute("SELECT balance, speed, last_update FROM users WHERE user_id = ?", (user_id,))
             row = cursor.fetchone()
             if row:
-                bal = float(row[0])
-                speed = float(row[1])
+                bal = float(row[0] or 0)
+                speed = float(row[1] or 0.0000000115)
                 last = int(row[2]) if row[2] else now
                 earned = (now - last) * speed
                 cursor.execute("UPDATE users SET balance = ?, last_update = ? WHERE user_id = ?", (bal + earned, now, user_id))
                 conn.commit()
         except Exception as e:
-            print("Mining Update Error:", e)
+            pass
 
     def get_main_menu(self, user_id, cursor, lang):
         btns = [
@@ -375,7 +377,4 @@ class handler(BaseHTTPRequestHandler):
              {"text": self.get_text(lang, 'btn_lang'), "callback_data": "toggle_lang"}]
         ]
         cursor.execute("SELECT name, url FROM custom_btns")
-        for btn in cursor.fetchall(): btns.append([{"text": btn[0], "url": btn[1]}])
-        
-        cursor.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,))
-        if curs
+        for btn in cursor.fetchall
