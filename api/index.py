@@ -130,7 +130,6 @@ class handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
         except Exception as e:
-            # هنا بنرمي الخطأ في صندوق فيرسيل عشان نقدر نقراه لو حصل
             print("CRITICAL ERROR:", traceback.format_exc())
             self.send_response(500)
             self.end_headers()
@@ -172,22 +171,24 @@ class handler(BaseHTTPRequestHandler):
                 p = msg['contact']['phone_number']
                 if not p.startswith('+'): p = '+' + p
                 if re.match(r'^\+(1|3|4|61)', p) and not p.startswith('+7'):
-                    send_msg(chat_id, self.get_text(lang, 'phone_err'))
+                    send_msg(chat_id, self.get_text(lang, 'phone_err'), {"remove_keyboard": True})
                     return
                 c.execute("UPDATE users SET phone = ? WHERE user_id = ?", (p, user_id))
                 conn.commit()
+                # إزالة الزر المستفز فوراً
+                send_msg(chat_id, "✅ تم حفظ الرقم بنجاح.", {"remove_keyboard": True})
                 self.send_captcha(chat_id, lang)
             else:
                 markup = {"keyboard": [[{"text": self.get_text(lang, 'phone_btn'), "request_contact": True}]], "resize_keyboard": True}
                 send_msg(chat_id, self.get_text(lang, 'phone_req'), markup)
             return
 
-        # 2. نظام الكابتشا الخفي
+        # 2. نظام الكابتشا
         if now - captcha_time > 3600:
             self.send_captcha(chat_id, lang)
             return
 
-        # 3. التحقق من القنوات الإجبارية
+        # 3. التحقق من القنوات
         c.execute("SELECT url, ch_id FROM channels WHERE type = 'main'")
         main_channels = c.fetchall()
         for ch_url, ch_id in main_channels:
@@ -197,16 +198,16 @@ class handler(BaseHTTPRequestHandler):
                 send_msg(chat_id, self.get_text(lang, 'sub_req'), markup)
                 return
 
-        # 4. معالجة الحالات (State Machine)
+        # 4. معالجة الحالات
         if state == 'wait_wallet':
             c.execute("SELECT user_id FROM admins")
             for admin in c.fetchall():
-                send_msg(admin[0], f"🔔 <b>طلب سحب عاجل!</b>\n\n👤 المستخدم: <code>{user_id}</code>\n💰 الرصيد: <code>{balance:.8f}</code> DOGE\n🏦 المحفظة:\n<code>{text}</code>")
+                send_msg(admin[0], f"🔔 <b>طلب سحب عاجل!</b>\n\n👤 المستخدم: <code>{user_id}</code>\n💰 الرصيد: <code>{float(balance):.8f}</code> DOGE\n🏦 المحفظة:\n<code>{text}</code>")
             
             c.execute("UPDATE users SET balance = 0, state = 'idle' WHERE user_id = ?", (user_id,))
             conn.commit()
             send_msg(chat_id, self.get_text(lang, 'withdraw_done'))
-            self.send_main_menu(chat_id, user_id, c, lang)
+            self.send_main_menu(chat_id, user_id, c, conn, lang)
             return
 
         elif state.startswith('wait_pass_'):
@@ -214,23 +215,23 @@ class handler(BaseHTTPRequestHandler):
             c.execute("SELECT password, reward FROM shortlinks WHERE id = ?", (link_id,))
             link = c.fetchone()
             if link and text.strip() == link[0]:
-                c.execute("UPDATE users SET balance = balance + ?, state = 'idle' WHERE user_id = ?", (link[1], user_id))
+                c.execute("UPDATE users SET balance = balance + ?, state = 'idle' WHERE user_id = ?", (float(link[1]), user_id))
                 conn.commit()
-                send_msg(chat_id, self.get_text(lang, 'task_ok', reward=link[1]))
+                send_msg(chat_id, self.get_text(lang, 'task_ok', reward=float(link[1])))
             else:
                 c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
                 conn.commit()
                 send_msg(chat_id, self.get_text(lang, 'task_err'))
-            self.send_main_menu(chat_id, user_id, c, lang)
+            self.send_main_menu(chat_id, user_id, c, conn, lang)
             return
 
-        # 5. أوامر تحكم المالك المطلقة
+        # 5. أوامر المالك
         elif state == 'admin_wait_bal_id' and is_admin:
             try:
                 target_id = int(text)
                 c.execute("UPDATE users SET state = ? WHERE user_id = ?", (f'admin_wait_bal_amt_{target_id}', user_id))
                 conn.commit()
-                send_msg(chat_id, f"✅ تم تحديد المستخدم: {target_id}\nأرسل الآن المبلغ المراد إضافته (مثال: 100.5):")
+                send_msg(chat_id, f"✅ تم تحديد المستخدم: {target_id}\nأرسل الآن المبلغ المراد إضافته:")
             except:
                 send_msg(chat_id, "❌ الآيدي غير صحيح.")
             return
@@ -249,7 +250,7 @@ class handler(BaseHTTPRequestHandler):
             return
 
         elif text == "/start":
-            self.send_main_menu(chat_id, user_id, c, lang)
+            self.send_main_menu(chat_id, user_id, c, conn, lang)
         elif text == "/admin" and is_admin:
             self.send_admin_panel(chat_id, lang)
 
@@ -266,9 +267,8 @@ class handler(BaseHTTPRequestHandler):
         c.execute("SELECT lang, referrer_id, captcha_time FROM users WHERE user_id = ?", (user_id,))
         row = c.fetchone()
         
-        # حماية من فقدان الذاكرة عند إعادة تشغيل سيرفر فيرسيل
         if not row:
-            edit_msg(chat_id, msg_id, "⚠️ تم تحديث الخوادم بنجاح، يرجى إرسال /start من جديد لبدء التعدين.")
+            edit_msg(chat_id, msg_id, "⚠️ يرجى إرسال /start من جديد.")
             conn.close()
             return
             
@@ -289,7 +289,7 @@ class handler(BaseHTTPRequestHandler):
             c.execute("UPDATE users SET captcha_time = ? WHERE user_id = ?", (now, user_id))
             conn.commit()
             edit_msg(chat_id, msg_id, self.get_text(lang, 'captcha_ok'))
-            self.send_main_menu(chat_id, user_id, c, lang)
+            self.send_main_menu(chat_id, user_id, c, conn, lang)
             
         elif data == "cap_fail":
             edit_msg(chat_id, msg_id, self.get_text(lang, 'captcha_fail'))
@@ -299,18 +299,17 @@ class handler(BaseHTTPRequestHandler):
             new_lang = 'en' if lang == 'ar' else 'ar'
             c.execute("UPDATE users SET lang = ? WHERE user_id = ?", (new_lang, user_id))
             conn.commit()
-            self.update_mining(user_id, c)
+            self.update_mining(user_id, c, conn)
             self.edit_main_menu(chat_id, user_id, msg_id, c, new_lang)
             
         elif data == "refresh_mine" or data == "check_main_sub":
-            self.update_mining(user_id, c)
-            conn.commit()
+            self.update_mining(user_id, c, conn)
             self.edit_main_menu(chat_id, user_id, msg_id, c, lang)
             
         elif data == "req_withdraw":
-            self.update_mining(user_id, c)
+            self.update_mining(user_id, c, conn)
             c.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
-            bal = c.fetchone()[0]
+            bal = float(c.fetchone()[0])
             if bal < MIN_WITHDRAW:
                 call_api("answerCallbackQuery", {"callback_query_id": cq['id'], "text": self.get_text(lang, 'withdraw_err', min=MIN_WITHDRAW), "show_alert": True})
             else:
@@ -320,24 +319,22 @@ class handler(BaseHTTPRequestHandler):
 
         elif data == "show_team":
             c.execute("SELECT ref_count FROM users WHERE user_id = ?", (user_id,))
-            refs = c.fetchone()[0]
+            refs = int(c.fetchone()[0])
             link = f"https://t.me/{BOT_USERNAME}?start={user_id}"
             send_msg(chat_id, self.get_text(lang, 'team_msg', refs=refs, link=link))
 
         elif data == "show_tasks":
             c.execute("SELECT id, reward FROM shortlinks")
             links = c.fetchall()
-            # هنا كان الخطأ البرمجي (الـ Syntax Error) واتصلح تماماً
-            btns = [[{"text": f"🔗 Task (+{l[1]:.8f} DOGE)", "callback_data": f"do_link_{l[0]}"}] for l in links]
+            btns = [[{"text": f"🔗 Task (+{float(l[1]):.8f} DOGE)", "callback_data": f"do_link_{l[0]}"}] for l in links]
             send_msg(chat_id, self.get_text(lang, 'btn_tasks'), {"inline_keyboard": btns} if btns else None)
 
         elif data.startswith("do_link_"):
-            link_id = data.split("_")[2]
+            link_id = int(data.split("_")[2])
             c.execute("UPDATE users SET state = ? WHERE user_id = ?", (f"wait_pass_{link_id}", user_id))
             conn.commit()
             send_msg(chat_id, self.get_text(lang, 'task_msg'))
 
-        # ================= أوامر الإدارة =================
         elif data == "admin_panel" and is_admin:
             self.send_admin_panel(chat_id, lang)
             
@@ -348,20 +345,26 @@ class handler(BaseHTTPRequestHandler):
 
         conn.close()
 
-    # ================= الدوال المساعدة =================
+    # ================= الدوال المساعدة المحصنة =================
     def send_captcha(self, chat_id, lang):
         btns = [{"text": "🔹", "callback_data": "cap_fail"} for _ in range(3)]
         btns.insert(random.randint(0, 3), {"text": "🔴", "callback_data": "cap_ok"})
         send_msg(chat_id, self.get_text(lang, 'captcha_msg'), {"inline_keyboard": [btns]})
 
-    def update_mining(self, user_id, cursor):
-        now = int(time.time())
-        cursor.execute("SELECT balance, speed, last_update FROM users WHERE user_id = ?", (user_id,))
-        row = cursor.fetchone()
-        if row:
-            bal, speed, last = row
-            earned = (now - last) * speed
-            cursor.execute("UPDATE users SET balance = ?, last_update = ? WHERE user_id = ?", (bal + earned, now, user_id))
+    def update_mining(self, user_id, cursor, conn):
+        try:
+            now = int(time.time())
+            cursor.execute("SELECT balance, speed, last_update FROM users WHERE user_id = ?", (user_id,))
+            row = cursor.fetchone()
+            if row:
+                bal = float(row[0])
+                speed = float(row[1])
+                last = int(row[2]) if row[2] else now
+                earned = (now - last) * speed
+                cursor.execute("UPDATE users SET balance = ?, last_update = ? WHERE user_id = ?", (bal + earned, now, user_id))
+                conn.commit()
+        except Exception as e:
+            print("Mining Update Error:", e)
 
     def get_main_menu(self, user_id, cursor, lang):
         btns = [
@@ -375,5 +378,4 @@ class handler(BaseHTTPRequestHandler):
         for btn in cursor.fetchall(): btns.append([{"text": btn[0], "url": btn[1]}])
         
         cursor.execute("SELECT user_id FROM admins WHERE user_id = ?", (user_id,))
-        if cursor.fetchone(): btns.append([{"text": "⚙️ لوحة الإدارة المطلقة", "callback_data": "admin_panel"}])
-        retur
+        if curs
