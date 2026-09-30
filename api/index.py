@@ -11,8 +11,7 @@ import traceback
 TOKEN = "8960593021:AAFEn0HioVC4K2S_LkJWVgqJVMYYJt-xF4Q"
 OWNER_ID = 6610111288
 BOT_USERNAME = "Dogcoinibot"
-DB_PATH = "/tmp/doge_final_v7.db"
-MIN_WITHDRAW = 0.01
+DB_PATH = "/tmp/doge_final_v8.db"
 
 LANG = {
     'ar': {
@@ -88,8 +87,18 @@ def init_db():
     c.execute('''CREATE TABLE IF NOT EXISTS shortlinks (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, url TEXT, password TEXT, reward REAL)''')
     c.execute('''CREATE TABLE IF NOT EXISTS claimed_tasks (user_id INTEGER, task_id INTEGER, claimed_at INTEGER)''')
     c.execute('''CREATE TABLE IF NOT EXISTS joined_speed_channels (user_id INTEGER, ch_id INTEGER)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)''')
+    c.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('min_withdraw', '0.01')")
     conn.commit()
     conn.close()
+
+def get_min_withdraw():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT value FROM settings WHERE key = 'min_withdraw'")
+    row = c.fetchone()
+    conn.close()
+    return float(row[0]) if row else 0.01
 
 def call_api(method, payload):
     api_url = f"https://api.telegram.org/bot{TOKEN}/{method}"
@@ -125,7 +134,7 @@ def get_text(lang, key, **kwargs):
 
 def get_dynamic_stats():
     now_ts = int(time.time())
-    launch_ts = 1788220800  # نقطة مرجعية
+    launch_ts = 1788220800
     days_passed = max(0, (now_ts - launch_ts) // 86400)
     
     total_growth = 0
@@ -135,7 +144,7 @@ def get_dynamic_stats():
         
     miners = 16780 + total_growth
     
-    random.seed(now_ts // 1800)  # يتذبذب كل نصف ساعة
+    random.seed(now_ts // 1800)
     eff = round(random.uniform(96.2, 98.7), 2)
     random.seed()
     return f"{miners:,}", eff
@@ -184,8 +193,11 @@ def send_main_menu(chat_id, user_id, cursor, conn, lang):
     send_msg(chat_id, text)
 
 def send_admin_panel(chat_id, lang):
+    min_w = get_min_withdraw()
     btns = [
         [{"text": "💰 زيادة رصيد مستخدم", "callback_data": "admin_add_bal"}, {"text": "📢 إذاعة للجميع", "callback_data": "admin_broadcast"}],
+        [{"text": f"⚙️ تعديل الحد الأدنى للسحب ({min_w} DOGE)", "callback_data": "admin_set_min_w"}],
+        [{"text": "👥 مراقبة المحتالين (>10 إحالة)", "callback_data": "admin_top_refs"}],
         [{"text": "➕ إضافة قناة إجبارية", "callback_data": "admin_add_main_ch"}, {"text": "📢 إضافة قناة مهام (+10%)", "callback_data": "admin_add_speed_ch"}],
         [{"text": "🔗 إضافة مهمة رابط مختصر", "callback_data": "admin_add_shortlink"}],
         [{"text": "🗑️ إدارة وحذف القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ إدارة وحذف المهام", "callback_data": "admin_manage_tasks"}],
@@ -223,14 +235,15 @@ def process_message(msg):
 
     captcha_passed, state, balance, lang, ref_id = user
     bal_float = float(balance or 0.0)
+    current_min_withdraw = get_min_withdraw()
 
-    # 1. التحقق من الكابتشا أولاً (لمرة واحدة في العمر)
+    # 1. التحقق من الكابتشا أولاً
     if captcha_passed == 0 and not is_admin:
         send_captcha(chat_id, lang)
         conn.close()
         return
 
-    # 2. التحقق من القنوات الإجبارية كشرط أساسي لفتح البوت (لغير المشرفين)
+    # 2. التحقق من القنوات الإجبارية
     if not is_admin:
         c.execute("SELECT url, ch_id FROM channels WHERE type = 'main'")
         for ch_url, ch_id in c.fetchall():
@@ -261,8 +274,8 @@ def process_message(msg):
         update_mining(user_id, c, conn)
         c.execute("SELECT balance FROM users WHERE user_id = ?", (user_id,))
         current_bal = float(c.fetchone()[0] or 0.0)
-        if current_bal < MIN_WITHDRAW:
-            send_msg(chat_id, get_text(lang, 'withdraw_err', min=MIN_WITHDRAW))
+        if current_bal < current_min_withdraw:
+            send_msg(chat_id, get_text(lang, 'withdraw_err', min=current_min_withdraw))
         else:
             c.execute("UPDATE users SET state = 'wait_wallet' WHERE user_id = ?", (user_id,))
             conn.commit()
@@ -280,10 +293,14 @@ def process_message(msg):
 
     elif text == get_text(lang, 'btn_tasks'):
         c.execute("SELECT id, description, url, reward FROM shortlinks")
-        links = c.fetchall()
+        links = list(c.fetchall())
         if not links:
             send_msg(chat_id, "📋 لا توجد مهام روابط حالياً، انتظر تحديث الإدارة.")
         else:
+            # ترتييب عشوائي فريد لكل مستخدم بناءً على الآيدي الخاص به
+            rnd = random.Random(user_id)
+            rnd.shuffle(links)
+            
             send_msg(chat_id, "📋 <b>قائمة المهام المربحة (روابط مختصرة):</b>\nتخطى الرابط واجلب كلمة السر لتحصل على مكافأتك فوراً (كل مهمة تتجدد كل 24 ساعة):")
             for idx, l in enumerate(links, 1):
                 task_id, desc, link_url, reward = l
@@ -407,6 +424,23 @@ def process_message(msg):
         c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
         conn.commit()
         send_msg(chat_id, f"✅ تم إرسال الإذاعة بنجاح إلى {len(all_u)} مستخدم.")
+        conn.close()
+        return
+
+    elif state == 'admin_set_min_w' and is_admin:
+        if text in system_btns:
+            c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
+            conn.commit()
+            conn.close()
+            return
+        try:
+            new_mw = float(text.strip())
+            c.execute("UPDATE settings SET value = ? WHERE key = 'min_withdraw'", (str(new_mw),))
+            c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
+            conn.commit()
+            send_msg(chat_id, f"✅ تم تحديث الحد الأدنى للسحب بنجاح ليصبح: <code>{new_mw} DOGE</code>")
+        except Exception:
+            send_msg(chat_id, "❌ القيمة غير صالحة! أرسل رقماً عشرياً صحيحاً (مثال: 0.05)")
         conn.close()
         return
 
@@ -711,6 +745,23 @@ def process_callback(cq):
         c.execute("UPDATE users SET state = 'admin_broadcast' WHERE user_id = ?", (user_id,))
         conn.commit()
         send_msg(chat_id, "📢 <b>أرسل الآن الرسالة التي تريد إذاعتها لجميع مستخدمي البوت:</b>")
+
+    elif data == "admin_set_min_w" and is_admin:
+        c.execute("UPDATE users SET state = 'admin_set_min_w' WHERE user_id = ?", (user_id,))
+        conn.commit()
+        send_msg(chat_id, "⚙️ <b>تعديل الحد الأدنى للسحب:</b>\nأرسل القيمة الرقمية الجديدة بالـ DOGE (مثال: <code>0.02</code>):")
+
+    elif data == "admin_top_refs" and is_admin:
+        c.execute("SELECT user_id, ref_count, balance FROM users WHERE ref_count > 10 ORDER BY ref_count DESC LIMIT 30")
+        top_list = c.fetchall()
+        if not top_list:
+            send_msg(chat_id, "👥 لا يوجد مستخدمين لديهم أكثر من 10 إحالات حالياً.")
+        else:
+            msg_top = "👥 <b>قائمة المستخدمين الأكثر دعوة (أكثر من 10 إحالات):</b>\n\n"
+            for t in top_list:
+                t_id, r_cnt, t_bal = t
+                msg_top += f"👤 آيدي: <code>{t_id}</code>\n👥 الإحالات: <code>{r_cnt}</code>\n💰 الرصيد: <code>{t_bal:.4f} DOGE</code>\n-------------------\n"
+            send_msg(chat_id, msg_top)
 
     elif data == "admin_add_main_ch" and is_admin:
         c.execute("UPDATE users SET state = 'admin_add_main_ch' WHERE user_id = ?", (user_id,))
