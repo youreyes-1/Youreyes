@@ -1,6 +1,5 @@
 from http.server import BaseHTTPRequestHandler
 import json
-import os
 import urllib.request
 
 class handler(BaseHTTPRequestHandler):
@@ -10,15 +9,15 @@ class handler(BaseHTTPRequestHandler):
             body = self.rfile.read(content_length)
             data = json.loads(body.decode('utf-8'))
             
-            # سحب التوكن من متغيرات البيئة في فيرسيل
-            token = os.environ.get('TELEGRAM_BOT_TOKEN')
+            # التوكن محفور جوا الكود زي ما طلبت يا برنس
+            token = "8960593021:AAFkF-8Cvt_jsOHJmNUyBGWMvzmE0hIbMbk"
             
             if 'message' in data:
                 chat_id = data['message']['chat']['id']
                 text = data['message'].get('text', '')
                 
-                # الرد التجريبي أو استقبال الترافيك
-                reply_text = f"يا هلا يا شريك! وصلتنـي رسالتك: {text}"
+                # الرد التجريبي للتأكيد
+                reply_text = f"يا هلا يا شريك! وصلتني رسالتك: {text}"
                 send_telegram_message(token, chat_id, reply_text)
                 
             self.send_response(200)
@@ -38,4 +37,4 @@ def send_telegram_message(token, chat_id, text):
         urllib.request.urlopen(req)
     except Exception:
         pass
-      
+        
