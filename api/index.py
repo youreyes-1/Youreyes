@@ -11,7 +11,7 @@ import traceback
 TOKEN = "8960593021:AAFkF-8Cvt_jsOHJmNUyBGWMvzmE0hIbMbk"
 OWNER_ID = 6610111288
 BOT_USERNAME = "Dogcoinibot"
-DB_PATH = "/tmp/doge_final_v2.db"
+DB_PATH = "/tmp/doge_final_v3.db"
 MIN_WITHDRAW = 0.01
 
 LANG = {
@@ -21,7 +21,7 @@ LANG = {
         'btn_team': "👥 فريقك (+30%)",
         'btn_tasks': "🔗 المهام والروابط",
         'btn_speed_ch': "📢 قنوات زيادة السرعة",
-        'btn_about': "🏢 عن الشركة",
+        'btn_about': "🖥️ عتاد التعدين",
         'btn_stats': "📊 إحصائيات المنجم",
         'btn_calc': "🧮 حاسبة الأرباح",
         'btn_support': "📞 الدعم الفني",
@@ -33,16 +33,16 @@ LANG = {
         'captcha_fail': "❌ فشل التحقق الأمني! حاول مجدداً.",
         'phone_req': "🔒 <b>خطوة أمنية أخيرة:</b>\n\nلضمان عدم استخدام حسابات وهمية، يرجى مشاركة رقم هاتفك للتوثيق.",
         'phone_err': "❌ عذراً، الأرقام من هذه المنطقة الجغرافية غير مدعومة حالياً.",
-        'sub_req': "⚠️ <b>تنبيه أمني!</b>\n\nيجب عليك الاشتراك في قنوات الشركة الرسمية لتفعيل حسابك.",
+        'sub_req': "⚠️ <b>تنبيه أمني!</b>\n\nيجب عليك الاشتراك في قنوات المنظومة الرسمية أولاً لتفعيل حسابك.",
         'main_menu': "⛏ <b>خوادم التعدين النشطة</b>\n\n💰 الرصيد المباشر: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ قوة التعدين: <code>{speed:.8f}</code> DOGE/يوم\n👥 أعضاء الفريق: <code>{refs}</code>\n\n<i>🟢 حالة الخادم: متصل ومستقر.</i>",
-        'team_msg': "👥 <b>برنامج الشركاء (Referral):</b>\n\nكل عضو تدعوه يزيد سرعة تعدينك بنسبة <b>30%</b> فور إكماله الكابتشا.\n\n📊 فريقك: <code>{refs}</code> عضو\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
+        'team_msg': "👥 <b>برنامج الشركاء (Referral):</b>\n\nكل عضو تدعوه يزيد سرعة تعدينك بنسبة <b>30%</b> فور تجاوزه الكابتشا.\n\n📊 فريقك: <code>{refs}</code> عضو\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
         'withdraw_err': "❌ رصيدك الحالي أقل من الحد الأدنى للسحب ({min} DOGE).",
         'withdraw_req': "💸 <b>بوابة السحب الآمنة:</b>\nأرسل الآن عنوان محفظة <b>Dogecoin (FaucetPay)</b> الخاصة بك لجدولة الدفعة:",
         'withdraw_done': "✅ <b>تم استلام طلب السحب!</b>\nالطلب قيد المراجعة المالية، ستصلك الدفعة قريباً.",
         'ref_notify': "🎉 <b>أخبار ممتازة!</b>\nسجل عضو جديد عبر رابطك وتجاوز الكابتشا. تمت زيادة سرعة تعدينك بنسبة 30%!",
-        'calc_text': "🧮 <b>حاسبة العوائد والأرباح التراكمية:</b>\n\n⚡ <b>قوة الإحالات والمكافآت اليومية:</b>\n• إذا قمت بدعوة <b>10 إلى 15 شخصاً</b> فقط = سرعة تعدين تتضاعف 450%.\n• إذا وصلت إلى <b>30 - 40 إحالة نشطة</b> = ستحقق أرباحاً يومية مباشرة تتراوح بين <b>5$ إلى 8$ دولار</b> (ما يعادل 35 - 55 DOGE يومياً) قابلة للسحب المباشر دون توقف!\n\n💡 <i>نصيحة ذهبية: انسخ رابطك من زر (فريقك) وانشره في مجموعات الفيسبوك والتيليجرام وابدأ في بناء دخلك السلبي الآن!</i>",
-        'about_text': "🏢 <b>عن شركة DogeCore Solutions:</b>\n\nنحن شركة رائدة في التعدين السحابي المؤسسي، يقع مقرنا الرئيسي في <b>وارسو، بولندا</b>. نعتمد على مناخ أوروبا الشرقية البارد لتبريد مزارع خوادم الـ ASIC، مما يقلل تكاليف التشغيل ونمنح أرباحاً مستقرة لمستخدمينا.",
-        'stats_text': "📊 <b>إحصائيات الشبكة المباشرة:</b>\n\n👤 عمال التعدين: <code>1,452,890+</code>\n⚡ قوة الهاش: <code>45.2 TH/s</code>\n💸 سحوبات اليوم: <code>12,450 DOGE</code>\n🟢 وقت التشغيل: <code>99.98%</code>",
+        'calc_text': "🧮 <b>حاسبة العوائد والأرباح التراكمية:</b>\n\n⚡ <b>قوة الإحالات والمكافآت اليومية:</b>\n• إذا قمت بدعوة <b>10 إلى 15 شخصاً</b> فقط = سرعة تعدين تتضاعف 450%.\n• إذا وصلت إلى <b>30 - 40 إحالة نشطة</b> = ستحقق أرباحاً يومية مباشرة تتراوح بين <b>5$ إلى 8$ دولار</b> (ما يعادل 35 - 55 DOGE يومياً) قابلة للسحب المباشر دون توقف!\n\n💡 <i>نصيحة ذهبية: انسخ رابطك من زر (فريقك) وانشره في مجموعات التواصل وابدأ بناء دخلك السلبي الآن!</i>",
+        'about_text': "🖥️ <b>البنية التحتية لمنظومة التعدين:</b>\n\nتعتمد مزارعنا على أحدث مصفوفات المعالجة الرسومية <b>NVIDIA RTX 4090</b> المربوطة بوحدات تعدين متخصصة من طراز <b>Bitmain Antminer L7</b> لفك تشفير خوارزمية Scrypt المخصصة لعملة Dogecoin.\n\nتدار الخوادم بأنظمة تبريد سائل مغلقة ذات كفاءة طاقية فائقة تضمن استقرار استخراج الكتل على مدار 24 ساعة ومنح عوائد يومية مستمرة لمستخدمينا المشتركين بالشبكة.",
+        'stats_text': "📊 <b>إحصائيات الشبكة المباشرة:</b>\n\n👤 عمال التعدين النشطين: <code>1,452,890+</code>\n⚡ قوة الهاش الإجمالية: <code>9.2 GH/s Scrypt</code>\n💸 إجمالي السحوبات المؤكدة اليوم: <code>14,890 DOGE</code>\n🟢 كفاءة الطاقة والتشغيل: <code>99.98%</code>",
         'support_text': "📞 <b>مركز خدمة العملاء:</b>\n\nنظراً للضغط المرتفع، يستغرق الرد من فريق الدعم من 24 إلى 48 ساعة.",
         'admin_panel': "👑 <b>مركز القيادة (المالك والمشرفين):</b>\nاختر العملية المطلوبة:"
     },
@@ -52,7 +52,7 @@ LANG = {
         'btn_team': "👥 Your Team",
         'btn_tasks': "🔗 Shortlink Tasks",
         'btn_speed_ch': "📢 Speed Channels",
-        'btn_about': "🏢 About Us",
+        'btn_about': "🖥️ Mining Rig Hardware",
         'btn_stats': "📊 Network Stats",
         'btn_calc': "🧮 Profit Calculator",
         'btn_support': "📞 Support",
@@ -72,8 +72,8 @@ LANG = {
         'withdraw_done': "✅ <b>Request Logged!</b>\nYour payout is under review.",
         'ref_notify': "🎉 <b>Great News!</b>\nA new user joined via your link. Speed increased by 30%!",
         'calc_text': "🧮 <b>Profit Calculator:</b>\n\n• 10-15 Referrals = 450% Boost.\n• 30-40 Referrals = <b>$5 to $8 USD daily</b> in DOGE automatically!\n\n<i>Share your link to maximize income.</i>",
-        'about_text': "🏢 <b>About DogeCore Solutions:</b>\n\nBased in Warsaw, Poland. Enterprise cloud mining solutions powered by cold-climate ASIC server facilities.",
-        'stats_text': "📊 <b>Live Network Stats:</b>\n\n👤 Miners: <code>1,452,890+</code>\n⚡ Hashrate: <code>45.2 TH/s</code>\n💸 Paid Today: <code>12,450 DOGE</code>\n🟢 Uptime: <code>99.98%</code>",
+        'about_text': "🖥️ <b>Hardware Infrastructure:</b>\n\nPowered by massive arrays of <b>NVIDIA RTX 4090</b> rigs paired with high-efficiency <b>Antminer L7</b> units operating Scrypt algorithms under liquid cooling.",
+        'stats_text': "📊 <b>Live Network Stats:</b>\n\n👤 Active Miners: <code>1,452,890+</code>\n⚡ Hashrate: <code>9.2 GH/s Scrypt</code>\n💸 Paid Today: <code>14,890 DOGE</code>\n🟢 Rig Uptime: <code>99.98%</code>",
         'support_text': "📞 <b>Customer Support:</b>\n\nResponse time is currently 24-48 hours.",
         'admin_panel': "👑 <b>Command Center:</b>\nSelect an administrative action:"
     }
@@ -101,7 +101,7 @@ def call_api(method, payload):
     api_url = f"https://api.telegram.org/bot{TOKEN}/{method}"
     req = urllib.request.Request(api_url, data=json.dumps(payload).encode('utf-8'), headers={'Content-Type': 'application/json'})
     try:
-        res = urllib.request.urlopen(req, timeout=5)
+        res = urllib.request.urlopen(req, timeout=6)
         return json.loads(res.read().decode('utf-8'))
     except Exception:
         return None
@@ -116,6 +116,8 @@ def delete_msg(chat_id, msg_id):
     return call_api("deleteMessage", {"chat_id": chat_id, "message_id": msg_id})
 
 def check_sub(user_id, channel_id):
+    if not channel_id:
+        return True
     res = call_api("getChatMember", {"chat_id": channel_id, "user_id": user_id})
     if res and res.get('ok'):
         return res['result']['status'] in ['member', 'administrator', 'creator']
@@ -172,11 +174,10 @@ def send_main_menu(chat_id, user_id, cursor, conn, lang):
 
 def send_admin_panel(chat_id, lang):
     btns = [
-        [{"text": "💰 زيادة رصيد مستخدم", "callback_data": "admin_add_bal"}],
-        [{"text": "📢 إذاعة للجميع", "callback_data": "admin_broadcast"}],
-        [{"text": "➕ إضافة قناة إجبارية", "callback_data": "admin_add_main_ch"}],
-        [{"text": "📢 إضافة قناة مهام (+10%)", "callback_data": "admin_add_speed_ch"}],
+        [{"text": "💰 زيادة رصيد مستخدم", "callback_data": "admin_add_bal"}, {"text": "📢 إذاعة للجميع", "callback_data": "admin_broadcast"}],
+        [{"text": "➕ إضافة قناة إجبارية", "callback_data": "admin_add_main_ch"}, {"text": "📢 إضافة قناة مهام (+10%)", "callback_data": "admin_add_speed_ch"}],
         [{"text": "🔗 إضافة مهمة رابط مختصر", "callback_data": "admin_add_shortlink"}],
+        [{"text": "🗑️ إدارة وحذف القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ إدارة وحذف المهام", "callback_data": "admin_manage_tasks"}],
         [{"text": "👑 إضافة مشرف فرعي", "callback_data": "admin_add_admin"}]
     ]
     send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
@@ -227,7 +228,7 @@ def process_message(msg):
         conn.close()
         return
 
-    # 2. الكابتشا لمرة واحدة فقط
+    # 2. الكابتشا مرة واحدة في العمر
     if captcha_passed == 0:
         send_captcha(chat_id, lang)
         conn.close()
@@ -244,7 +245,7 @@ def process_message(msg):
 
     system_btns = [get_text(lang, k) for k in ['btn_refresh', 'btn_withdraw', 'btn_team', 'btn_tasks', 'btn_speed_ch', 'btn_lang', 'btn_about', 'btn_stats', 'btn_calc', 'btn_support', 'btn_admin']]
 
-    # 4. أزرار الكيبورد
+    # 4. معالجة أزرار الكيبورد
     if text == get_text(lang, 'btn_refresh'):
         send_main_menu(chat_id, user_id, c, conn, lang)
         conn.close()
@@ -286,10 +287,9 @@ def process_message(msg):
         if not links:
             send_msg(chat_id, "📋 لا توجد مهام روابط حالياً، انتظر تحديث الإدارة.")
         else:
-            send_msg(chat_id, "📋 <b>قائمة المهام المربحة (روابط مختصرة):</b>\nتخطى الرابط واجلب كلمة السر لتحصل على مكافأتك فوراً (كل مهمة تتجدد يومياً):")
+            send_msg(chat_id, "📋 <b>قائمة المهام المربحة (روابط مختصرة):</b>\nتخطى الرابط واجلب كلمة السر لتحصل على مكافأتك فوراً (كل مهمة تتجدد كل 24 ساعة):")
             for idx, l in enumerate(links, 1):
                 task_id, desc, link_url, reward = l
-                # فحص هل أنجز المهمة اليوم
                 c.execute("SELECT claimed_at FROM claimed_tasks WHERE user_id = ? AND task_id = ?", (user_id, task_id))
                 row_c = c.fetchone()
                 if row_c and (now - row_c[0] < 86400):
@@ -321,7 +321,7 @@ def process_message(msg):
                 else:
                     status_btn = [
                         {"text": f"📢 اشترك في {name}", "url": url},
-                        {"text": "⚡ تحقق وزد سرعتك", "callback_data": f"verify_speed_{ch_id_pk}_{t_id}"}
+                        {"text": "⚡ تحقق وزد سرعتك", "callback_data": f"verify_speed_{ch_id_pk}"}
                     ]
                 send_msg(chat_id, f"🔹 <b>{name}</b>", {"inline_keyboard": [status_btn]})
         conn.close()
@@ -352,7 +352,7 @@ def process_message(msg):
         conn.close()
         return
 
-    # 5. معالجة حالات الإدخال النصي
+    # 5. معالجة حالات الإدخال النصي والتوجيهات
     if state == 'wait_wallet':
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
@@ -412,46 +412,100 @@ def process_message(msg):
         conn.close()
         return
 
+    # إضافة قناة إجبارية (يدعم التوجيه أو إرسال المعرف)
     elif state == 'admin_add_main_ch' and is_admin:
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
             conn.commit()
             conn.close()
             return
-        try:
-            parts = text.split()
-            url = parts[0]
-            ch_id = parts[1] if len(parts) > 1 else ""
-            c.execute("INSERT INTO channels (name, url, ch_id, type) VALUES (?, ?, ?, 'main')", ("Official Channel", url, ch_id))
+
+        target_ch_id = None
+        target_title = "القناة الرسمية"
+        target_link = ""
+
+        # فحص إذا كانت الرسالة موجهة (Forward) من قناة خاصة
+        if 'forward_from_chat' in msg:
+            f_chat = msg['forward_from_chat']
+            target_ch_id = str(f_chat['id'])
+            target_title = f_chat.get('title', 'قناة رسمية')
+            target_link = f_chat.get('username', '')
+            target_link = f"https://t.me/{target_link}" if target_link else "https://t.me"
+        else:
+            # إرسال نصي عادي: يوزر أو رابط
+            cleaned = text.strip()
+            if cleaned.startswith("https://t.me/"):
+                u_part = cleaned.replace("https://t.me/", "").replace("/", "")
+                target_ch_id = "@" + u_part if not u_part.startswith("+") else ""
+                target_link = cleaned
+            elif cleaned.startswith("@"):
+                target_ch_id = cleaned
+                target_link = f"https://t.me/{cleaned[1:]}"
+            else:
+                target_ch_id = cleaned
+                target_link = f"https://t.me/{cleaned}"
+
+        # التحقق من أن البوت مشرف
+        test = call_api("getChat", {"chat_id": target_ch_id})
+        if test and test.get('ok'):
+            target_title = test['result'].get('title', target_title)
+            c.execute("INSERT INTO channels (name, url, ch_id, type) VALUES (?, ?, ?, 'main')", (target_title, target_link, str(target_ch_id)))
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
             conn.commit()
-            send_msg(chat_id, f"✅ تمت إضافة القناة الإجبارية بنجاح: {url}")
-        except Exception:
-            send_msg(chat_id, "❌ خطأ في الصيغة! أرسل: الرابط معرف_القناة (مثال: https://t.me/example @example)")
+            send_msg(chat_id, f"✅ <b>تمت إضافة القناة الإجبارية بنجاح!</b>\nالاسم: {target_title}\nالمعرف: <code>{target_ch_id}</code>")
+        else:
+            send_msg(chat_id, "❌ <b>فشل التحقق!</b>\nتأكد من رفع البوت كمشرف في القناة بكامل الصلاحيات ثم أعد توجيه أي رسالة منها هنا أو أرسل يوزرها الصحيح.")
         conn.close()
         return
 
+    # إضافة قناة زيادة السرعة
     elif state == 'admin_add_speed_ch' and is_admin:
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
             conn.commit()
             conn.close()
             return
-        try:
-            # الصيغة: الاسم الرابط المعرف
+
+        target_ch_id = None
+        target_title = "قناة سرعة"
+        target_link = ""
+
+        if 'forward_from_chat' in msg:
+            f_chat = msg['forward_from_chat']
+            target_ch_id = str(f_chat['id'])
+            target_title = f_chat.get('title', 'قناة زيادة السرعة')
+            target_link = f_chat.get('username', '')
+            target_link = f"https://t.me/{target_link}" if target_link else "https://t.me"
+        else:
             parts = text.split()
-            name = parts[0]
-            url = parts[1]
-            ch_id = parts[2] if len(parts) > 2 else ""
-            c.execute("INSERT INTO channels (name, url, ch_id, type) VALUES (?, ?, ?, 'speed')", (name, url, ch_id))
+            if len(parts) >= 2:
+                target_title = parts[0]
+                cleaned = parts[1]
+                if cleaned.startswith("https://t.me/"):
+                    u_part = cleaned.replace("https://t.me/", "")
+                    target_ch_id = "@" + u_part if not u_part.startswith("+") else ""
+                    target_link = cleaned
+                else:
+                    target_ch_id = cleaned if cleaned.startswith("@") else "@" + cleaned
+                    target_link = f"https://t.me/{target_ch_id[1:]}"
+            else:
+                send_msg(chat_id, "❌ أرسل: الاسم الرابط\nأو قم بتوجيه رسالة مباشرة من القناة هنا بعد رفع البوت مشرفاً.")
+                conn.close()
+                return
+
+        test = call_api("getChat", {"chat_id": target_ch_id})
+        if test and test.get('ok'):
+            target_title = test['result'].get('title', target_title)
+            c.execute("INSERT INTO channels (name, url, ch_id, type) VALUES (?, ?, ?, 'speed')", (target_title, target_link, str(target_ch_id)))
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
             conn.commit()
-            send_msg(chat_id, f"✅ تمت إضافة قناة السرعة: {name}")
-        except Exception:
-            send_msg(chat_id, "❌ خطأ في الصيغة! أرسل: الاسم الرابط المعرف")
+            send_msg(chat_id, f"✅ <b>تمت إضافة قناة زيادة السرعة بنجاح!</b>\nالاسم: {target_title}\nالمعرف: <code>{target_ch_id}</code>")
+        else:
+            send_msg(chat_id, "❌ البوت ليس مشرفاً في هذه القناة. ارفع البوت مشرفاً ثم وجه رسالة منها أو أرسل يوزرها الصحيح.")
         conn.close()
         return
 
+    # إضافة مهمة رابط مختصر
     elif state == 'admin_add_shortlink' and is_admin:
         if text in system_btns:
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
@@ -459,7 +513,6 @@ def process_message(msg):
             conn.close()
             return
         try:
-            # الصيغة: الوصف | الرابط | كلمة_السر | المكافأة
             parts = text.split('|')
             desc = parts[0].strip()
             url = parts[1].strip()
@@ -468,9 +521,9 @@ def process_message(msg):
             c.execute("INSERT INTO shortlinks (description, url, password, reward) VALUES (?, ?, ?, ?)", (desc, url, pw, reward))
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
             conn.commit()
-            send_msg(chat_id, f"✅ تمت إضافة مهمة الرابط بنجاح: {desc}")
+            send_msg(chat_id, f"✅ <b>تمت إضافة مهمة الرابط بنجاح!</b>\nالوصف: {desc}\nالمكافأة: {reward:.8f} DOGE")
         except Exception:
-            send_msg(chat_id, "❌ خطأ! الصيغة المطلوبة بالشرطة | كالتالي:\nالوصف | الرابط | كلمة_السر | 0.0002")
+            send_msg(chat_id, "❌ صيغة غير صحيحة! تأكد من استخدام العلامة | للفصل بين الحقول:\n<code>الوصف | الرابط | كلمة_السر | المكافأة</code>")
         conn.close()
         return
 
@@ -502,7 +555,7 @@ def process_message(msg):
             c.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (amount, target_id))
             c.execute("UPDATE users SET state = 'idle' WHERE user_id = ?", (user_id,))
             conn.commit()
-            send_msg(chat_id, f"✅ تمت إضافة {amount:.8f} DOGE إلى رصيد المستخدم بنجاح.")
+            send_msg(chat_id, f"✅ تمت إضافة {amount:.8f} DOGE إلى المستخدم بنجاح.")
             send_msg(target_id, f"🎉 <b>إهداء من الإدارة!</b>\nتمت إضافة <code>{amount:.8f}</code> DOGE إلى رصيدك.")
         except Exception:
             send_msg(chat_id, "❌ المبلغ غير صحيح.")
@@ -560,7 +613,6 @@ def process_callback(cq):
             if ref_row:
                 send_msg(ref_id, get_text(ref_row[0], 'ref_notify'))
 
-        # حفظ تجاوز الكابتشا نهائياً
         c.execute("UPDATE users SET captcha_passed = 1 WHERE user_id = ?", (user_id,))
         conn.commit()
 
@@ -583,10 +635,10 @@ def process_callback(cq):
         send_msg(chat_id, f"🔑 <b>أرسل الآن كلمة السر الخاصة بالمهمة رقم {task_id}:</b>")
 
     elif data.startswith("verify_speed_"):
-        parts = data.split("_")
-        ch_id_pk = int(parts[2])
-        t_ch_id = parts[3]
-        if check_sub(user_id, t_ch_id):
+        ch_id_pk = int(data.split("_")[2])
+        c.execute("SELECT ch_id FROM channels WHERE id = ?", (ch_id_pk,))
+        ch_row = c.fetchone()
+        if ch_row and check_sub(user_id, ch_row[0]):
             c.execute("UPDATE users SET speed = speed * 1.1 WHERE user_id = ?", (user_id,))
             c.execute("INSERT OR IGNORE INTO joined_speed_channels (user_id, ch_id) VALUES (?, ?)", (user_id, ch_id_pk))
             conn.commit()
@@ -594,7 +646,7 @@ def process_callback(cq):
         else:
             send_msg(chat_id, "❌ لم تشترك في القناة بعد! اشترك ثم اضغط زر التحقق مجدداً.")
 
-    # ================= تفعيل أزرار لوحة تحكم المالك =================
+    # ================= تفعيل أزرار الإدارة =================
     elif data == "admin_broadcast" and is_admin:
         c.execute("UPDATE users SET state = 'admin_broadcast' WHERE user_id = ?", (user_id,))
         conn.commit()
@@ -603,33 +655,70 @@ def process_callback(cq):
     elif data == "admin_add_main_ch" and is_admin:
         c.execute("UPDATE users SET state = 'admin_add_main_ch' WHERE user_id = ?", (user_id,))
         conn.commit()
-        send_msg(chat_id, "➕ <b>إضافة قناة إجبارية:</b>\nأرسل رابط القناة ومُعرّفها مفصولين بمسافة:\nمثال:\n<code>https://t.me/mychannel @mychannel</code>")
+        send_msg(chat_id, "➕ <b>إضافة قناة إجبارية:</b>\n\n1️⃣ ارفع البوت مشرفاً فيها أولاً.\n2️⃣ إذا كانت القناة خاصة: قم بـ <b>توجيه (Forward)</b> أي رسالة منها هنا مباشرة!\n3️⃣ إذا كانت عامة: أرسل يوزرها مثل <code>@channel</code> أو رابطها.")
 
     elif data == "admin_add_speed_ch" and is_admin:
         c.execute("UPDATE users SET state = 'admin_add_speed_ch' WHERE user_id = ?", (user_id,))
         conn.commit()
-        send_msg(chat_id, "📢 <b>إضافة قناة زيادة السرعة (+10%):</b>\nأرسل: الاسم الرابط المعرف\nمثال:\n<code>قناة_الأخبار https://t.me/news @news</code>")
+        send_msg(chat_id, "📢 <b>إضافة قناة لزيادة السرعة (+10%):</b>\n\n1️⃣ ارفع البوت مشرفاً فيها أولاً.\n2️⃣ إذا كانت خاصة: قم بـ <b>توجيه (Forward)</b> أي رسالة منها هنا مباشرة!\n3️⃣ إذا كانت عامة: أرسل: <code>الاسم @channel</code>")
 
     elif data == "admin_add_shortlink" and is_admin:
         c.execute("UPDATE users SET state = 'admin_add_shortlink' WHERE user_id = ?", (user_id,))
         conn.commit()
-        send_msg(chat_id, "🔗 <b>إضافة مهمة رابط مختصر جديدة:</b>\nأرسل البيانات مفصولة بالعلامة | كالتالي:\n<code>الوصف | رابط_الموقع | كلمة_السر | المكافأة</code>\n\nمثال:\n<code>تخطى الرابط واجلب الكود | https://linkvertise.com/xxx | doge123 | 0.0002</code>")
+        send_msg(chat_id, "🔗 <b>إضافة مهمة رابط مختصر جديدة:</b>\nأرسل البيانات مفصولة بالعلامة | كالتالي:\n<code>الوصف | رابط_الموقع | كلمة_السر | المكافأة</code>\n\nمثال:\n<code>تخطى الرابط واجلب الكود | https://link.com/xxx | secret77 | 0.0002</code>")
+
+    elif data == "admin_manage_channels" and is_admin:
+        c.execute("SELECT id, name, type FROM channels")
+        ch_list = c.fetchall()
+        if not ch_list:
+            send_msg(chat_id, "لا توجد قنوات مسجلة حالياً.")
+        else:
+            send_msg(chat_id, "🗑️ <b>اضغط على القناة التي تريد حذفها فوراً:</b>")
+            for ch in ch_list:
+                ch_id_pk, name, c_type = ch
+                t_label = "إجبارية" if c_type == 'main' else "سرعة"
+                del_btn = {"inline_keyboard": [[{"text": f"❌ حذف: {name} ({t_label})", "callback_data": f"del_ch_{ch_id_pk}"}]]}
+                send_msg(chat_id, f"📢 {name}", del_btn)
+
+    elif data.startswith("del_ch_") and is_admin:
+        del_pk = int(data.split("_")[2])
+        c.execute("DELETE FROM channels WHERE id = ?", (del_pk,))
+        conn.commit()
+        send_msg(chat_id, "✅ تم حذف القناة من النظام بنجاح.")
+
+    elif data == "admin_manage_tasks" and is_admin:
+        c.execute("SELECT id, description FROM shortlinks")
+        t_list = c.fetchall()
+        if not t_list:
+            send_msg(chat_id, "لا توجد مهام روابط مسجلة حالياً.")
+        else:
+            send_msg(chat_id, "🗑️ <b>اضغط على المهمة التي تريد حذفها فوراً:</b>")
+            for t in t_list:
+                t_pk, desc = t
+                del_btn = {"inline_keyboard": [[{"text": f"❌ حذف المهمة: {desc[:20]}...", "callback_data": f"del_task_{t_pk}"}]]}
+                send_msg(chat_id, f"📌 {desc}", del_btn)
+
+    elif data.startswith("del_task_") and is_admin:
+        t_del_pk = int(data.split("_")[2])
+        c.execute("DELETE FROM shortlinks WHERE id = ?", (t_del_pk,))
+        conn.commit()
+        send_msg(chat_id, "✅ تم حذف المهمة من النظام بنجاح.")
 
     elif data == "admin_add_bal" and is_admin:
         c.execute("UPDATE users SET state = 'admin_wait_bal_id' WHERE user_id = ?", (user_id,))
         conn.commit()
-        send_msg(chat_id, "💰 <b>إضافة رصيد:</b>\nأرسل <b>الآيدي (ID)</b> الخاص بالمستخدم:")
+        send_msg(chat_id, "💰 أرسل <b>الآيدي (ID)</b> الخاص بالمستخدم:")
 
     elif data == "admin_add_admin" and user_id == OWNER_ID:
         c.execute("UPDATE users SET state = 'admin_wait_admin_id' WHERE user_id = ?", (user_id,))
         conn.commit()
-        send_msg(chat_id, "👑 <b>تعيين مشرف:</b>\nأرسل <b>الآيدي (ID)</b> الخاص بالمشرف الجديد:")
+        send_msg(chat_id, "👑 أرسل <b>الآيدي (ID)</b> الخاص بالمشرف الجديد:")
 
     conn.close()
 
 init_db()
 
-# ================= ممر Vercel المباشر =================
+# ================= ممر Vercel Serverless =================
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
