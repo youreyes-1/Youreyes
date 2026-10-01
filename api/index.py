@@ -188,14 +188,13 @@ def process_message(msg):
         send_msg(chat_id, get_text(lang, 'captcha_msg'), {"inline_keyboard": [btns]})
         return
 
-    # 🛑 هندسة إدارة الحالات العليا (لمنع تعلق المستخدمين في الخيارات) 🛑
+    # 🛑 هندسة إدارة الحالات العليا (متضمنة نظام الإضافة خطوة بخطوة وتعديل كلمات السر) 🛑
     if state != 'idle':
-        # إذا ضغط على أي زر نظام أو أمر ستارت، يتم إلغاء الحالة السابقة فوراً
         if text in system_btns or text == "/start":
             update_user(user_id, {"state": "idle"})
-            state = "idle" # نعدل المتغير المحلي عشان يكمل الكود لتحت طبيعي
+            state = "idle" 
         else:
-            # معالجة حالات السحب
+            # --- حالات السحب ---
             if state.startswith('wait_wallet'):
                 wallet_str = text.strip()
                 is_doge_address = wallet_str.startswith("D") and len(wallet_str) >= 30 and wallet_str.isalnum()
@@ -226,7 +225,7 @@ def process_message(msg):
                     send_msg(chat_id, get_text(lang, 'withdraw_done'))
                     return
             
-            # معالجة كلمات السر للمهام
+            # --- إدخال المستخدم لكلمة سر المهمة للربح ---
             elif state.startswith('wait_pass_'):
                 task_id = int(state.split('_')[2])
                 t_res = supabase.table("shortlinks").select("*").eq("id", task_id).execute()
@@ -240,9 +239,49 @@ def process_message(msg):
                     send_msg(chat_id, "❌ <b>كلمة السر خاطئة! تم الإلغاء.</b>")
                 return
 
-            # معالجة حالات الإدارة
+            # --- حالات الإدارة المتقدمة (Admin) ---
             elif user_is_admin:
-                if state == 'admin_broadcast':
+                # 🛑 معالج إضافة مهمة رابط خطوة بخطوة 🛑
+                if state == 'addsl_1':
+                    desc = text.replace('===', '')
+                    update_user(user_id, {"state": f"addsl_2==={desc}"})
+                    send_msg(chat_id, "🔗 <b>الخطوة 2:</b> أرسل رابط المهمة (URL):")
+                    return
+                elif state.startswith('addsl_2==='):
+                    desc = state.split('===')[1]
+                    url = text.replace('===', '')
+                    update_user(user_id, {"state": f"addsl_3==={desc}==={url}"})
+                    send_msg(chat_id, "🔑 <b>الخطوة 3:</b> أرسل كلمة السر المطلوبة:")
+                    return
+                elif state.startswith('addsl_3==='):
+                    parts = state.split('===')
+                    desc, url = parts[1], parts[2]
+                    passwd = text.replace('===', '')
+                    update_user(user_id, {"state": f"addsl_4==={desc}==={url}==={passwd}"})
+                    send_msg(chat_id, "💰 <b>الخطوة 4:</b> أرسل مبلغ المكافأة (مثال: 0.05):")
+                    return
+                elif state.startswith('addsl_4==='):
+                    parts = state.split('===')
+                    desc, url, passwd = parts[1], parts[2], parts[3]
+                    try:
+                        reward = float(text.strip())
+                        supabase.table("shortlinks").insert({"description": desc, "url": url, "password": passwd, "reward": reward}).execute()
+                        send_msg(chat_id, "✅ <b>تمت إضافة المهمة بنجاح!</b>")
+                    except ValueError:
+                        send_msg(chat_id, "❌ <b>خطأ!</b> يجب إدخال المبلغ كأرقام فقط. تم الإلغاء، حاول مجدداً.")
+                    update_user(user_id, {"state": "idle"})
+                    return
+                
+                # 🛑 معالج تعديل كلمة السر 🛑
+                elif state.startswith('admin_edit_pass_'):
+                    t_id = int(state.split('_')[3])
+                    supabase.table("shortlinks").update({"password": text.strip()}).eq("id", t_id).execute()
+                    update_user(user_id, {"state": "idle"})
+                    send_msg(chat_id, "✅ <b>تم تحديث كلمة السر بنجاح!</b>\nالمستخدمين حيضطروا يتخطوا الرابط من جديد.")
+                    return
+
+                # باقي حالات الإدارة
+                elif state == 'admin_broadcast':
                     for u in supabase.table("users").select("user_id").execute().data:
                         try: send_msg(u['user_id'], f"📢 <b>إعلان رسمي:</b>\n\n{text}")
                         except: pass
@@ -280,12 +319,6 @@ def process_message(msg):
                         send_msg(chat_id, "✅ تمت الإضافة.")
                     else: send_msg(chat_id, "❌ البوت ليس مشرفاً أو المعرف خطأ.")
                     update_user(user_id, {"state": "idle"}); return
-                elif state == 'admin_add_shortlink':
-                    parts = text.split('|')
-                    if len(parts) == 4:
-                        supabase.table("shortlinks").insert({"description": parts[0].strip(), "url": parts[1].strip(), "password": parts[2].strip(), "reward": float(parts[3].strip())}).execute()
-                        send_msg(chat_id, "✅ تمت الإضافة.")
-                    update_user(user_id, {"state": "idle"}); return
                 elif state == 'admin_wait_bal_id':
                     update_user(user_id, {"state": f'admin_wait_bal_amt_{text}'}); send_msg(chat_id, "💰 أرسل المبلغ:")
                     return
@@ -300,7 +333,6 @@ def process_message(msg):
                     supabase.table("admins").upsert({"user_id": int(text)}).execute(); update_user(user_id, {"state": "idle"})
                     send_msg(chat_id, "✅ تم التعيين."); return
 
-    # استكمال التحقق من قنوات الاشتراك الأساسية
     if not user_is_admin:
         main_channels = supabase.table("channels").select("*").eq("type", "main").execute().data
         unjoined = [ch for ch in main_channels if ch.get('ch_id') and not check_sub(user_id, ch['ch_id'])]
@@ -414,8 +446,8 @@ def process_message(msg):
             [{"text": f"⚙️ الهدية اليومية ({daily_b})", "callback_data": "admin_set_daily_b"}, {"text": "⚙️ نظام الإحالات (3 أجيال)", "callback_data": "admin_manage_refs"}],
             [{"text": "📝 تعديل الدعم الفني", "callback_data": "admin_set_support"}, {"text": "👥 مراقبة المحتالين", "callback_data": "admin_top_refs"}],
             [{"text": "➕ قناة إجبارية", "callback_data": "admin_add_main_ch"}, {"text": "📢 قناة ربح", "callback_data": "admin_add_speed_ch"}],
-            [{"text": "🔗 مهمة رابط", "callback_data": "admin_add_shortlink"}, {"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}],
-            [{"text": "🗑 إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
+            [{"text": "🔗 مهمة رابط جديدة", "callback_data": "admin_add_shortlink"}, {"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}],
+            [{"text": "🗑 إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "⚙️ إدارة المهام (تعديل/حذف)", "callback_data": "admin_manage_tasks"}]
         ]
         return send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
 
@@ -557,12 +589,11 @@ def process_callback(cq):
         for adm in supabase.table("admins").select("user_id").execute().data:
             send_msg(adm['user_id'], f"🚩 <b>بلاغ عن رابط معطل!</b>\n\n👤 المستخدم: <code>{user_id}</code>\n📢 القناة: <b>{ch['name']}</b>\n🔗 الرابط الحالي: {ch['url']}\n\nيرجى فحص القناة أو تعديلها من لوحة الإدارة.")
 
-    # ================= عرض المهام (لحل مشكلة عدم الاستجابة) =================
+    # ================= عرض المهام =================
     elif data.startswith("task_page_"):
         page = int(data.split("_")[2])
         links = supabase.table("shortlinks").select("*").execute().data
         if not links:
-            # هنا التعديل الجذري: تغيير النص في الواجهة بدلاً من رسالة منبثقة تتعارض مع تيليجرام
             edit_msg(chat_id, msg_id, "📋 <b>لا توجد مهام روابط حالياً.</b>\nيرجى العودة لاحقاً.", {"inline_keyboard": [[{"text": "🔙 رجوع للقائمة", "callback_data": "back_to_earn"}]]})
             return
             
@@ -632,7 +663,7 @@ def process_callback(cq):
                 f"⏱️ آخر ساعة: <code>{active_hour:,}</code>\n"
                 f"📅 آخر 24 ساعة: <code>{active_day:,}</code>\n"
                 f"📆 آخر أسبوع: <code>{active_week:,}</code>\n"
-                f"🗓️ آخر شهر: <code>{active_month:,}</code>\n"
+                f"🗓️️ آخر شهر: <code>{active_month:,}</code>\n"
             )
             send_msg(chat_id, stats_msg)
         except Exception:
@@ -646,6 +677,26 @@ def process_callback(cq):
                 [{"text": "🔙 رجوع", "callback_data": "admin_back"}]]
         send_msg(chat_id, "⚙️ <b>تعديل الأجيال:</b>", {"inline_keyboard": btns})
     
+    elif data == "admin_add_shortlink" and user_is_admin:
+        update_user(user_id, {"state": "addsl_1"})
+        send_msg(chat_id, "📝 <b>الخطوة 1 من 4:</b>\nأرسل وصف المهمة (مثال: تخطى الرابط الأول للمدونة):")
+
+    elif data == "admin_manage_tasks" and user_is_admin:
+        tasks = supabase.table("shortlinks").select("*").execute().data
+        if not tasks:
+            send_msg(chat_id, "📋 لا توجد مهام حالياً.")
+        else:
+            for t in tasks:
+                send_msg(chat_id, f"📌 <b>{t['description']}</b>\n🔑 الرمز الحالي: <code>{t['password']}</code>\n💰 المكافأة: <code>{t['reward']}</code>", 
+                         {"inline_keyboard": [
+                             [{"text": "🔑 تعديل الرمز", "callback_data": f"edit_pass_{t['id']}"}, {"text": f"❌ حذف", "callback_data": f"del_task_{t['id']}"}]
+                         ]})
+
+    elif data.startswith("edit_pass_") and user_is_admin:
+        t_id = data.split("_")[2]
+        update_user(user_id, {"state": f"admin_edit_pass_{t_id}"})
+        send_msg(chat_id, "🔑 <b>أرسل كلمة السر الجديدة لهذه المهمة:</b>")
+
     elif data == "admin_back" and user_is_admin:
         min_w = get_setting("min_withdraw", "0.01"); ch_r = get_setting("ch_reward", "0.004"); daily_b = get_setting("daily_bonus", "0.005")
         btns = [
@@ -655,15 +706,15 @@ def process_callback(cq):
             [{"text": f"⚙️ الهدية اليومية ({daily_b})", "callback_data": "admin_set_daily_b"}, {"text": "⚙️ نظام الإحالات (3 أجيال)", "callback_data": "admin_manage_refs"}],
             [{"text": "📝 تعديل الدعم الفني", "callback_data": "admin_set_support"}, {"text": "👥 مراقبة المحتالين", "callback_data": "admin_top_refs"}],
             [{"text": "➕ قناة إجبارية", "callback_data": "admin_add_main_ch"}, {"text": "📢 قناة ربح", "callback_data": "admin_add_speed_ch"}],
-            [{"text": "🔗 مهمة رابط", "callback_data": "admin_add_shortlink"}, {"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}],
-            [{"text": "🗑 إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
+            [{"text": "🔗 مهمة رابط جديدة", "callback_data": "admin_add_shortlink"}, {"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}],
+            [{"text": "🗑 إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "⚙️ إدارة المهام (تعديل/حذف)", "callback_data": "admin_manage_tasks"}]
         ]
         send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
 
     elif data == "admin_set_t1" and user_is_admin:
         update_user(user_id, {"state": "admin_set_t1"}); send_msg(chat_id, "⚙️ أرسل نسبة الجيل الأول كـ رقم (مثال: 50):")
     elif data == "admin_set_t2" and user_is_admin:
-        update_user(user_id, {"state": "admin_set_t2"}); send_msg(chat_id, "⚙️️ أرسل نسبة الجيل الثاني كـ رقم (مثال: 20):")
+        update_user(user_id, {"state": "admin_set_t2"}); send_msg(chat_id, "⚙ أرسل نسبة الجيل الثاني كـ رقم (مثال: 20):")
     elif data == "admin_set_t3" and user_is_admin:
         update_user(user_id, {"state": "admin_set_t3"}); send_msg(chat_id, "⚙️ أرسل نسبة الجيل الثالث كـ رقم (مثال: 5):")
 
@@ -684,14 +735,12 @@ def process_callback(cq):
         update_user(user_id, {"state": "admin_add_main_ch"}); send_msg(chat_id, "➕ <b>إضافة قناة إجبارية:</b> أرسل المعرف أو وجه رسالة.")
     elif data == "admin_add_speed_ch" and user_is_admin:
         update_user(user_id, {"state": "admin_add_speed_ch"}); send_msg(chat_id, "📢 <b>إضافة قناة ربح:</b> أرسل المعرف أو وجه رسالة.")
-    elif data == "admin_add_shortlink" and user_is_admin:
-        update_user(user_id, {"state": "admin_add_shortlink"}); send_msg(chat_id, "🔗 أرسل: <code>الوصف | الرابط | كلمة_السر | المكافأة</code>")
+    
     elif data == "admin_manage_channels" and user_is_admin:
         for ch in supabase.table("channels").select("*").execute().data: send_msg(chat_id, f"📢 {ch['name']}", {"inline_keyboard": [[{"text": f"❌ حذف", "callback_data": f"del_ch_{ch['id']}"}]]})
     elif data.startswith("del_ch_") and user_is_admin:
         supabase.table("channels").delete().eq("id", int(data.split("_")[2])).execute(); send_msg(chat_id, "✅ تم الحذف.")
-    elif data == "admin_manage_tasks" and user_is_admin:
-        for t in supabase.table("shortlinks").select("*").execute().data: send_msg(chat_id, f"📌 {t['description']}", {"inline_keyboard": [[{"text": f"❌ حذف", "callback_data": f"del_task_{t['id']}"}]]})
+    
     elif data.startswith("del_task_") and user_is_admin:
         supabase.table("shortlinks").delete().eq("id", int(data.split("_")[2])).execute(); send_msg(chat_id, "✅ تم الحذف.")
     elif data == "admin_add_bal" and user_is_admin:
