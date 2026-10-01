@@ -208,8 +208,36 @@ def process_message(msg):
         send_msg(chat_id, get_text(new_lang, 'main_menu', balance=float(user['balance']), speed=float(user['speed'])*86400, refs=int(user['ref_count'])))
         return
 
+    # ================= الفخ الأمني أثناء السحب =================
     elif text == get_text(lang, 'btn_withdraw'):
         user = calculate_and_update_mining(user)
+        
+        joined_channels = supabase.table("joined_speed_channels").select("*").eq("user_id", user_id).execute().data
+        if joined_channels:
+            active_reward_channels = supabase.table("channels").select("*").eq("type", "speed").execute().data
+            active_dict = {ch['id']: ch['name'] for ch in active_reward_channels}
+            ch_tg_ids = {ch['id']: ch['ch_id'] for ch in active_reward_channels}
+            
+            ch_reward_val = float(get_setting("ch_reward", "0.004"))
+            penalty = ch_reward_val * 2
+            penalized = False
+            
+            for jc in joined_channels:
+                ch_id_pk = jc['ch_id']
+                if ch_id_pk in active_dict:
+                    tg_ch_id = ch_tg_ids[ch_id_pk]
+                    if not check_sub(user_id, tg_ch_id): 
+                        user['balance'] -= penalty
+                        update_user(user_id, {"balance": user['balance']})
+                        supabase.table("joined_speed_channels").delete().eq("user_id", user_id).eq("ch_id", ch_id_pk).execute()
+                        penalized = True
+                        
+                        err_msg = f"🚨 <b>تحذير أمني: محاولة احتيال!</b>\n\nلقد قمت بالخروج من القناة ({active_dict[ch_id_pk]}) بعد استلامك للمكافأة.\nتم خصم <code>{penalty:.4f}</code> DOGE (ضعف المكافأة) من رصيدك كعقوبة صارمة (حتى لو أصبح رصيدك بالسالب)." if lang == 'ar' else f"🚨 <b>Security Warning!</b>\n\nYou left the reward channel ({active_dict[ch_id_pk]}) after claiming the bonus.\nA penalty of <code>{penalty:.4f}</code> DOGE (Double Reward) has been deducted (even into negative)."
+                        send_msg(chat_id, err_msg)
+            
+            if penalized:
+                return
+
         min_w = float(get_setting("min_withdraw", "0.01"))
         if float(user['balance']) < min_w:
             send_msg(chat_id, get_text(lang, 'withdraw_err', min=min_w))
@@ -261,7 +289,11 @@ def process_message(msg):
         channels = supabase.table("channels").select("*").eq("type", "speed").execute().data
         if not channels: return send_msg(chat_id, "📢 لا توجد قنوات مكافآت حالياً." if lang=='ar' else "📢 No reward channels available.")
         ch_reward_val = get_setting("ch_reward", "0.004")
-        send_msg(chat_id, f"🎁 <b>اشترك واربح {ch_reward_val} DOGE فوراً:</b>" if lang=='ar' else f"🎁 <b>Join & Earn {ch_reward_val} DOGE:</b>")
+        
+        # 🛑 التحذير الصارم قبل عرض القنوات 🛑
+        warning_msg = f"🎁 <b>اشترك واربح {ch_reward_val} DOGE فوراً:</b>\n\n⚠️ <b>تحذير صارم:</b> إذا قمت بالاشتراك واستلام المكافأة ثم غادرت القناة قبل انتهاء الإعلان، سيتم خصم <b>ضعف المكافأة</b> من رصيدك عند محاولة السحب (حتى لو أصبح رصيدك بالسالب!)." if lang == 'ar' else f"🎁 <b>Join & Earn {ch_reward_val} DOGE:</b>\n\n⚠️ <b>Strict Warning:</b> If you join, claim the reward, and then leave the channel, <b>DOUBLE the reward</b> will be deducted from your balance upon withdrawal (even if it goes negative!)."
+        send_msg(chat_id, warning_msg)
+        
         for ch in channels:
             j_res = supabase.table("joined_speed_channels").select("*").eq("user_id", user_id).eq("ch_id", ch['id']).execute()
             status_btn = [{"text": "✅ Claimed / تم الاستلام", "callback_data": "already_active"}] if j_res.data else [{"text": f"📢 Join {ch['name']}", "url": ch['url']}, {"text": "🎁 Verify & Claim", "callback_data": f"verify_reward_{ch['id']}"}]
@@ -289,7 +321,7 @@ def process_message(msg):
             [{"text": "📝 تعديل الدعم الفني", "callback_data": "admin_set_support"}, {"text": "👥 مراقبة المحتالين", "callback_data": "admin_top_refs"}],
             [{"text": "➕ قناة إجبارية", "callback_data": "admin_add_main_ch"}, {"text": "📢 قناة ربح", "callback_data": "admin_add_speed_ch"}],
             [{"text": "🔗 مهمة رابط", "callback_data": "admin_add_shortlink"}, {"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}],
-            [{"text": "🗑️️ إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
+            [{"text": "🗑 إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
         ]
         return send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
 
@@ -348,7 +380,6 @@ def process_message(msg):
         update_user(user_id, {"state": "idle"})
         return send_msg(chat_id, f"✅ تم تحديث الهدية اليومية.")
     
-    # حالات إعداد نسب الإحالة
     elif state == 'admin_set_t1' and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         set_setting("ref_t1", float(text.strip())); update_user(user_id, {"state": "idle"})
@@ -414,7 +445,6 @@ def process_callback(cq):
 
     if data == "cap_ok":
         if user and user.get('captcha_passed', 0) == 0 and user.get('referrer_id'):
-            # 🛑 التوزيع الهرمي للإحالات (3 أجيال) بشكل آمن ومصدري 🛑
             t1_id = user['referrer_id']
             base_speed = 0.0000000115
             
@@ -422,14 +452,12 @@ def process_callback(cq):
             t2_p = float(get_setting("ref_t2", "20"))
             t3_p = float(get_setting("ref_t3", "5"))
 
-            # الجيل الأول
             t1_user = get_user(t1_id)
             if t1_user:
                 new_s1 = float(t1_user['speed']) + (base_speed * (t1_p / 100.0))
                 update_user(t1_id, {"speed": new_s1, "ref_count": int(t1_user['ref_count']) + 1})
                 send_msg(t1_id, get_text(t1_user.get('lang', 'en'), 'ref_notify', level=1, ref_p=t1_p))
                 
-                # الجيل الثاني
                 t2_id = t1_user.get('referrer_id')
                 if t2_id and t2_id != 0:
                     t2_user = get_user(t2_id)
@@ -438,7 +466,6 @@ def process_callback(cq):
                         update_user(t2_id, {"speed": new_s2})
                         send_msg(t2_id, get_text(t2_user.get('lang', 'en'), 'ref_notify', level=2, ref_p=t2_p))
                         
-                        # الجيل الثالث
                         t3_id = t2_user.get('referrer_id')
                         if t3_id and t3_id != 0:
                             t3_user = get_user(t3_id)
@@ -490,13 +517,11 @@ def process_callback(cq):
         send_msg(chat_id, "⏳ جاري حساب الإحصائيات من قاعدة البيانات...")
         now_ts = int(time.time())
         try:
-            # دالة مساعدة لجلب العدد السريع باستخدام count="exact" بدون سحب الداتا كلها
             def get_count(min_ts=0):
                 try:
                     res = supabase.table("users").select("user_id", count="exact").gte("last_update", min_ts).limit(1).execute()
                     return res.count if hasattr(res, 'count') and res.count is not None else 0
                 except:
-                    # Fallback في حال فشل الكاونت المباشر
                     return len(supabase.table("users").select("user_id").gte("last_update", min_ts).execute().data)
 
             total_users = get_count(0)
@@ -543,7 +568,7 @@ def process_callback(cq):
             [{"text": "📝 تعديل الدعم الفني", "callback_data": "admin_set_support"}, {"text": "👥 مراقبة المحتالين", "callback_data": "admin_top_refs"}],
             [{"text": "➕ قناة إجبارية", "callback_data": "admin_add_main_ch"}, {"text": "📢 قناة ربح", "callback_data": "admin_add_speed_ch"}],
             [{"text": "🔗 مهمة رابط", "callback_data": "admin_add_shortlink"}, {"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}],
-            [{"text": "🗑️️ إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
+            [{"text": "🗑 إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
         ]
         send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
 
