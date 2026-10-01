@@ -19,7 +19,7 @@ LANG = {
     'en': {
         'btn_refresh': "🔄 Refresh Data",
         'btn_withdraw': "💸 Withdraw",
-        'btn_team': "👥 Referral Team",
+        'btn_team': "👥 Team (3 Tiers)",
         'btn_tasks': "🔗 Shortlinks Tasks",
         'btn_reward_ch': "🎁 Join & Earn",
         'btn_daily_bonus': "🎁 Daily Bonus",
@@ -32,14 +32,14 @@ LANG = {
         'captcha_msg': "🤖 <b>Anti-Bot System:</b>\nClick the unique symbol (🔴) to authenticate.",
         'captcha_ok': "Human verification successful!",
         'captcha_fail': "❌ Verification failed! Please try again.",
-        'sub_req': "⚠️️ <b>Action Required!</b>\nJoin ALL our official channels below to unlock your miner:",
-        'main_menu': "⛏ <b>Active Mining Servers</b>\n\n💰 Live Balance: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ Hash Power: <code>{speed:.8f}</code> DOGE/Day\n👥 Team Size: <code>{refs}</code>\n\n<i>🟢 Server Status: Online & Stable (Cloud).</i>",
-        'team_msg': "👥 <b>Partner Program:</b>\nEarn a <b>{ref_p}%</b> mining speed boost for every verified referral.\n\n📊 Team Members: <code>{refs}</code>\n🔗 Your Referral Link:\n<code>{link}</code>",
+        'sub_req': "⚠ <b>Action Required!</b>\nJoin ALL our official channels below to unlock your miner:",
+        'main_menu': "⛏ <b>Active Mining Servers</b>\n\n💰 Live Balance: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ Hash Power: <code>{speed:.8f}</code> DOGE/Day\n👥 Direct Team: <code>{refs}</code>\n\n<i>🟢 Server Status: Online & Stable (Cloud).</i>",
+        'team_msg': "👥 <b>Multi-Tier Partner Program:</b>\nBuild your network and earn from 3 levels deep!\n\n🥇 Tier 1 (Direct): <b>+{t1}%</b> speed\n🥈 Tier 2: <b>+{t2}%</b> speed\n🥉 Tier 3: <b>+{t3}%</b> speed\n\n📊 Direct Invites: <code>{refs}</code>\n🔗 Your Referral Link:\n<code>{link}</code>",
         'withdraw_err': "❌ Balance is below the minimum threshold ({min} DOGE).",
         'withdraw_req': "💸 <b>Secure Withdrawal:</b>\nSend your <b>Dogecoin (FaucetPay)</b> wallet address (Start with D or Email):",
         'withdraw_done': "✅ <b>Request Logged!</b>\nYour payout is under review.",
-        'ref_notify': "🎉 <b>Great News!</b>\nA new user joined via your link. Speed increased by {ref_p}%!",
-        'calc_text': "🧮 <b>Profit Calculator:</b>\n• 10-15 Referrals = 450% Boost.\n• 30-40 Referrals = <b>$5 to $8 USD daily</b> in DOGE!\n<i>Share your link to maximize income.</i>",
+        'ref_notify': "🎉 <b>Great News!</b>\nA user joined your network (Tier {level}). Speed increased by {ref_p}%!",
+        'calc_text': "🧮 <b>Profit Calculator:</b>\n• 10-15 Referrals = Massive Boost.\n• 30-40 Referrals = <b>$5 to $8 USD daily</b> in DOGE!\n<i>Share your link to maximize income.</i>",
         'about_text': "🖥️ <b>Hardware Infrastructure:</b>\nPowered by massive arrays of <b>NVIDIA RTX 4090</b> rigs paired with high-efficiency <b>Antminer L7</b> units operating Scrypt algorithms under liquid cooling.",
         'stats_text': "📊 <b>Live Network Stats:</b>\n👤 Active Miners: <code>{miners}</code>\n⚡ Hashrate: <code>9.2 GH/s Scrypt</code>\n💸 Paid Today: <code>1,450 DOGE</code>\n🟢 Rig Uptime: <code>{eff}%</code>",
         'support_text': "📞 <b>Customer Support:</b>\nResponse time is currently 24-48 hours.",
@@ -48,7 +48,7 @@ LANG = {
     'ar': {
         'btn_refresh': "🔄 تحديث الأرباح",
         'btn_withdraw': "💸 سحب الرصيد",
-        'btn_team': "👥 فريقك من الإحالات",
+        'btn_team': "👥 فريقك (3 أجيال)",
         'btn_tasks': "🔗 المهام والروابط",
         'btn_reward_ch': "🎁 اشترك واربح",
         'btn_daily_bonus': "🎁 الهدية اليومية",
@@ -62,12 +62,12 @@ LANG = {
         'captcha_ok': "تم التحقق البشري بنجاح!",
         'captcha_fail': "❌ فشل التحقق الأمني! حاول مجدداً.",
         'sub_req': "⚠️ <b>شرط أساسي!</b>\nيجب عليك الاشتراك في جميع القنوات أدناه لتفعيل حسابك:",
-        'main_menu': "⛏ <b>خوادم التعدين النشطة</b>\n\n💰 الرصيد المباشر: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ قوة التعدين: <code>{speed:.8f}</code> DOGE/يوم\n👥 أعضاء الفريق: <code>{refs}</code>\n\n<i>🟢 حالة الخادم: متصل ومستقر (سحابي).</i>",
-        'team_msg': "👥 <b>برنامج الشركاء:</b>\nكل عضو تدعوه يزيد سرعة تعدينك بنسبة <b>{ref_p}%</b>.\n\n📊 فريقك: <code>{refs}</code> عضو\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
+        'main_menu': "⛏ <b>خوادم التعدين النشطة</b>\n\n💰 الرصيد المباشر: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ قوة التعدين: <code>{speed:.8f}</code> DOGE/يوم\n👥 إحالاتك المباشرة: <code>{refs}</code>\n\n<i>🟢 حالة الخادم: متصل ومستقر (سحابي).</i>",
+        'team_msg': "👥 <b>نظام الإحالات الهرمي (3 أجيال):</b>\nابنِ شبكتك واربح من دعوات أصدقائك وأصدقاء أصدقائك!\n\n🥇 الجيل الأول (مباشر): <b>+{t1}%</b> سرعة\n🥈 الجيل الثاني: <b>+{t2}%</b> سرعة\n🥉 الجيل الثالث: <b>+{t3}%</b> سرعة\n\n📊 إحالاتك المباشرة: <code>{refs}</code> عضو\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
         'withdraw_err': "❌ رصيدك الحالي أقل من الحد الأدنى للسحب ({min} DOGE).",
         'withdraw_req': "💸 <b>بوابة السحب الآمنة:</b>\nأرسل عنوان محفظة <b>Dogecoin (FaucetPay)</b> (يبدأ بحرف D أو الإيميل):",
         'withdraw_done': "✅ <b>تم استلام طلب السحب!</b>\nالطلب قيد المراجعة المالية.",
-        'ref_notify': "🎉 <b>أخبار ممتازة!</b>\nسجل عضو جديد عبر رابطك وتجاوز الكابتشا. زادت سرعتك بنسبة {ref_p}%!",
+        'ref_notify': "🎉 <b>أخبار ممتازة!</b>\nانضم شخص لشبكتك (من الجيل {level}). زادت سرعتك بنسبة {ref_p}%!",
         'calc_text': "🧮 <b>حاسبة العوائد:</b>\n• 10-15 شخص = سرعة تتضاعف بقوة.\n• 30-40 شخص = <b>5$ إلى 8$ يومياً</b> تسحبها مباشرة!\n💡 انسخ رابطك وانشره.",
         'about_text': "🖥️ <b>البنية التحتية:</b>\nنعتمد على مصفوفات <b>NVIDIA RTX 4090</b> ووحدات <b>Antminer L7</b> لفك تشفير العملة بأعلى كفاءة.",
         'stats_text': "📊 <b>إحصائيات الشبكة:</b>\n👤 عمال التعدين: <code>{miners}</code>\n⚡ قوة الهاش: <code>9.2 GH/s Scrypt</code>\n💸 سحوبات اليوم: <code>1,450 DOGE</code>\n🟢 كفاءة التشغيل: <code>{eff}%</code>",
@@ -220,8 +220,10 @@ def process_message(msg):
 
     elif text == get_text(lang, 'btn_team'):
         link = f"https://t.me/{BOT_USERNAME}?start={user_id}"
-        ref_p = float(get_setting("ref_percent", "50"))
-        send_msg(chat_id, get_text(lang, 'team_msg', ref_p=ref_p, refs=int(user['ref_count']), link=link))
+        t1 = get_setting("ref_t1", "50")
+        t2 = get_setting("ref_t2", "20")
+        t3 = get_setting("ref_t3", "5")
+        send_msg(chat_id, get_text(lang, 'team_msg', t1=t1, t2=t2, t3=t3, refs=int(user['ref_count']), link=link))
         return
 
     elif text == get_text(lang, 'btn_daily_bonus'):
@@ -274,15 +276,15 @@ def process_message(msg):
     elif text == get_text(lang, 'btn_support'):
         custom_support = get_setting(f"support_text_{lang}", "")
         return send_msg(chat_id, custom_support if custom_support else get_text(lang, 'support_text'))
+    
     elif text == get_text(lang, 'btn_admin') and user_is_admin:
         min_w = get_setting("min_withdraw", "0.01")
         ch_r = get_setting("ch_reward", "0.004")
         daily_b = get_setting("daily_bonus", "0.005")
-        ref_p = get_setting("ref_percent", "50")
         btns = [
             [{"text": "💰 زيادة رصيد", "callback_data": "admin_add_bal"}, {"text": "📢 إذاعة", "callback_data": "admin_broadcast"}],
             [{"text": f"⚙️ الحد الأدنى ({min_w})", "callback_data": "admin_set_min_w"}, {"text": f"⚙️ مكافأة القنوات ({ch_r})", "callback_data": "admin_set_ch_r"}],
-            [{"text": f"⚙️ الهدية اليومية ({daily_b})", "callback_data": "admin_set_daily_b"}, {"text": f"⚙️ نسبة الإحالة ({ref_p}%)", "callback_data": "admin_set_ref_p"}],
+            [{"text": f"⚙️ الهدية اليومية ({daily_b})", "callback_data": "admin_set_daily_b"}, {"text": "⚙️ نظام الإحالات (3 أجيال)", "callback_data": "admin_manage_refs"}],
             [{"text": "📝 تعديل الدعم الفني", "callback_data": "admin_set_support"}, {"text": "👥 مراقبة المحتالين", "callback_data": "admin_top_refs"}],
             [{"text": "➕ قناة إجبارية", "callback_data": "admin_add_main_ch"}, {"text": "📢 قناة ربح", "callback_data": "admin_add_speed_ch"}],
             [{"text": "🔗 مهمة رابط", "callback_data": "admin_add_shortlink"}, {"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}],
@@ -344,11 +346,21 @@ def process_message(msg):
         set_setting("daily_bonus", float(text.strip()))
         update_user(user_id, {"state": "idle"})
         return send_msg(chat_id, f"✅ تم تحديث الهدية اليومية.")
-    elif state == 'admin_set_ref_p' and user_is_admin:
+    
+    # حالات إعداد نسب الإحالة
+    elif state == 'admin_set_t1' and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
-        set_setting("ref_percent", float(text.strip()))
-        update_user(user_id, {"state": "idle"})
-        return send_msg(chat_id, f"✅ تم تحديث نسبة الإحالة بنجاح.")
+        set_setting("ref_t1", float(text.strip())); update_user(user_id, {"state": "idle"})
+        return send_msg(chat_id, f"✅ تم تحديث نسبة الجيل الأول.")
+    elif state == 'admin_set_t2' and user_is_admin:
+        if text in system_btns: return update_user(user_id, {"state": "idle"})
+        set_setting("ref_t2", float(text.strip())); update_user(user_id, {"state": "idle"})
+        return send_msg(chat_id, f"✅ تم تحديث نسبة الجيل الثاني.")
+    elif state == 'admin_set_t3' and user_is_admin:
+        if text in system_btns: return update_user(user_id, {"state": "idle"})
+        set_setting("ref_t3", float(text.strip())); update_user(user_id, {"state": "idle"})
+        return send_msg(chat_id, f"✅ تم تحديث نسبة الجيل الثالث.")
+
     elif state == 'admin_set_support' and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         set_setting(f"support_text_{lang}", text)
@@ -401,17 +413,39 @@ def process_callback(cq):
 
     if data == "cap_ok":
         if user and user.get('captcha_passed', 0) == 0 and user.get('referrer_id'):
-            ref_user = get_user(user['referrer_id'])
-            if ref_user:
-                # 🛑 التعديل المالي الحاسم: حساب الإضافة من السرعة الأساسية بشكل ثابت ومصدري
-                ref_p = float(get_setting("ref_percent", "50"))
-                base_speed = 0.0000000115
-                bonus_speed = base_speed * (ref_p / 100.0)
-                new_speed = float(ref_user['speed']) + bonus_speed
+            # 🛑 التوزيع الهرمي للإحالات (3 أجيال) بشكل آمن ومصدري 🛑
+            t1_id = user['referrer_id']
+            base_speed = 0.0000000115
+            
+            t1_p = float(get_setting("ref_t1", "50"))
+            t2_p = float(get_setting("ref_t2", "20"))
+            t3_p = float(get_setting("ref_t3", "5"))
+
+            # الجيل الأول
+            t1_user = get_user(t1_id)
+            if t1_user:
+                new_s1 = float(t1_user['speed']) + (base_speed * (t1_p / 100.0))
+                update_user(t1_id, {"speed": new_s1, "ref_count": int(t1_user['ref_count']) + 1})
+                send_msg(t1_id, get_text(t1_user.get('lang', 'en'), 'ref_notify', level=1, ref_p=t1_p))
                 
-                update_user(user['referrer_id'], {"speed": new_speed, "ref_count": int(ref_user['ref_count']) + 1})
-                send_msg(user['referrer_id'], get_text(ref_user.get('lang', 'en'), 'ref_notify', ref_p=ref_p))
-                
+                # الجيل الثاني
+                t2_id = t1_user.get('referrer_id')
+                if t2_id and t2_id != 0:
+                    t2_user = get_user(t2_id)
+                    if t2_user:
+                        new_s2 = float(t2_user['speed']) + (base_speed * (t2_p / 100.0))
+                        update_user(t2_id, {"speed": new_s2})
+                        send_msg(t2_id, get_text(t2_user.get('lang', 'en'), 'ref_notify', level=2, ref_p=t2_p))
+                        
+                        # الجيل الثالث
+                        t3_id = t2_user.get('referrer_id')
+                        if t3_id and t3_id != 0:
+                            t3_user = get_user(t3_id)
+                            if t3_user:
+                                new_s3 = float(t3_user['speed']) + (base_speed * (t3_p / 100.0))
+                                update_user(t3_id, {"speed": new_s3})
+                                send_msg(t3_id, get_text(t3_user.get('lang', 'en'), 'ref_notify', level=3, ref_p=t3_p))
+
         update_user(user_id, {"captcha_passed": 1})
         delete_msg(chat_id, msg_id)
         
@@ -451,6 +485,41 @@ def process_callback(cq):
         send_msg(chat_id, f"🔑 <b>أرسل الآن كلمة السر:</b>")
 
     # أزرار الإدارة
+    elif data == "admin_manage_refs" and user_is_admin:
+        t1 = get_setting("ref_t1", "50")
+        t2 = get_setting("ref_t2", "20")
+        t3 = get_setting("ref_t3", "5")
+        btns = [
+            [{"text": f"🥇 الجيل الأول ({t1}%)", "callback_data": "admin_set_t1"}],
+            [{"text": f"🥈 الجيل الثاني ({t2}%)", "callback_data": "admin_set_t2"}],
+            [{"text": f"🥉 الجيل الثالث ({t3}%)", "callback_data": "admin_set_t3"}],
+            [{"text": "🔙 رجوع", "callback_data": "admin_back"}]
+        ]
+        send_msg(chat_id, "⚙️ <b>اختر الجيل الذي تريد تعديل نسبته المئوية:</b>", {"inline_keyboard": btns})
+    
+    elif data == "admin_back" and user_is_admin:
+        # يرجع يعرض القائمة الرئيسية للإدارة
+        min_w = get_setting("min_withdraw", "0.01")
+        ch_r = get_setting("ch_reward", "0.004")
+        daily_b = get_setting("daily_bonus", "0.005")
+        btns = [
+            [{"text": "💰 زيادة رصيد", "callback_data": "admin_add_bal"}, {"text": "📢 إذاعة", "callback_data": "admin_broadcast"}],
+            [{"text": f"⚙️ الحد الأدنى ({min_w})", "callback_data": "admin_set_min_w"}, {"text": f"⚙️ مكافأة القنوات ({ch_r})", "callback_data": "admin_set_ch_r"}],
+            [{"text": f"⚙️ الهدية اليومية ({daily_b})", "callback_data": "admin_set_daily_b"}, {"text": "⚙️ نظام الإحالات (3 أجيال)", "callback_data": "admin_manage_refs"}],
+            [{"text": "📝 تعديل الدعم الفني", "callback_data": "admin_set_support"}, {"text": "👥 مراقبة المحتالين", "callback_data": "admin_top_refs"}],
+            [{"text": "➕ قناة إجبارية", "callback_data": "admin_add_main_ch"}, {"text": "📢 قناة ربح", "callback_data": "admin_add_speed_ch"}],
+            [{"text": "🔗 مهمة رابط", "callback_data": "admin_add_shortlink"}, {"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}],
+            [{"text": "🗑️ إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
+        ]
+        send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
+
+    elif data == "admin_set_t1" and user_is_admin:
+        update_user(user_id, {"state": "admin_set_t1"}); send_msg(chat_id, "⚙️ أرسل نسبة الجيل الأول كـ رقم (مثال: 50):")
+    elif data == "admin_set_t2" and user_is_admin:
+        update_user(user_id, {"state": "admin_set_t2"}); send_msg(chat_id, "⚙️ أرسل نسبة الجيل الثاني كـ رقم (مثال: 20):")
+    elif data == "admin_set_t3" and user_is_admin:
+        update_user(user_id, {"state": "admin_set_t3"}); send_msg(chat_id, "⚙️ أرسل نسبة الجيل الثالث كـ رقم (مثال: 5):")
+
     elif data == "admin_broadcast" and user_is_admin:
         update_user(user_id, {"state": "admin_broadcast"}); send_msg(chat_id, "📢 <b>أرسل الرسالة للإذاعة:</b>")
     elif data == "admin_set_min_w" and user_is_admin:
@@ -459,8 +528,6 @@ def process_callback(cq):
         update_user(user_id, {"state": "admin_set_ch_r"}); send_msg(chat_id, "⚙️ أرسل قيمة المكافأة للقنوات:")
     elif data == "admin_set_daily_b" and user_is_admin:
         update_user(user_id, {"state": "admin_set_daily_b"}); send_msg(chat_id, "⚙️ أرسل قيمة الهدية اليومية:")
-    elif data == "admin_set_ref_p" and user_is_admin:
-        update_user(user_id, {"state": "admin_set_ref_p"}); send_msg(chat_id, "⚙️ أرسل نسبة الإحالة الجديدة كـ رقم (مثال: 50):")
     elif data == "admin_set_support" and user_is_admin:
         update_user(user_id, {"state": "admin_set_support"}); send_msg(chat_id, "📝 أرسل رسالة الدعم الفني الجديدة:")
     elif data == "admin_top_refs" and user_is_admin:
@@ -495,7 +562,7 @@ class handler(BaseHTTPRequestHandler):
                 if 'message' in data: process_message(data['message'])
                 elif 'callback_query' in data: process_callback(data['callback_query'])
         except Exception:
-            try: send_msg(OWNER_ID, f"⚠️ <b>Crash Trace:</b>\n<code>{traceback.format_exc()[-600:]}</code>")
+            try: send_msg(OWNER_ID, f"⚠️️ <b>Crash Trace:</b>\n<code>{traceback.format_exc()[-600:]}</code>")
             except: pass
         self.send_response(200); self.end_headers(); self.wfile.write(b"OK")
     def do_GET(self):
