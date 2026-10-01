@@ -282,13 +282,14 @@ def process_message(msg):
         ch_r = get_setting("ch_reward", "0.004")
         daily_b = get_setting("daily_bonus", "0.005")
         btns = [
+            [{"text": "📈 إحصائيات البوت الحقيقية", "callback_data": "admin_real_stats"}],
             [{"text": "💰 زيادة رصيد", "callback_data": "admin_add_bal"}, {"text": "📢 إذاعة", "callback_data": "admin_broadcast"}],
             [{"text": f"⚙️ الحد الأدنى ({min_w})", "callback_data": "admin_set_min_w"}, {"text": f"⚙️ مكافأة القنوات ({ch_r})", "callback_data": "admin_set_ch_r"}],
             [{"text": f"⚙️ الهدية اليومية ({daily_b})", "callback_data": "admin_set_daily_b"}, {"text": "⚙️ نظام الإحالات (3 أجيال)", "callback_data": "admin_manage_refs"}],
             [{"text": "📝 تعديل الدعم الفني", "callback_data": "admin_set_support"}, {"text": "👥 مراقبة المحتالين", "callback_data": "admin_top_refs"}],
             [{"text": "➕ قناة إجبارية", "callback_data": "admin_add_main_ch"}, {"text": "📢 قناة ربح", "callback_data": "admin_add_speed_ch"}],
             [{"text": "🔗 مهمة رابط", "callback_data": "admin_add_shortlink"}, {"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}],
-            [{"text": "🗑️ إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
+            [{"text": "🗑️️ إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
         ]
         return send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
 
@@ -484,7 +485,40 @@ def process_callback(cq):
         update_user(user_id, {"state": f"wait_pass_{data.split('_')[2]}"})
         send_msg(chat_id, f"🔑 <b>أرسل الآن كلمة السر:</b>")
 
-    # أزرار الإدارة
+    # ================= الإحصائيات الحقيقية =================
+    elif data == "admin_real_stats" and user_is_admin:
+        send_msg(chat_id, "⏳ جاري حساب الإحصائيات من قاعدة البيانات...")
+        now_ts = int(time.time())
+        try:
+            # دالة مساعدة لجلب العدد السريع باستخدام count="exact" بدون سحب الداتا كلها
+            def get_count(min_ts=0):
+                try:
+                    res = supabase.table("users").select("user_id", count="exact").gte("last_update", min_ts).limit(1).execute()
+                    return res.count if hasattr(res, 'count') and res.count is not None else 0
+                except:
+                    # Fallback في حال فشل الكاونت المباشر
+                    return len(supabase.table("users").select("user_id").gte("last_update", min_ts).execute().data)
+
+            total_users = get_count(0)
+            active_hour = get_count(now_ts - 3600)
+            active_day = get_count(now_ts - 86400)
+            active_week = get_count(now_ts - 604800)
+            active_month = get_count(now_ts - 2592000)
+
+            stats_msg = (
+                "📈 <b>إحصائيات البوت الحقيقية (Real-Time Stats):</b>\n\n"
+                f"👥 <b>إجمالي المستخدمين:</b> <code>{total_users:,}</code> مستخدم\n\n"
+                f"🔥 <b>التفاعل النشط:</b>\n"
+                f"⏱️ خلال آخر ساعة: <code>{active_hour:,}</code> مستخدم\n"
+                f"📅 خلال 24 ساعة: <code>{active_day:,}</code> مستخدم\n"
+                f"📆 خلال آخر أسبوع: <code>{active_week:,}</code> مستخدم\n"
+                f"🗓️ خلال آخر شهر: <code>{active_month:,}</code> مستخدم\n"
+            )
+            send_msg(chat_id, stats_msg)
+        except Exception as e:
+            send_msg(chat_id, "❌ حدث خطأ أثناء الاتصال السحابي لجلب الإحصائيات.")
+
+    # ================= أزرار الإدارة الأخرى =================
     elif data == "admin_manage_refs" and user_is_admin:
         t1 = get_setting("ref_t1", "50")
         t2 = get_setting("ref_t2", "20")
@@ -498,18 +532,18 @@ def process_callback(cq):
         send_msg(chat_id, "⚙️ <b>اختر الجيل الذي تريد تعديل نسبته المئوية:</b>", {"inline_keyboard": btns})
     
     elif data == "admin_back" and user_is_admin:
-        # يرجع يعرض القائمة الرئيسية للإدارة
         min_w = get_setting("min_withdraw", "0.01")
         ch_r = get_setting("ch_reward", "0.004")
         daily_b = get_setting("daily_bonus", "0.005")
         btns = [
+            [{"text": "📈 إحصائيات البوت الحقيقية", "callback_data": "admin_real_stats"}],
             [{"text": "💰 زيادة رصيد", "callback_data": "admin_add_bal"}, {"text": "📢 إذاعة", "callback_data": "admin_broadcast"}],
             [{"text": f"⚙️ الحد الأدنى ({min_w})", "callback_data": "admin_set_min_w"}, {"text": f"⚙️ مكافأة القنوات ({ch_r})", "callback_data": "admin_set_ch_r"}],
             [{"text": f"⚙️ الهدية اليومية ({daily_b})", "callback_data": "admin_set_daily_b"}, {"text": "⚙️ نظام الإحالات (3 أجيال)", "callback_data": "admin_manage_refs"}],
             [{"text": "📝 تعديل الدعم الفني", "callback_data": "admin_set_support"}, {"text": "👥 مراقبة المحتالين", "callback_data": "admin_top_refs"}],
             [{"text": "➕ قناة إجبارية", "callback_data": "admin_add_main_ch"}, {"text": "📢 قناة ربح", "callback_data": "admin_add_speed_ch"}],
             [{"text": "🔗 مهمة رابط", "callback_data": "admin_add_shortlink"}, {"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}],
-            [{"text": "🗑️ إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
+            [{"text": "🗑️️ إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
         ]
         send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
 
@@ -562,7 +596,7 @@ class handler(BaseHTTPRequestHandler):
                 if 'message' in data: process_message(data['message'])
                 elif 'callback_query' in data: process_callback(data['callback_query'])
         except Exception:
-            try: send_msg(OWNER_ID, f"⚠️️ <b>Crash Trace:</b>\n<code>{traceback.format_exc()[-600:]}</code>")
+            try: send_msg(OWNER_ID, f"⚠ <b>Crash Trace:</b>\n<code>{traceback.format_exc()[-600:]}</code>")
             except: pass
         self.send_response(200); self.end_headers(); self.wfile.write(b"OK")
     def do_GET(self):
