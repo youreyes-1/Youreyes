@@ -49,7 +49,7 @@ LANG = {
         'btn_refresh': "🔄 تحديث الأرباح",
         'btn_withdraw': "💸 سحب الرصيد",
         'btn_team': "👥 فريقك (+30%)",
-        'btn_tasks': "🔗 المهام والروابط",
+        'btn_tasks': "🔗 المهام والربح",
         'btn_reward_ch': "🎁 اشترك واربح",
         'btn_daily_bonus': "🎁 الهدية اليومية",
         'btn_about': "🖥 عتاد التعدين",
