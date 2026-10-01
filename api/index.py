@@ -19,11 +19,11 @@ LANG = {
     'en': {
         'btn_refresh': "🔄 Refresh Data",
         'btn_withdraw': "💸 Withdraw",
-        'btn_team': "👥 Team (+30%)",
+        'btn_team': "👥 Referral Team",
         'btn_tasks': "🔗 Shortlinks Tasks",
         'btn_reward_ch': "🎁 Join & Earn",
         'btn_daily_bonus': "🎁 Daily Bonus",
-        'btn_about': "🖥️ Mining Hardware",
+        'btn_about': "🖥️️ Mining Hardware",
         'btn_stats': "📊 Network Stats",
         'btn_calc': "🧮 Profit Calculator",
         'btn_support': "📞 Support",
@@ -34,11 +34,11 @@ LANG = {
         'captcha_fail': "❌ Verification failed! Please try again.",
         'sub_req': "⚠️ <b>Action Required!</b>\nJoin ALL our official channels below to unlock your miner:",
         'main_menu': "⛏ <b>Active Mining Servers</b>\n\n💰 Live Balance: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ Hash Power: <code>{speed:.8f}</code> DOGE/Day\n👥 Team Size: <code>{refs}</code>\n\n<i>🟢 Server Status: Online & Stable (Cloud).</i>",
-        'team_msg': "👥 <b>Partner Program:</b>\nEarn a <b>30%</b> mining speed boost for every verified referral.\n\n📊 Team Members: <code>{refs}</code>\n🔗 Your Referral Link:\n<code>{link}</code>",
+        'team_msg': "👥 <b>Partner Program:</b>\nEarn a <b>{ref_p}%</b> mining speed boost for every verified referral.\n\n📊 Team Members: <code>{refs}</code>\n🔗 Your Referral Link:\n<code>{link}</code>",
         'withdraw_err': "❌ Balance is below the minimum threshold ({min} DOGE).",
-        'withdraw_req': "💸 <b>Secure Withdrawal:</b>\nSend your <b>Dogecoin (FaucetPay)</b> wallet address:",
+        'withdraw_req': "💸 <b>Secure Withdrawal:</b>\nSend your <b>Dogecoin (FaucetPay)</b> wallet address (Start with D or Email):",
         'withdraw_done': "✅ <b>Request Logged!</b>\nYour payout is under review.",
-        'ref_notify': "🎉 <b>Great News!</b>\nA new user joined via your link. Speed increased by 30%!",
+        'ref_notify': "🎉 <b>Great News!</b>\nA new user joined via your link. Speed increased by {ref_p}%!",
         'calc_text': "🧮 <b>Profit Calculator:</b>\n• 10-15 Referrals = 450% Boost.\n• 30-40 Referrals = <b>$5 to $8 USD daily</b> in DOGE!\n<i>Share your link to maximize income.</i>",
         'about_text': "🖥️ <b>Hardware Infrastructure:</b>\nPowered by massive arrays of <b>NVIDIA RTX 4090</b> rigs paired with high-efficiency <b>Antminer L7</b> units operating Scrypt algorithms under liquid cooling.",
         'stats_text': "📊 <b>Live Network Stats:</b>\n👤 Active Miners: <code>{miners}</code>\n⚡ Hashrate: <code>9.2 GH/s Scrypt</code>\n💸 Paid Today: <code>1,450 DOGE</code>\n🟢 Rig Uptime: <code>{eff}%</code>",
@@ -48,8 +48,8 @@ LANG = {
     'ar': {
         'btn_refresh': "🔄 تحديث الأرباح",
         'btn_withdraw': "💸 سحب الرصيد",
-        'btn_team': "👥 فريقك (+30%)",
-        'btn_tasks': "🔗 المهام والربح",
+        'btn_team': "👥 فريقك من الإحالات",
+        'btn_tasks': "🔗 المهام والروابط",
         'btn_reward_ch': "🎁 اشترك واربح",
         'btn_daily_bonus': "🎁 الهدية اليومية",
         'btn_about': "🖥 عتاد التعدين",
@@ -63,12 +63,12 @@ LANG = {
         'captcha_fail': "❌ فشل التحقق الأمني! حاول مجدداً.",
         'sub_req': "⚠️ <b>شرط أساسي!</b>\nيجب عليك الاشتراك في جميع القنوات أدناه لتفعيل حسابك:",
         'main_menu': "⛏ <b>خوادم التعدين النشطة</b>\n\n💰 الرصيد المباشر: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ قوة التعدين: <code>{speed:.8f}</code> DOGE/يوم\n👥 أعضاء الفريق: <code>{refs}</code>\n\n<i>🟢 حالة الخادم: متصل ومستقر (سحابي).</i>",
-        'team_msg': "👥 <b>برنامج الشركاء:</b>\nكل عضو تدعوه يزيد سرعة تعدينك بنسبة <b>30%</b>.\n\n📊 فريقك: <code>{refs}</code> عضو\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
+        'team_msg': "👥 <b>برنامج الشركاء:</b>\nكل عضو تدعوه يزيد سرعة تعدينك بنسبة <b>{ref_p}%</b>.\n\n📊 فريقك: <code>{refs}</code> عضو\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
         'withdraw_err': "❌ رصيدك الحالي أقل من الحد الأدنى للسحب ({min} DOGE).",
-        'withdraw_req': "💸 <b>بوابة السحب الآمنة:</b>\nأرسل الآن عنوان محفظة <b>Dogecoin (FaucetPay)</b> الخاصة بك:",
+        'withdraw_req': "💸 <b>بوابة السحب الآمنة:</b>\nأرسل عنوان محفظة <b>Dogecoin (FaucetPay)</b> (يبدأ بحرف D أو الإيميل):",
         'withdraw_done': "✅ <b>تم استلام طلب السحب!</b>\nالطلب قيد المراجعة المالية.",
-        'ref_notify': "🎉 <b>أخبار ممتازة!</b>\nسجل عضو جديد عبر رابطك وتجاوز الكابتشا. زادت سرعتك بنسبة 30%!",
-        'calc_text': "🧮 <b>حاسبة العوائد:</b>\n• 10-15 شخص = سرعة تتضاعف 450%.\n• 30-40 شخص = <b>5$ إلى 8$ يومياً</b> تسحبها مباشرة!\n💡 انسخ رابطك وانشره.",
+        'ref_notify': "🎉 <b>أخبار ممتازة!</b>\nسجل عضو جديد عبر رابطك وتجاوز الكابتشا. زادت سرعتك بنسبة {ref_p}%!",
+        'calc_text': "🧮 <b>حاسبة العوائد:</b>\n• 10-15 شخص = سرعة تتضاعف بقوة.\n• 30-40 شخص = <b>5$ إلى 8$ يومياً</b> تسحبها مباشرة!\n💡 انسخ رابطك وانشره.",
         'about_text': "🖥️ <b>البنية التحتية:</b>\nنعتمد على مصفوفات <b>NVIDIA RTX 4090</b> ووحدات <b>Antminer L7</b> لفك تشفير العملة بأعلى كفاءة.",
         'stats_text': "📊 <b>إحصائيات الشبكة:</b>\n👤 عمال التعدين: <code>{miners}</code>\n⚡ قوة الهاش: <code>9.2 GH/s Scrypt</code>\n💸 سحوبات اليوم: <code>1,450 DOGE</code>\n🟢 كفاءة التشغيل: <code>{eff}%</code>",
         'support_text': "📞 <b>مركز خدمة العملاء:</b>\nنظراً للضغط، يستغرق الرد من 24 إلى 48 ساعة.",
@@ -99,10 +99,8 @@ def is_admin(user_id):
 def call_api(method, payload):
     api_url = f"https://api.telegram.org/bot{TOKEN}/{method}"
     req = urllib.request.Request(api_url, data=json.dumps(payload).encode('utf-8'), headers={'Content-Type': 'application/json'})
-    try:
-        return json.loads(urllib.request.urlopen(req, timeout=5).read().decode('utf-8'))
-    except Exception:
-        return None
+    try: return json.loads(urllib.request.urlopen(req, timeout=5).read().decode('utf-8'))
+    except Exception: return None
 
 def send_msg(chat_id, text, markup=None):
     payload = {"chat_id": chat_id, "text": text, "parse_mode": "HTML", "disable_web_page_preview": True}
@@ -115,8 +113,7 @@ def delete_msg(chat_id, msg_id):
 def check_sub(user_id, channel_id):
     if not channel_id: return True
     res = call_api("getChatMember", {"chat_id": channel_id, "user_id": user_id})
-    if res and res.get('ok'):
-        return res['result']['status'] in ['member', 'administrator', 'creator']
+    if res and res.get('ok'): return res['result']['status'] in ['member', 'administrator', 'creator']
     return False
 
 def get_text(lang, key, **kwargs):
@@ -151,7 +148,6 @@ def calculate_and_update_mining(user):
     speed = float(user.get('speed', 0.0000000115))
     last = int(user.get('last_update') or now)
     earned = (now - last) * speed
-    
     if earned > 0:
         user['balance'] = bal + earned
         user['last_update'] = now
@@ -191,8 +187,7 @@ def process_message(msg):
         unjoined = [ch for ch in main_channels if ch.get('ch_id') and not check_sub(user_id, ch['ch_id'])]
         if unjoined:
             markup = {"inline_keyboard": []}
-            for ch in unjoined:
-                markup["inline_keyboard"].append([{"text": f"📢 Join {ch['name']}", "url": ch['url']}])
+            for ch in unjoined: markup["inline_keyboard"].append([{"text": f"📢 Join {ch['name']}", "url": ch['url']}])
             markup["inline_keyboard"].append([{"text": "✅ Verify / تحقق", "callback_data": "check_main_sub"}])
             send_msg(chat_id, get_text(lang, 'sub_req'), markup)
             return
@@ -201,8 +196,7 @@ def process_message(msg):
 
     if text == get_text(lang, 'btn_refresh') or text == "/start":
         user = calculate_and_update_mining(user)
-        if text == "/start":
-            send_msg(chat_id, "✅", get_reply_keyboard(lang, user_is_admin))
+        if text == "/start": send_msg(chat_id, "✅", get_reply_keyboard(lang, user_is_admin))
         send_msg(chat_id, get_text(lang, 'main_menu', balance=float(user['balance']), speed=float(user['speed'])*86400, refs=int(user['ref_count'])))
         return
 
@@ -226,7 +220,8 @@ def process_message(msg):
 
     elif text == get_text(lang, 'btn_team'):
         link = f"https://t.me/{BOT_USERNAME}?start={user_id}"
-        send_msg(chat_id, get_text(lang, 'team_msg', refs=int(user['ref_count']), link=link))
+        ref_p = float(get_setting("ref_percent", "50"))
+        send_msg(chat_id, get_text(lang, 'team_msg', ref_p=ref_p, refs=int(user['ref_count']), link=link))
         return
 
     elif text == get_text(lang, 'btn_daily_bonus'):
@@ -262,72 +257,58 @@ def process_message(msg):
 
     elif text == get_text(lang, 'btn_reward_ch'):
         channels = supabase.table("channels").select("*").eq("type", "speed").execute().data
-        if not channels:
-            send_msg(chat_id, "📢 لا توجد قنوات مكافآت حالياً." if lang=='ar' else "📢 No reward channels available.")
-            return
+        if not channels: return send_msg(chat_id, "📢 لا توجد قنوات مكافآت حالياً." if lang=='ar' else "📢 No reward channels available.")
         ch_reward_val = get_setting("ch_reward", "0.004")
         send_msg(chat_id, f"🎁 <b>اشترك واربح {ch_reward_val} DOGE فوراً:</b>" if lang=='ar' else f"🎁 <b>Join & Earn {ch_reward_val} DOGE:</b>")
         for ch in channels:
             j_res = supabase.table("joined_speed_channels").select("*").eq("user_id", user_id).eq("ch_id", ch['id']).execute()
-            if j_res.data:
-                status_btn = [{"text": "✅ Claimed / تم الاستلام", "callback_data": "already_active"}]
-            else:
-                status_btn = [{"text": f"📢 Join {ch['name']}", "url": ch['url']}, {"text": "🎁 Verify & Claim", "callback_data": f"verify_reward_{ch['id']}"}]
+            status_btn = [{"text": "✅ Claimed / تم الاستلام", "callback_data": "already_active"}] if j_res.data else [{"text": f"📢 Join {ch['name']}", "url": ch['url']}, {"text": "🎁 Verify & Claim", "callback_data": f"verify_reward_{ch['id']}"}]
             send_msg(chat_id, f"🔹 <b>{ch['name']}</b>", {"inline_keyboard": [status_btn]})
         return
 
-    elif text == get_text(lang, 'btn_calc'):
-        send_msg(chat_id, get_text(lang, 'calc_text'))
-        return
-
-    elif text == get_text(lang, 'btn_stats'):
+    elif text == get_text(lang, 'btn_calc'): return send_msg(chat_id, get_text(lang, 'calc_text'))
+    elif text == get_text(lang, 'btn_stats'): 
         miners_dyn, eff_dyn = get_dynamic_stats()
-        send_msg(chat_id, get_text(lang, 'stats_text', miners=miners_dyn, eff=eff_dyn))
-        return
-
-    elif text == get_text(lang, 'btn_about'):
-        send_msg(chat_id, get_text(lang, 'about_text'))
-        return
-
+        return send_msg(chat_id, get_text(lang, 'stats_text', miners=miners_dyn, eff=eff_dyn))
+    elif text == get_text(lang, 'btn_about'): return send_msg(chat_id, get_text(lang, 'about_text'))
     elif text == get_text(lang, 'btn_support'):
         custom_support = get_setting(f"support_text_{lang}", "")
-        send_msg(chat_id, custom_support if custom_support else get_text(lang, 'support_text'))
-        return
-
+        return send_msg(chat_id, custom_support if custom_support else get_text(lang, 'support_text'))
     elif text == get_text(lang, 'btn_admin') and user_is_admin:
         min_w = get_setting("min_withdraw", "0.01")
         ch_r = get_setting("ch_reward", "0.004")
         daily_b = get_setting("daily_bonus", "0.005")
+        ref_p = get_setting("ref_percent", "50")
         btns = [
             [{"text": "💰 زيادة رصيد", "callback_data": "admin_add_bal"}, {"text": "📢 إذاعة", "callback_data": "admin_broadcast"}],
-            [{"text": f"⚙️ الحد الأدنى للسحب ({min_w})", "callback_data": "admin_set_min_w"}, {"text": f"⚙️ مكافأة القنوات ({ch_r})", "callback_data": "admin_set_ch_r"}],
-            [{"text": f"⚙️ الهدية اليومية ({daily_b})", "callback_data": "admin_set_daily_b"}],
+            [{"text": f"⚙️ الحد الأدنى ({min_w})", "callback_data": "admin_set_min_w"}, {"text": f"⚙️ مكافأة القنوات ({ch_r})", "callback_data": "admin_set_ch_r"}],
+            [{"text": f"⚙️ الهدية اليومية ({daily_b})", "callback_data": "admin_set_daily_b"}, {"text": f"⚙️ نسبة الإحالة ({ref_p}%)", "callback_data": "admin_set_ref_p"}],
             [{"text": "📝 تعديل الدعم الفني", "callback_data": "admin_set_support"}, {"text": "👥 مراقبة المحتالين", "callback_data": "admin_top_refs"}],
             [{"text": "➕ قناة إجبارية", "callback_data": "admin_add_main_ch"}, {"text": "📢 قناة ربح", "callback_data": "admin_add_speed_ch"}],
-            [{"text": "🔗 مهمة رابط", "callback_data": "admin_add_shortlink"}],
-            [{"text": "🗑️ إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}],
-            [{"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}]
+            [{"text": "🔗 مهمة رابط", "callback_data": "admin_add_shortlink"}, {"text": "👑 مشرف فرعي", "callback_data": "admin_add_admin"}],
+            [{"text": "🗑️ إدارة القنوات", "callback_data": "admin_manage_channels"}, {"text": "🗑️ المهام", "callback_data": "admin_manage_tasks"}]
         ]
-        send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
-        return
+        return send_msg(chat_id, get_text(lang, 'admin_panel'), {"inline_keyboard": btns})
 
-    # 4. معالجة النصوص للمشرفين وحالات الانتظار
+    # ================= حالات الانتظار والفلاتر الأمنية =================
     if state == 'wait_wallet':
-        if text in system_btns:
-            update_user(user_id, {"state": "idle"})
-            return
+        if text in system_btns: return update_user(user_id, {"state": "idle"})
+        wallet_str = text.strip()
+        is_doge_address = wallet_str.startswith("D") and len(wallet_str) >= 30 and wallet_str.isalnum()
+        is_fp_email = "@" in wallet_str and "." in wallet_str
+        if not (is_doge_address or is_fp_email):
+            err_msg = "❌ <b>عنوان غير صالح!</b>\nيرجى إرسال عنوان Dogecoin صحيح أو إيميل FaucetPay." if lang == 'ar' else "❌ <b>Invalid Address!</b>\nSend a valid DOGE address or FaucetPay email."
+            return send_msg(chat_id, err_msg)
+        
         user = calculate_and_update_mining(user)
         for adm in supabase.table("admins").select("user_id").execute().data:
-            send_msg(adm['user_id'], f"🔔 <b>طلب سحب عاجل!</b>\n👤 آيدي: <code>{user_id}</code>\n💰 الرصيد: <code>{user['balance']:.8f}</code>\n🏦 المحفظة:\n<code>{text}</code>")
-        supabase.table("withdrawals").insert({"user_id": user_id, "amount": user['balance'], "wallet": text, "status": "pending", "created_at": now}).execute()
+            send_msg(adm['user_id'], f"🔔 <b>طلب سحب عاجل!</b>\n👤 آيدي: <code>{user_id}</code>\n💰 الرصيد: <code>{user['balance']:.8f}</code>\n🏦 المحفظة:\n<code>{wallet_str}</code>")
+        supabase.table("withdrawals").insert({"user_id": user_id, "amount": user['balance'], "wallet": wallet_str, "status": "pending", "created_at": now}).execute()
         update_user(user_id, {"balance": 0.0, "state": "idle"})
-        send_msg(chat_id, get_text(lang, 'withdraw_done'))
-        return
+        return send_msg(chat_id, get_text(lang, 'withdraw_done'))
 
     elif state.startswith('wait_pass_'):
-        if text in system_btns:
-            update_user(user_id, {"state": "idle"})
-            return
+        if text in system_btns: return update_user(user_id, {"state": "idle"})
         task_id = int(state.split('_')[2])
         t_res = supabase.table("shortlinks").select("*").eq("id", task_id).execute()
         if t_res.data and text.strip() == t_res.data[0]['password']:
@@ -340,43 +321,39 @@ def process_message(msg):
             send_msg(chat_id, "❌ <b>كلمة السر خاطئة!</b>")
         return
 
+    # إعدادات الإدارة
     elif state == 'admin_broadcast' and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         for u in supabase.table("users").select("user_id").execute().data:
             try: send_msg(u['user_id'], f"📢 <b>إعلان رسمي:</b>\n\n{text}")
             except: pass
         update_user(user_id, {"state": "idle"})
-        send_msg(chat_id, "✅ تم إرسال الإذاعة.")
-        return
-
+        return send_msg(chat_id, "✅ تم إرسال الإذاعة.")
     elif state == 'admin_set_min_w' and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         set_setting("min_withdraw", float(text.strip()))
         update_user(user_id, {"state": "idle"})
-        send_msg(chat_id, f"✅ تم تحديث الحد الأدنى.")
-        return
-
+        return send_msg(chat_id, f"✅ تم تحديث الحد الأدنى.")
     elif state == 'admin_set_ch_r' and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         set_setting("ch_reward", float(text.strip()))
         update_user(user_id, {"state": "idle"})
-        send_msg(chat_id, f"✅ تم تحديث مكافأة القنوات بنجاح.")
-        return
-
+        return send_msg(chat_id, f"✅ تم تحديث مكافأة القنوات.")
     elif state == 'admin_set_daily_b' and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         set_setting("daily_bonus", float(text.strip()))
         update_user(user_id, {"state": "idle"})
-        send_msg(chat_id, f"✅ تم تحديث قيمة الهدية اليومية بنجاح.")
-        return
-
+        return send_msg(chat_id, f"✅ تم تحديث الهدية اليومية.")
+    elif state == 'admin_set_ref_p' and user_is_admin:
+        if text in system_btns: return update_user(user_id, {"state": "idle"})
+        set_setting("ref_percent", float(text.strip()))
+        update_user(user_id, {"state": "idle"})
+        return send_msg(chat_id, f"✅ تم تحديث نسبة الإحالة بنجاح.")
     elif state == 'admin_set_support' and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         set_setting(f"support_text_{lang}", text)
         update_user(user_id, {"state": "idle"})
-        send_msg(chat_id, "✅ تم تحديث رسالة الدعم الفني لغتك الحالية.")
-        return
-
+        return send_msg(chat_id, "✅ تم تحديث رسالة الدعم الفني.")
     elif state in ['admin_add_main_ch', 'admin_add_speed_ch'] and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         ch_type = 'main' if state == 'admin_add_main_ch' else 'speed'
@@ -386,26 +363,19 @@ def process_message(msg):
         if test and test.get('ok'):
             supabase.table("channels").insert({"name": test['result'].get('title', 'قناة'), "url": test['result'].get('invite_link') or f"https://t.me/{test['result'].get('username', '')}", "ch_id": str(ch_id), "type": ch_type}).execute()
             send_msg(chat_id, "✅ تمت إضافة القناة بنجاح.")
-        else:
-            send_msg(chat_id, "❌ البوت ليس مشرفاً في القناة أو المعرف خطأ.")
-        update_user(user_id, {"state": "idle"})
-        return
-
+        else: send_msg(chat_id, "❌ البوت ليس مشرفاً في القناة أو المعرف خطأ.")
+        return update_user(user_id, {"state": "idle"})
     elif state == 'admin_add_shortlink' and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         parts = text.split('|')
         if len(parts) == 4:
             supabase.table("shortlinks").insert({"description": parts[0].strip(), "url": parts[1].strip(), "password": parts[2].strip(), "reward": float(parts[3].strip())}).execute()
             send_msg(chat_id, "✅ تمت الإضافة.")
-        update_user(user_id, {"state": "idle"})
-        return
-
+        return update_user(user_id, {"state": "idle"})
     elif state == 'admin_wait_bal_id' and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         update_user(user_id, {"state": f'admin_wait_bal_amt_{text}'})
-        send_msg(chat_id, "💰 أرسل المبلغ:")
-        return
-
+        return send_msg(chat_id, "💰 أرسل المبلغ:")
     elif state.startswith('admin_wait_bal_amt_') and user_is_admin:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         t_id = int(state.split('_')[4])
@@ -413,15 +383,12 @@ def process_message(msg):
         if t_user:
             update_user(t_id, {"balance": float(t_user.get('balance',0)) + float(text)})
             send_msg(chat_id, "✅ تمت الإضافة.")
-        update_user(user_id, {"state": "idle"})
-        return
-
+        return update_user(user_id, {"state": "idle"})
     elif state == 'admin_wait_admin_id' and user_id == OWNER_ID:
         if text in system_btns: return update_user(user_id, {"state": "idle"})
         supabase.table("admins").upsert({"user_id": int(text)}).execute()
         update_user(user_id, {"state": "idle"})
-        send_msg(chat_id, "✅ تم تعيين المشرف.")
-        return
+        return send_msg(chat_id, "✅ تم تعيين المشرف.")
 
 # ================= معالجة الأزرار المدمجة =================
 def process_callback(cq):
@@ -436,8 +403,10 @@ def process_callback(cq):
         if user and user.get('captcha_passed', 0) == 0 and user.get('referrer_id'):
             ref_user = get_user(user['referrer_id'])
             if ref_user:
-                update_user(user['referrer_id'], {"speed": float(ref_user['speed']) * 1.3, "ref_count": int(ref_user['ref_count']) + 1})
-                send_msg(user['referrer_id'], get_text(ref_user.get('lang', 'en'), 'ref_notify'))
+                ref_p = float(get_setting("ref_percent", "50"))
+                multiplier = 1.0 + (ref_p / 100.0)
+                update_user(user['referrer_id'], {"speed": float(ref_user['speed']) * multiplier, "ref_count": int(ref_user['ref_count']) + 1})
+                send_msg(user['referrer_id'], get_text(ref_user.get('lang', 'en'), 'ref_notify', ref_p=ref_p))
         update_user(user_id, {"captcha_passed": 1})
         delete_msg(chat_id, msg_id)
         
@@ -470,8 +439,7 @@ def process_callback(cq):
             update_user(user_id, {"balance": float(user.get('balance', 0)) + reward})
             supabase.table("joined_speed_channels").upsert({"user_id": user_id, "ch_id": ch_id_pk}).execute()
             send_msg(chat_id, f"🎉 <b>مبروك!</b> استلمت مكافأة {reward} DOGE!")
-        else:
-            send_msg(chat_id, "❌ لم تشترك في القناة بعد!")
+        else: send_msg(chat_id, "❌ لم تشترك في القناة بعد!")
 
     elif data.startswith("enter_pass_"):
         update_user(user_id, {"state": f"wait_pass_{data.split('_')[2]}"})
@@ -479,47 +447,38 @@ def process_callback(cq):
 
     # أزرار الإدارة
     elif data == "admin_broadcast" and user_is_admin:
-        update_user(user_id, {"state": "admin_broadcast"})
-        send_msg(chat_id, "📢 <b>أرسل الرسالة للإذاعة:</b>")
+        update_user(user_id, {"state": "admin_broadcast"}); send_msg(chat_id, "📢 <b>أرسل الرسالة للإذاعة:</b>")
     elif data == "admin_set_min_w" and user_is_admin:
-        update_user(user_id, {"state": "admin_set_min_w"})
-        send_msg(chat_id, "⚙️ أرسل الحد الأدنى الجديد:")
+        update_user(user_id, {"state": "admin_set_min_w"}); send_msg(chat_id, "⚙️ أرسل الحد الأدنى الجديد:")
     elif data == "admin_set_ch_r" and user_is_admin:
-        update_user(user_id, {"state": "admin_set_ch_r"})
-        send_msg(chat_id, "⚙️ أرسل قيمة المكافأة للقنوات:")
+        update_user(user_id, {"state": "admin_set_ch_r"}); send_msg(chat_id, "⚙️ أرسل قيمة المكافأة للقنوات:")
     elif data == "admin_set_daily_b" and user_is_admin:
-        update_user(user_id, {"state": "admin_set_daily_b"})
-        send_msg(chat_id, "⚙️ أرسل قيمة الهدية اليومية الجديدة بالـ DOGE:")
+        update_user(user_id, {"state": "admin_set_daily_b"}); send_msg(chat_id, "⚙️ أرسل قيمة الهدية اليومية:")
+    elif data == "admin_set_ref_p" and user_is_admin:
+        update_user(user_id, {"state": "admin_set_ref_p"}); send_msg(chat_id, "⚙️ أرسل نسبة الإحالة الجديدة كـ رقم (مثال: 50):")
     elif data == "admin_set_support" and user_is_admin:
-        update_user(user_id, {"state": "admin_set_support"})
-        send_msg(chat_id, "📝 أرسل رسالة الدعم الفني الجديدة:")
+        update_user(user_id, {"state": "admin_set_support"}); send_msg(chat_id, "📝 أرسل رسالة الدعم الفني الجديدة:")
     elif data == "admin_top_refs" and user_is_admin:
         top_list = supabase.table("users").select("*").gt("ref_count", 10).order("ref_count", desc=True).limit(30).execute().data
-        if top_list: send_msg(chat_id, "👥 <b>المحتالون/المتفاعلون (>10):</b>\n" + "".join([f"👤 {t['user_id']} | 👥 {t['ref_count']} | 💰 {float(t['balance']):.4f}\n" for t in top_list]))
+        if top_list: send_msg(chat_id, "👥 <b>المتفاعلون (>10):</b>\n" + "".join([f"👤 {t['user_id']} | 👥 {t['ref_count']} | 💰 {float(t['balance']):.4f}\n" for t in top_list]))
     elif data == "admin_add_main_ch" and user_is_admin:
-        update_user(user_id, {"state": "admin_add_main_ch"})
-        send_msg(chat_id, "➕ <b>إضافة قناة إجبارية:</b> أرسل المعرف أو وجه رسالة.")
+        update_user(user_id, {"state": "admin_add_main_ch"}); send_msg(chat_id, "➕ <b>إضافة قناة إجبارية:</b> أرسل المعرف أو وجه رسالة.")
     elif data == "admin_add_speed_ch" and user_is_admin:
-        update_user(user_id, {"state": "admin_add_speed_ch"})
-        send_msg(chat_id, "📢 <b>إضافة قناة ربح:</b> أرسل المعرف أو وجه رسالة.")
+        update_user(user_id, {"state": "admin_add_speed_ch"}); send_msg(chat_id, "📢 <b>إضافة قناة ربح:</b> أرسل المعرف أو وجه رسالة.")
     elif data == "admin_add_shortlink" and user_is_admin:
-        update_user(user_id, {"state": "admin_add_shortlink"})
-        send_msg(chat_id, "🔗 أرسل: <code>الوصف | الرابط | كلمة_السر | المكافأة</code>")
+        update_user(user_id, {"state": "admin_add_shortlink"}); send_msg(chat_id, "🔗 أرسل: <code>الوصف | الرابط | كلمة_السر | المكافأة</code>")
     elif data == "admin_manage_channels" and user_is_admin:
-        ch_list = supabase.table("channels").select("*").execute().data
-        for ch in ch_list: send_msg(chat_id, f"📢 {ch['name']}", {"inline_keyboard": [[{"text": f"❌ حذف", "callback_data": f"del_ch_{ch['id']}"}]]})
+        for ch in supabase.table("channels").select("*").execute().data: send_msg(chat_id, f"📢 {ch['name']}", {"inline_keyboard": [[{"text": f"❌ حذف", "callback_data": f"del_ch_{ch['id']}"}]]})
     elif data.startswith("del_ch_") and user_is_admin:
-        supabase.table("channels").delete().eq("id", int(data.split("_")[2])).execute()
-        send_msg(chat_id, "✅ تم الحذف.")
+        supabase.table("channels").delete().eq("id", int(data.split("_")[2])).execute(); send_msg(chat_id, "✅ تم الحذف.")
     elif data == "admin_manage_tasks" and user_is_admin:
-        t_list = supabase.table("shortlinks").select("*").execute().data
-        for t in t_list: send_msg(chat_id, f"📌 {t['description']}", {"inline_keyboard": [[{"text": f"❌ حذف", "callback_data": f"del_task_{t['id']}"}]]})
+        for t in supabase.table("shortlinks").select("*").execute().data: send_msg(chat_id, f"📌 {t['description']}", {"inline_keyboard": [[{"text": f"❌ حذف", "callback_data": f"del_task_{t['id']}"}]]})
     elif data.startswith("del_task_") and user_is_admin:
-        supabase.table("shortlinks").delete().eq("id", int(data.split("_")[2])).execute()
-        send_msg(chat_id, "✅ تم الحذف.")
+        supabase.table("shortlinks").delete().eq("id", int(data.split("_")[2])).execute(); send_msg(chat_id, "✅ تم الحذف.")
     elif data == "admin_add_bal" and user_is_admin:
-        update_user(user_id, {"state": "admin_wait_bal_id"})
-        send_msg(chat_id, "💰 أرسل آيدي المستخدم:")
+        update_user(user_id, {"state": "admin_wait_bal_id"}); send_msg(chat_id, "💰 أرسل آيدي المستخدم:")
+    elif data == "admin_add_admin" and user_id == OWNER_ID:
+        update_user(user_id, {"state": "admin_wait_admin_id"}); send_msg(chat_id, "👑 أرسل آيدي المشرف الجديد:")
 
 # ================= ممر Vercel Serverless =================
 class handler(BaseHTTPRequestHandler):
