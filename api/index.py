@@ -23,7 +23,7 @@ LANG = {
         'btn_tasks': "🔗 Shortlinks Tasks",
         'btn_reward_ch': "🎁 Join & Earn",
         'btn_daily_bonus': "🎁 Daily Bonus",
-        'btn_about': "🖥️️ Mining Hardware",
+        'btn_about': "🖥 Mining Hardware",
         'btn_stats': "📊 Network Stats",
         'btn_calc': "🧮 Profit Calculator",
         'btn_support': "📞 Support",
@@ -32,7 +32,7 @@ LANG = {
         'captcha_msg': "🤖 <b>Anti-Bot System:</b>\nClick the unique symbol (🔴) to authenticate.",
         'captcha_ok': "Human verification successful!",
         'captcha_fail': "❌ Verification failed! Please try again.",
-        'sub_req': "⚠️ <b>Action Required!</b>\nJoin ALL our official channels below to unlock your miner:",
+        'sub_req': "⚠️️ <b>Action Required!</b>\nJoin ALL our official channels below to unlock your miner:",
         'main_menu': "⛏ <b>Active Mining Servers</b>\n\n💰 Live Balance: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ Hash Power: <code>{speed:.8f}</code> DOGE/Day\n👥 Team Size: <code>{refs}</code>\n\n<i>🟢 Server Status: Online & Stable (Cloud).</i>",
         'team_msg': "👥 <b>Partner Program:</b>\nEarn a <b>{ref_p}%</b> mining speed boost for every verified referral.\n\n📊 Team Members: <code>{refs}</code>\n🔗 Your Referral Link:\n<code>{link}</code>",
         'withdraw_err': "❌ Balance is below the minimum threshold ({min} DOGE).",
@@ -403,10 +403,15 @@ def process_callback(cq):
         if user and user.get('captcha_passed', 0) == 0 and user.get('referrer_id'):
             ref_user = get_user(user['referrer_id'])
             if ref_user:
+                # 🛑 التعديل المالي الحاسم: حساب الإضافة من السرعة الأساسية بشكل ثابت ومصدري
                 ref_p = float(get_setting("ref_percent", "50"))
-                multiplier = 1.0 + (ref_p / 100.0)
-                update_user(user['referrer_id'], {"speed": float(ref_user['speed']) * multiplier, "ref_count": int(ref_user['ref_count']) + 1})
+                base_speed = 0.0000000115
+                bonus_speed = base_speed * (ref_p / 100.0)
+                new_speed = float(ref_user['speed']) + bonus_speed
+                
+                update_user(user['referrer_id'], {"speed": new_speed, "ref_count": int(ref_user['ref_count']) + 1})
                 send_msg(user['referrer_id'], get_text(ref_user.get('lang', 'en'), 'ref_notify', ref_p=ref_p))
+                
         update_user(user_id, {"captcha_passed": 1})
         delete_msg(chat_id, msg_id)
         
