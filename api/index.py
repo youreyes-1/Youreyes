@@ -35,7 +35,7 @@ LANG = {
         'main_menu': "⛏ <b>Active Mining Servers</b>\n\n💰 Live Balance: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ Hash Power: <code>{speed:.8f}</code> DOGE/Day\n👥 Direct Team: <code>{refs}</code>\n\n<i>🟢 Server Status: Online & Stable (Cloud).</i>",
         'team_msg': "👥 <b>Multi-Tier Partner Program:</b>\nBuild your network and earn from 3 levels deep!\n\n🥇 Tier 1 (Direct): <b>+{t1}%</b> speed\n🥈 Tier 2: <b>+{t2}%</b> speed\n🥉 Tier 3: <b>+{t3}%</b> speed\n\n📊 Direct Invites: <code>{refs}</code>\n🔗 Your Referral Link:\n<code>{link}</code>",
         'withdraw_err': "❌ Balance is below the minimum threshold ({min} DOGE).",
-        'withdraw_req': "💸 <b>Secure Withdrawal:</b>\nSend your <b>Dogecoin (FaucetPay)</b> wallet address (Start with D or Email):",
+        'withdraw_req': "💸 <b>Secure Zero-Fee Withdrawal:</b>\n\nPlease send your <b>FaucetPay Email</b> or <b>Username</b>.\n\n❓ <i>How to get it?</i>\nDo NOT send a DOGE address starting with 'D'. Simply send the exact Email you used to register on FaucetPay.io, or your profile Username. This ensures instant, fee-free transfer.",
         'withdraw_done': "✅ <b>Request Logged!</b>\nYour payout is under review.",
         'ref_notify': "🎉 <b>Great News!</b>\nA user joined your network (Tier {level}). Speed increased by {ref_p}%!",
         'earn_menu': "🎯 <b>Earn & Tasks Center:</b>\n💰 Balance: <code>{balance:.8f}</code> DOGE\n\nChoose a category to start earning:",
@@ -64,7 +64,7 @@ LANG = {
         'main_menu': "⛏ <b>خوادم التعدين النشطة</b>\n\n💰 الرصيد المباشر: <code>{balance:.8f}</code> <b>DOGE</b>\n⚡ قوة التعدين: <code>{speed:.8f}</code> DOGE/يوم\n👥 إحالاتك المباشرة: <code>{refs}</code>\n\n<i>🟢 حالة الخادم: متصل ومستقر (سحابي).</i>",
         'team_msg': "👥 <b>نظام الإحالات الهرمي (3 أجيال):</b>\nابنِ شبكتك واربح من دعوات أصدقائك وأصدقاء أصدقائك!\n\n🥇 الجيل الأول (مباشر): <b>+{t1}%</b> سرعة\n🥈 الجيل الثاني: <b>+{t2}%</b> سرعة\n🥉 الجيل الثالث: <b>+{t3}%</b> سرعة\n\n📊 إحالاتك المباشرة: <code>{refs}</code> عضو\n🔗 رابط الدعوة الخاص بك:\n<code>{link}</code>",
         'withdraw_err': "❌ رصيدك الحالي أقل من الحد الأدنى للسحب ({min} DOGE).",
-        'withdraw_req': "💸 <b>بوابة السحب الآمنة:</b>\nأرسل عنوان محفظة <b>Dogecoin (FaucetPay)</b> (يبدأ بحرف D أو الإيميل):",
+        'withdraw_req': "💸 <b>بوابة السحب الآمنة (بدون رسوم):</b>\n\nأرسل <b>البريد الإلكتروني (Email)</b> أو <b>اسم المستخدم (Username)</b> الخاص بحسابك في FaucetPay.\n\n⚠️ <i>تنبيه هام جداً:</i>\nلا ترسل عنوان محفظة يبدأ بحرف D لأن ذلك يعرضك لرسوم شبكة عالية. فقط اكتب نفس الإيميل الذي سجلت به في موقع FaucetPay لضمان وصول الرصيد فوراً ومجاناً.",
         'withdraw_done': "✅ <b>تم استلام طلب السحب!</b>\nالطلب قيد المراجعة المالية.",
         'ref_notify': "🎉 <b>أخبار ممتازة!</b>\nانضم شخص لشبكتك (من الجيل {level}). زادت سرعتك بنسبة {ref_p}%!",
         'earn_menu': "🎯 <b>مركز المهام والربح:</b>\n💰 رصيدك: <code>{balance:.8f}</code> DOGE\n\nاختر القسم الذي تريد العمل عليه:",
@@ -188,44 +188,46 @@ def process_message(msg):
         send_msg(chat_id, get_text(lang, 'captcha_msg'), {"inline_keyboard": [btns]})
         return
 
-    # 🛑 هندسة إدارة الحالات العليا (متضمنة نظام الإضافة خطوة بخطوة وتعديل كلمات السر) 🛑
+    # 🛑 هندسة إدارة الحالات العليا 🛑
     if state != 'idle':
         if text in system_btns or text == "/start":
             update_user(user_id, {"state": "idle"})
             state = "idle" 
         else:
-            # --- حالات السحب ---
+            # --- حالات السحب المفلترة بصرامة ---
             if state.startswith('wait_wallet'):
                 wallet_str = text.strip()
-                is_doge_address = wallet_str.startswith("D") and len(wallet_str) >= 30 and wallet_str.isalnum()
-                is_fp_email = "@" in wallet_str and "." in wallet_str
                 
-                if not (is_doge_address or is_fp_email):
+                is_fp_email = "@" in wallet_str and "." in wallet_str
+                is_fp_user = wallet_str.isalnum() and len(wallet_str) >= 3 and len(wallet_str) < 30
+                is_doge_addr = wallet_str.startswith("D") and len(wallet_str) >= 30
+                
+                # الفلتر الأمني: يجب أن لا يكون عنوان دوج كوين، ويجب أن يكون إيميل أو يوزرنيم
+                if is_doge_addr or not (is_fp_email or is_fp_user):
                     parts = state.split('_')
                     attempt = int(parts[2]) if len(parts) > 2 else 1
                     
                     if attempt >= 2:
                         update_user(user_id, {"state": "idle"})
-                        err_msg = "❌ <b>تم إلغاء عملية السحب بسبب إدخال خاطئ متكرر!</b>" if lang == 'ar' else "❌ <b>Withdrawal cancelled due to multiple invalid inputs!</b>"
+                        err_msg = "❌ <b>تم إلغاء عملية السحب بسبب إدخال خاطئ متكرر!</b>\nالرجاء قراءة التعليمات جيداً قبل المحاولة." if lang == 'ar' else "❌ <b>Withdrawal cancelled due to multiple invalid inputs!</b>"
                         send_msg(chat_id, err_msg)
                         user = calculate_and_update_mining(user)
                         send_msg(chat_id, get_text(lang, 'main_menu', balance=float(user['balance']), speed=float(user['speed'])*86400, refs=int(user['ref_count'])), get_reply_keyboard(lang, user_is_admin))
                         return
                     else:
                         update_user(user_id, {"state": f"wait_wallet_{attempt + 1}"})
-                        err_msg = "❌ <b>عنوان غير صالح!</b>\nيرجى إرسال عنوان Dogecoin صحيح أو إيميل FaucetPay.\n\n⚠️ <i>هذه محاولتك الخاطئة الأولى، الإدخال الخاطئ القادم سيلغي العملية.</i>" if lang == 'ar' else "❌ <b>Invalid Address!</b>\nSend a valid DOGE address or FaucetPay email.\n\n⚠️ <i>Next invalid attempt will cancel the process.</i>"
+                        err_msg = "❌ <b>إدخال غير صالح!</b>\nأنت تحاول إرسال عنوان محفظة خارجي وهذا سيكلفك رسوماً باهظة.\n\nالرجاء إرسال <b>إيميل FaucetPay</b> أو <b>اسم المستخدم (Username)</b> فقط لتتم العملية بنجاح.\n\n⚠️ <i>المحاولة الخاطئة القادمة ستلغي العملية.</i>" if lang == 'ar' else "❌ <b>Invalid Input!</b>\nDo NOT send a DOGE address.\nPlease send your <b>FaucetPay Email</b> or <b>Username</b> only.\n\n⚠️ <i>Next invalid attempt will cancel the process.</i>"
                         send_msg(chat_id, err_msg)
                         return
                 else:
                     user = calculate_and_update_mining(user)
                     for adm in supabase.table("admins").select("user_id").execute().data:
-                        send_msg(adm['user_id'], f"🔔 <b>طلب سحب عاجل!</b>\n👤 آيدي: <code>{user_id}</code>\n💰 الرصيد: <code>{user['balance']:.8f}</code>\n🏦 المحفظة:\n<code>{wallet_str}</code>")
+                        send_msg(adm['user_id'], f"🔔 <b>طلب سحب عاجل!</b>\n👤 آيدي: <code>{user_id}</code>\n💰 الرصيد: <code>{user['balance']:.8f}</code>\n🏦 الحساب (إيميل/يوزر):\n<code>{wallet_str}</code>")
                     supabase.table("withdrawals").insert({"user_id": user_id, "amount": user['balance'], "wallet": wallet_str, "status": "pending", "created_at": now}).execute()
                     update_user(user_id, {"balance": 0.0, "state": "idle"})
                     send_msg(chat_id, get_text(lang, 'withdraw_done'))
                     return
             
-            # --- إدخال المستخدم لكلمة سر المهمة للربح ---
             elif state.startswith('wait_pass_'):
                 task_id = int(state.split('_')[2])
                 t_res = supabase.table("shortlinks").select("*").eq("id", task_id).execute()
@@ -239,9 +241,7 @@ def process_message(msg):
                     send_msg(chat_id, "❌ <b>كلمة السر خاطئة! تم الإلغاء.</b>")
                 return
 
-            # --- حالات الإدارة المتقدمة (Admin) ---
             elif user_is_admin:
-                # 🛑 معالج إضافة مهمة رابط خطوة بخطوة 🛑
                 if state == 'addsl_1':
                     desc = text.replace('===', '')
                     update_user(user_id, {"state": f"addsl_2==={desc}"})
@@ -272,7 +272,6 @@ def process_message(msg):
                     update_user(user_id, {"state": "idle"})
                     return
                 
-                # 🛑 معالج تعديل كلمة السر 🛑
                 elif state.startswith('admin_edit_pass_'):
                     t_id = int(state.split('_')[3])
                     supabase.table("shortlinks").update({"password": text.strip()}).eq("id", t_id).execute()
@@ -280,7 +279,6 @@ def process_message(msg):
                     send_msg(chat_id, "✅ <b>تم تحديث كلمة السر بنجاح!</b>\nالمستخدمين حيضطروا يتخطوا الرابط من جديد.")
                     return
 
-                # باقي حالات الإدارة
                 elif state == 'admin_broadcast':
                     for u in supabase.table("users").select("user_id").execute().data:
                         try: send_msg(u['user_id'], f"📢 <b>إعلان رسمي:</b>\n\n{text}")
@@ -663,7 +661,7 @@ def process_callback(cq):
                 f"⏱️ آخر ساعة: <code>{active_hour:,}</code>\n"
                 f"📅 آخر 24 ساعة: <code>{active_day:,}</code>\n"
                 f"📆 آخر أسبوع: <code>{active_week:,}</code>\n"
-                f"🗓️️ آخر شهر: <code>{active_month:,}</code>\n"
+                f"🗓 آخر شهر: <code>{active_month:,}</code>\n"
             )
             send_msg(chat_id, stats_msg)
         except Exception:
