@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سيف الساحر | Demon Slayer Sword</title>
+  <style>
+    :root {
+      --bg-dark: #07070b;
+      --accent-blue: #2E6BFF;
+      --accent-gold: #FFD24A;
+      --accent-red: #E74C3C;
+      --panel-bg: rgba(14, 14, 24, 0.88);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at center, #141224 0%, #050508 100%);
+      color: #f0f4f8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #game-wrapper {
+      position: relative;
+      width: 1024px;
+      height: 600px;
+      border-radius: 14px;
+      box-shadow: 0 0 70px rgba(46, 107, 255, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      background: #0a0a0f;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 8, 14, 0.86);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 28px;
+      text-align: center;
+      transition: opacity 0.25s ease;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    h1.game-title {
+      font-size: 3.4rem;
+      margin: 0 0 8px 0;
+      background: linear-gradient(135deg, #fff 0%, #7DE3FF 45%, #2E6BFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 35px rgba(46, 107, 255, 0.45);
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: #a5b2c6;
+      max-width: 620px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 24px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px 24px;
+      border-radius: 12px;
+      margin-bottom: 26px;
+      text-align: right;
+      font-size: 0.95rem;
+    }
+
+    .control-item span.key {
+      display: inline-block;
+      background: #1f2437;
+      color: #7DE3FF;
+      border: 1px solid #3b4668;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-left: 8px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #2E6BFF, #1b44b8);
+      color: #fff;
+      border: 1px solid #679bff;
+      padding: 13px 32px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(46, 107, 255, 0.4);
+      transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 0 35px rgba(125, 227, 255, 0.7);
+      filter: brightness(1.12);
+    }
+
+    .btn.secondary {
+      background: linear-gradient(135deg, #2d3246, #1b1e2b);
+      border-color: #525c7a;
+      box-shadow: none;
+    }
+
+    .cards-container {
+      display: flex;
+      gap: 18px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .perk-card {
+      background: linear-gradient(180deg, rgba(32, 38, 62, 0.95), rgba(16, 19, 32, 0.95));
+      border: 2px solid rgba(125, 227, 255, 0.25);
+      border-radius: 12px;
+      width: 230px;
+      padding: 20px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .perk-card:hover {
+      transform: translateY(-6px);
+      border-color: #FFD24A;
+      box-shadow: 0 10px 30px rgba(255, 210, 74, 0.25);
+    }
+
+    .perk-icon {
+      font-size: 2.6rem;
+      margin-bottom: 10px;
+    }
+
+    .perk-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #FFD24A;
+      margin-bottom: 8px;
+    }
+
+    .perk-desc {
+      font-size: 0.92rem;
+      color: #c3cfe2;
+      line-height: 1.45;
+    }
+
+    .stats-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 18px 32px;
+      margin: 16px 0 24px 0;
+      min-width: 340px;
+    }
+
+    .stat-line {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 0;
+      font-size: 1.05rem;
+    }
+
+    .rank-badge {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: #FFD24A;
+      text-shadow: 0 0 25px rgba(255, 210, 74, 0.8);
+      margin: 4px 0 10px 0;
+    }
+
+    #top-bar-hint {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #7c889e;
+      display: flex;
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-wrapper">
+    <canvas id="game" width="1024" height="600"></canvas>
+
+    <!-- شاشة البداية -->
+    <div id="menu-overlay" class="overlay">
+      <h1 class="game-title">🗡️ سيف الساحر</h1>
+      <p class="subtitle">
+        خمس مراحل في أعماق الجحيم، وستة تطورات لسيفك السحري. اقتل 10 شياطين في كل مرحلة ليترقّى سيفك في قلب المعركة وتختبر قوته فوراً على من تبقّى!
+      </p>
+
+      <div class="controls-grid">
+        <div class="control-item"><span class="key">WASD / الأسهم</span> الحركة في الساحة</div>
+        <div class="control-item"><span class="key">الماوس</span> توجيه السيف حول المحارب</div>
+        <div class="control-item"><span class="key">كليك يسار / J</span> ضربة السيف الأساسية</div>
+        <div class="control-item"><span class="key">كليك يمين / K</span> الضربة الخاصة للسيف</div>
+        <div class="control-item"><span class="key">Space</span> اندفاع سريع (مناعة 0.2 ثانية)</div>
+        <div class="control-item"><span class="key">M</span> كتم / تشغيل الصوت</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" id="btn-start">ابدأ المعركة 🔥</button>
+        <button class="btn secondary hidden" id="btn-continue">استكمال التقدم المحفوظ 💾</button>
+      </div>
+    </div>
+
+    <!-- شاشة صندوق المكافأة بين المراحل -->
+    <div id="chest-overlay" class="overlay hidden">
+      <h1 class="game-title" style="font-size:2.4rem;">🎁 غنيمة نهاية المرحلة</h1>
+      <p class="subtitle" id="chest-subtitle">اختر بركة واحدة لتعزيز محاربك قبل دخول المرحلة التالية:</p>
+      <div class="cards-container" id="perk-cards"></div>
+    </div>
+
+    <!-- شاشة النهاية / الفوز أو الخسارة -->
+    <div id="end-overlay" class="overlay hidden">
+      <h1 class="game-title" id="end-title">انتهت المعركة</h1>
+      <div class="rank-badge" id="end-rank">S</div>
+      <div class="stats-box" id="end-stats"></div>
+      <div class="btn-row">
+        <button class="btn" id="btn-restart">إعادة اللعب من البداية 🔄</button>
+        <button class="btn secondary hidden" id="btn-retry-stage">إعادة هذه المرحلة ⚔️</button>
+        <button class="btn secondary hidden" id="btn-endless">طور التحدي اللانهائي 👹</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="top-bar-hint">
+    <span>💡 نصيحة: الترقية تحدث عند القتلة العاشرة داخل المرحلة — راقب شريط الترقية أعلى الشاشة!</span>
+  </div>
+
+<script>
+/**
+ * ============================================================================
+ * 1. مولد الصوت التوليدي (Web Audio API Synthesizer)
+ * يصنع كافة المؤثرات الصوتية والنبضات الموسيقية برمجياً بدون أي ملفات خارجية
+ * ============================================================================
+ */
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.muted = false;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  toggleMute() {
+    this.muted = !this.muted;
+    return this.muted;
+  }
+
+  playSwing(swordIdx) {
+    if (this.muted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = swordIdx >= 3 ? 'sawtooth' : 'triangle';
+    const baseFreq = 180 + swordIdx * 55;
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(60, now + 0.14);
+
+    gain.gain.setValueAtTime(0.16, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.15);
+  }
+
+  playHit(isCrit = false) {
+    if (this.muted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(isCrit ? 150 : 110, now);
+    osc.frequency.exponentialRampToValueAtTime(35, now + 0.1);
+
+    gain.gain.setValueAtTime(0.22, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.1);
+  }
+
+  playDash() {
+    if (this.muted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(90, now + 0.16);
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.16);
+  }
+
+  playSpecial(type) {
+    if (this.muted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    if (type === 'lightningChain') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(620, now);
+      osc.frequency.linearRampToValueAtTime(180, now + 0.08);
+      osc.frequency.linearRampToValueAtTime(520, now + 0.16);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.32);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.33);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.33);
+    } else if (type === 'shockwave') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(38, now + 0.35);
+      gain.gain.setValueAtTime(0.28, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.36);
+    } else {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(160, now + 0.22);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.23);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.23);
+    }
+  }
+
+  playUpgradeFanfare() {
+    if (this.muted || !this.ctx) return;
+    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+    notes.forEach((freq, idx) => {
+      const now = this.ctx.currentTime + idx * 0.075;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.45);
+    });
+  }
+
+  playPlayerHurt() {
+    if (this.muted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(140, now);
+    osc.frequency.linearRampToValueAtTime(55, now + 0.25);
+    gain.gain.setValueAtTime(0.26, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.26);
+  }
+}
+
+const SFX = new SoundEngine();
+
+/**
+ * ============================================================================
+ * 2. جداول البيانات الأساسية (Data-Driven Architecture)
+ * السيوف الستة، قواعد الترقية، الشياطين الخمسة، والم
