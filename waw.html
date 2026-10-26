@@ -3,8 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>سيف الساحر | نسخة الموبايل الكاملة</title>
+  <title>سيف الساحر | Demon Slayer Sword</title>
   <style>
+    :root {
+      --bg-deep: #05050a;
+      --bg-panel: rgba(12, 14, 26, 0.94);
+      --blue-core: #2E6BFF;
+      --cyan-glow: #7DE3FF;
+      --gold-core: #FFD24A;
+      --red-core: #E74C3C;
+      --purple-core: #9B59B6;
+      --text-main: #F2F6FC;
+      --text-dim: #9EB0C7;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -12,16 +24,17 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
-      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #06060b;
-      color: #ffffff;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Tahoma, Arial, sans-serif;
       position: fixed;
       inset: 0;
     }
@@ -30,277 +43,614 @@
       display: block;
       width: 100vw;
       height: 100vh;
-      background: #090812;
+      background: #080711;
+      touch-action: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1;
     }
 
-    /* الشاشات التفاعلية المتجاوبة مع شاشة الهاتف */
     .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(7, 7, 14, 0.92);
-      backdrop-filter: blur(8px);
+      background: radial-gradient(circle at center, rgba(16, 20, 38, 0.94) 0%, rgba(5, 5, 12, 0.98) 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 50;
-      padding: 18px;
+      z-index: 100;
+      padding: 16px;
       text-align: center;
       overflow-y: auto;
+      touch-action: manipulation;
     }
 
     .hidden {
       display: none !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+    }
+
+    .panel-card {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(16, 20, 36, 0.92);
+      border: 1px solid rgba(125, 227, 255, 0.22);
+      border-radius: 18px;
+      padding: 20px 16px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.75), 0 0 35px rgba(46, 107, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .title {
-      font-size: clamp(2rem, 7vw, 3.2rem);
+      font-size: clamp(1.9rem, 6.5vw, 2.9rem);
       font-weight: 900;
       margin-bottom: 8px;
-      background: linear-gradient(135deg, #ffffff 0%, #7DE3FF 50%, #2E6BFF 100%);
+      background: linear-gradient(135deg, #ffffff 0%, #7DE3FF 48%, #2E6BFF 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 25px rgba(46, 107, 255, 0.5);
+      text-shadow: 0 0 28px rgba(46, 107, 255, 0.45);
+      line-height: 1.2;
     }
 
-    .desc {
-      font-size: clamp(0.9rem, 3.5vw, 1.1rem);
-      color: #b4c2d8;
-      max-width: 480px;
-      line-height: 1.5;
+    .subtitle {
+      font-size: clamp(0.88rem, 3.4vw, 1.02rem);
+      color: var(--text-dim);
+      line-height: 1.55;
+      margin-bottom: 14px;
+      max-width: 390px;
+    }
+
+    .guide-list {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(125, 227, 255, 0.16);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      text-align: right;
+    }
+
+    .guide-item {
+      font-size: clamp(0.8rem, 3.1vw, 0.92rem);
+      color: #dbe6f5;
+      margin-bottom: 7px;
+      line-height: 1.45;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .guide-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .swords-preview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      width: 100%;
       margin-bottom: 16px;
     }
 
-    .features-box {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(125, 227, 255, 0.2);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 20px;
-      width: 100%;
-      max-width: 420px;
-      text-align: right;
-      font-size: clamp(0.82rem, 3.2vw, 0.95rem);
-      line-height: 1.7;
-      color: #d8e3f0;
+    .sword-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 6px 4px;
+      font-size: 0.75rem;
+      color: #cad6e8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .sword-pill b {
+      font-size: 0.8rem;
     }
 
     .btn {
-      background: linear-gradient(135deg, #2E6BFF, #163ca8);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 340px;
+      padding: 15px 22px;
+      margin: 6px 0;
+      font-size: clamp(1.05rem, 4.3vw, 1.22rem);
+      font-weight: 800;
       color: #ffffff;
+      background: linear-gradient(135deg, #2E6BFF 0%, #1740B0 100%);
       border: 2px solid #7DE3FF;
       border-radius: 14px;
-      padding: 14px 28px;
-      font-size: clamp(1.05rem, 4.5vw, 1.25rem);
-      font-weight: 800;
-      width: 100%;
-      max-width: 320px;
-      margin: 6px 0;
       cursor: pointer;
-      box-shadow: 0 0 25px rgba(46, 107, 255, 0.55);
-      transition: transform 0.1s;
+      box-shadow: 0 0 28px rgba(46, 107, 255, 0.55);
+      touch-action: manipulation;
+      z-index: 110;
     }
 
     .btn:active {
-      transform: scale(0.96);
+      filter: brightness(1.2);
+      transform: scale(0.98);
     }
 
     .btn.secondary {
-      background: linear-gradient(135deg, #2b3147, #181c29);
-      border-color: #5c698a;
+      background: linear-gradient(135deg, #262c40 0%, #171b29 100%);
+      border-color: #556285;
       box-shadow: none;
+      font-size: clamp(0.95rem, 3.8vw, 1.08rem);
+      padding: 12px 18px;
     }
 
-    .cards-wrap {
+    .btn.gold {
+      background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+      border-color: #FFD24A;
+      box-shadow: 0 0 24px rgba(255, 210, 74, 0.45);
+    }
+
+    .perks-container {
       display: flex;
       flex-direction: column;
       gap: 10px;
       width: 100%;
-      max-width: 360px;
-      margin-top: 10px;
+      margin: 10px 0 6px 0;
     }
 
-    .perk-card {
-      background: linear-gradient(135deg, #1b2238, #101422);
+    .perk-item {
+      background: linear-gradient(135deg, rgba(28, 35, 58, 0.95) 0%, rgba(16, 20, 34, 0.95) 100%);
       border: 2px solid rgba(255, 210, 74, 0.45);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 12px 14px;
       display: flex;
       align-items: center;
       gap: 12px;
       text-align: right;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
-    .perk-card:active {
-      transform: scale(0.97);
+    .perk-item:active {
       border-color: #7DE3FF;
+      background: rgba(46, 107, 255, 0.25);
     }
 
-    .perk-icon {
+    .perk-emoji {
       font-size: 2.2rem;
       flex-shrink: 0;
     }
 
-    .perk-info h3 {
-      color: #FFD24A;
-      font-size: 1.05rem;
+    .perk-text h3 {
+      font-size: 1.02rem;
+      color: var(--gold-core);
       margin-bottom: 3px;
     }
 
-    .perk-info p {
-      color: #c2cee0;
-      font-size: 0.85rem;
+    .perk-text p {
+      font-size: 0.84rem;
+      color: #c5d2e6;
       line-height: 1.35;
     }
 
-    .stats-card {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      padding: 14px 18px;
+    .stats-table {
       width: 100%;
-      max-width: 340px;
-      margin: 10px 0 18px 0;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 10px 0 16px 0;
     }
 
     .stat-row {
       display: flex;
       justify-content: space-between;
-      padding: 6px 0;
+      align-items: center;
+      padding: 7px 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
 
-    .rank-big {
-      font-size: 3rem;
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .rank-badge {
+      font-size: 3.1rem;
       font-weight: 900;
-      color: #FFD24A;
-      text-shadow: 0 0 20px rgba(255, 210, 74, 0.8);
-      margin: 4px 0;
+      color: var(--gold-core);
+      text-shadow: 0 0 24px rgba(255, 210, 74, 0.85);
+      margin: 2px 0 6px 0;
+    }
+
+    #top-quick-bar {
+      position: fixed;
+      top: 60px;
+      left: 10px;
+      display: flex;
+      gap: 8px;
+      z-index: 30;
+    }
+
+    .mini-hud-btn {
+      background: rgba(16, 20, 34, 0.82);
+      border: 1px solid rgba(125, 227, 255, 0.35);
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .mini-hud-btn:active {
+      background: rgba(46, 107, 255, 0.5);
     }
   </style>
 </head>
 <body>
 
+  <!-- لوحة الرسم الأساسية -->
   <canvas id="game"></canvas>
 
-  <!-- شاشة البداية -->
+  <!-- أزرار سريعة أثناء اللعب -->
+  <div id="top-quick-bar" class="hidden">
+    <button type="button" class="mini-hud-btn" id="btn-mute" onclick="window.toggleAudioMute()">🔊 الصوت</button>
+    <button type="button" class="mini-hud-btn" id="btn-autoaim" onclick="window.toggleAutoAimMode()">🎯 توجيه تلقائي: مفعل</button>
+  </div>
+
+  <!-- شاشة البداية الرئيسية -->
   <div id="menu-screen" class="overlay">
-    <div class="title">🗡️ سيف الساحر</div>
-    <p class="desc">
-      نسخة الموبايل الكاملة! اقتل 10 شياطين في كل مرحلة ليترقّى سيفك في قلب المعركة من الخشبي حتى السيف الأزرق العظيم.
-    </p>
-    <div class="features-box">
-      <div>🕹️ <b>الجانب الأيسر:</b> عصا تحكم لمس للحركة والمراوغة</div>
-      <div>⚔️ <b>زر الضرب (الأكبر):</b> اضغط أو خليك ضاغط للهجوم والتوجيه التلقائي</div>
-      <div>⚡ <b>زر المهارة:</b> الضربة القاضية الخاصة بكل سيف</div>
-      <div>💨 <b>زر الاندفاع:</b> هروب سريع مع مناعة ضد الضربات</div>
+    <div class="panel-card">
+      <div class="title">🗡️ سيف الساحر</div>
+      <p class="subtitle">
+        نسخة الموبايل الكاملة! اقتل 10 شياطين في كل مرحلة ليترقّى سيفك في قلب المعركة من الخشبي حتى السيف الأزرق العظيم.
+      </p>
+
+      <div class="guide-list">
+        <div class="guide-item">🕹️ <span><b>الجانب الأيسر:</b> عصا تحكم لمس للحركة والمراوغة</span></div>
+        <div class="guide-item">⚔️ <span><b>زر الضرب (الأكبر):</b> اضغط أو خليك ضاغط للهجوم والتوجيه التلقائي</span></div>
+        <div class="guide-item">⚡ <span><b>زر المهارة:</b> الضربة القاضية الخاصة بكل سيف</span></div>
+        <div class="guide-item">💨 <span><b>زر الاندفاع:</b> هروب سريع مع مناعة 0.25 ثانية</span></div>
+      </div>
+
+      <div class="swords-preview">
+        <div class="sword-pill"><span>🪵</span><b style="color:#A66A38">الخشبي</b><span>ضرر 10</span></div>
+        <div class="sword-pill"><span>⚔️</span><b style="color:#C2CAD6">الحديدي</b><span>ضرر 20</span></div>
+        <div class="sword-pill"><span>🗡️</span><b style="color:#FFFFFF">الفولاذي</b><span>ضرر 28</span></div>
+        <div class="sword-pill"><span>✨</span><b style="color:#FFD24A">الذهبي</b><span>موجة قاطعة</span></div>
+        <div class="sword-pill"><span>💎</span><b style="color:#7DE3FF">الماسي</b><span>موجة صدمة</span></div>
+        <div class="sword-pill"><span>🔵</span><b style="color:#2E6BFF">الأزرق</b><span>صاعقة رعد</span></div>
+      </div>
+
+      <button
+        type="button"
+        class="btn"
+        id="start-btn"
+        onclick="window.forceStartGame(1, 0)"
+        ontouchend="event.preventDefault(); window.forceStartGame(1, 0);"
+      >
+        ابدأ المعركة الآن 🔥
+      </button>
+
+      <button
+        type="button"
+        class="btn secondary hidden"
+        id="continue-btn"
+        onclick="window.continueSavedGame()"
+        ontouchend="event.preventDefault(); window.continueSavedGame();"
+      >
+        استكمال المرحلة المحفوظة 💾
+      </button>
     </div>
-    <button class="btn" id="start-btn">ابدأ المعركة الآن 🔥</button>
-    <button class="btn secondary hidden" id="continue-btn">استكمال المرحلة المحفوظة 💾</button>
   </div>
 
-  <!-- شاشة صندوق المكافآت بين المراحل -->
+  <!-- شاشة صندوق الغنيمة بين المراحل -->
   <div id="chest-screen" class="overlay hidden">
-    <div class="title" style="font-size:1.9rem;">🎁 غنيمة المرحلة</div>
-    <p class="desc">اختر قوّة إضافية لمحاربك قبل المرحلة التالية:</p>
-    <div class="cards-wrap" id="perks-list"></div>
+    <div class="panel-card">
+      <div class="title" style="font-size:1.85rem;">🎁 غنيمة نهاية المرحلة</div>
+      <p class="subtitle">اختر بركة قتالية واحدة لتعزيز محاربك قبل دخول المرحلة التالية:</p>
+      <div class="perks-container" id="perks-list"></div>
+    </div>
   </div>
 
-  <!-- شاشة النهاية -->
+  <!-- شاشة النهاية (فوز أو خسارة) -->
   <div id="end-screen" class="overlay hidden">
-    <div class="title" id="end-title">انتهت المعركة</div>
-    <div class="rank-big" id="end-rank">S</div>
-    <div class="stats-card" id="end-stats"></div>
-    <button class="btn" id="retry-stage-btn">إعادة هذه المرحلة ⚔️</button>
-    <button class="btn secondary" id="restart-all-btn">اللعب من المرحلة الأولى 🔄</button>
-    <button class="btn secondary hidden" id="endless-btn">طور التحدي اللانهائي 👹</button>
+    <div class="panel-card">
+      <div class="title" id="end-title">انتهت المعركة</div>
+      <div class="rank-badge" id="end-rank">S</div>
+      <div class="stats-table" id="end-stats"></div>
+
+      <button
+        type="button"
+        class="btn"
+        id="retry-stage-btn"
+        onclick="window.retryCurrentStage()"
+        ontouchend="event.preventDefault(); window.retryCurrentStage();"
+      >
+        إعادة هذه المرحلة ⚔️
+      </button>
+
+      <button
+        type="button"
+        class="btn gold hidden"
+        id="endless-btn"
+        onclick="window.startEndlessMode()"
+        ontouchend="event.preventDefault(); window.startEndlessMode();"
+      >
+        طور التحدي اللانهائي 👹
+      </button>
+
+      <button
+        type="button"
+        class="btn secondary"
+        id="restart-all-btn"
+        onclick="window.forceStartGame(1, 0)"
+        ontouchend="event.preventDefault(); window.forceStartGame(1, 0);"
+      >
+        اللعب من المرحلة الأولى 🔄
+      </button>
+    </div>
   </div>
 
 <script>
 /**
  * ============================================================================
- * 1. إعداد الشاشة المتجاوبة مع جميع الهواتف (Responsive Fullscreen Canvas)
+ * القسم 1: دوال التحكم الفوري في النوافذ (مضمونة العمل 100% على اللمس في الهاتف)
+ * ============================================================================
+ */
+function hideScreen(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add('hidden');
+    el.style.display = 'none';
+  }
+}
+
+function showScreen(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.remove('hidden');
+    el.style.display = 'flex';
+  }
+}
+
+/**
+ * ============================================================================
+ * القسم 2: إعداد لوحة الرسم (Canvas) المتجاوبة مع جميع مقاسات شاشات الهواتف
  * ============================================================================
  */
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
-let W = window.innerWidth;
-let H = window.innerHeight;
+let W = window.innerWidth || 360;
+let H = window.innerHeight || 640;
 
-function resizeCanvas() {
-  W = window.innerWidth;
-  H = window.innerHeight;
+function updateCanvasDimensions() {
+  W = window.innerWidth || document.documentElement.clientWidth || 360;
+  H = window.innerHeight || document.documentElement.clientHeight || 640;
   canvas.width = W;
   canvas.height = H;
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+
+window.addEventListener('resize', updateCanvasDimensions);
+window.addEventListener('orientationchange', () => setTimeout(updateCanvasDimensions, 150));
+updateCanvasDimensions();
 
 /**
  * ============================================================================
- * 2. محرك الصوت التوليدي (Web Audio API) - يشتغل فور لمس الشاشة
+ * القسم 3: محرك الصوت التوليدي الكامل (Web Audio API Synthesizer)
+ * يصنع أصوات السيوف، الضربات، الرعد، الانفجارات، وموسيقى الترقية بدون ملفات
  * ============================================================================
  */
-class SoundSystem {
+class ProceduralAudioEngine {
   constructor() {
     this.ctx = null;
     this.muted = false;
   }
+
   unlock() {
     try {
       if (!this.ctx) {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        this.ctx = new AC();
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          this.ctx = new AudioContextClass();
+        }
       }
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-    } catch (e) {}
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    } catch (err) {
+      // تجاهل أي قيود صوتية من المتصفح حتى لا تتعطل اللعبة
+    }
   }
-  tone(freqStart, freqEnd, dur, type = 'triangle', vol = 0.18) {
+
+  playTone(freqStart, freqEnd, duration, waveType = 'triangle', volume = 0.16) {
     if (this.muted || !this.ctx) return;
     try {
       const now = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freqStart, now);
-      osc.frequency.exponentialRampToValueAtTime(Math.max(20, freqEnd), now + dur);
-      gain.gain.setValueAtTime(vol, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      osc.type = waveType;
+      osc.frequency.setValueAtTime(Math.max(20, freqStart), now);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(20, freqEnd), now + duration);
+
+      gain.gain.setValueAtTime(volume, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
       osc.connect(gain);
       gain.connect(this.ctx.destination);
+
       osc.start(now);
-      osc.stop(now + dur);
-    } catch (e) {}
+      osc.stop(now + duration);
+    } catch (err) {}
   }
-  swing(idx) { this.tone(200 + idx * 55, 65, 0.13, idx >= 3 ? 'sawtooth' : 'triangle', 0.15); }
-  hit() { this.tone(130, 38, 0.09, 'square', 0.2); }
-  dash() { this.tone(330, 95, 0.15, 'sine', 0.15); }
-  hurt() { this.tone(150, 45, 0.25, 'sawtooth', 0.25); }
-  special() { this.tone(520, 120, 0.28, 'sawtooth', 0.22); }
-  upgrade() {
+
+  playSwordSwing(swordIndex) {
+    const startFreq = 195 + swordIndex * 52;
+    const wave = swordIndex >= 3 ? 'sawtooth' : 'triangle';
+    this.playTone(startFreq, 62, 0.14, wave, 0.15);
+  }
+
+  playEnemyHit(isCritical = false) {
+    if (isCritical) {
+      this.playTone(180, 42, 0.12, 'sawtooth', 0.22);
+    } else {
+      this.playTone(125, 38, 0.09, 'square', 0.18);
+    }
+  }
+
+  playDashSound() {
+    this.playTone(350, 95, 0.15, 'sine', 0.15);
+  }
+
+  playSpecialSkill(abilityType) {
+    if (abilityType === 'lightningChain') {
+      this.playTone(680, 140, 0.28, 'sawtooth', 0.24);
+      setTimeout(() => this.playTone(540, 90, 0.22, 'square', 0.2), 70);
+    } else if (abilityType === 'shockwave') {
+      this.playTone(230, 35, 0.35, 'triangle', 0.26);
+    } else {
+      this.playTone(460, 150, 0.24, 'sawtooth', 0.2);
+    }
+  }
+
+  playPlayerHurt() {
+    this.playTone(145, 42, 0.26, 'sawtooth', 0.25);
+  }
+
+  playBossRoar() {
+    this.playTone(95, 28, 0.55, 'sawtooth', 0.28);
+  }
+
+  playUpgradeFanfare() {
     if (this.muted || !this.ctx) return;
-    [261, 329, 392, 523, 659, 784].forEach((f, i) => {
-      setTimeout(() => this.tone(f, f * 1.02, 0.32, 'triangle', 0.22), i * 65);
+    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+    notes.forEach((freq, idx) => {
+      setTimeout(() => {
+        this.playTone(freq, freq * 1.03, 0.34, 'triangle', 0.22);
+      }, idx * 65);
     });
   }
 }
-const SFX = new SoundSystem();
+
+const SFX = new ProceduralAudioEngine();
+
+window.toggleAudioMute = function() {
+  SFX.muted = !SFX.muted;
+  const btn = document.getElementById('btn-mute');
+  if (btn) {
+    btn.textContent = SFX.muted ? '🔇 صامت' : '🔊 الصوت';
+  }
+};
 
 /**
  * ============================================================================
- * 3. بيانات السيوف الستة، قواعد الترقية، الشياطين، والمراحل الخمس
+ * القسم 4: جداول البيانات الكاملة (السيوف الستة، الشياطين، والمراحل الخمس)
  * ============================================================================
  */
 const SWORDS = [
-  { id: 'wood',    name: 'السيف الخشبي',        icon: '🪵', dmg: 10, impBonus: 0,  range: 68,  cd: 0.42, color: '#A66A38', glow: 6,  ability: null,             specName: 'طعنة مندفعة',   specCd: 3.0 },
-  { id: 'iron',    name: 'السيف الحديدي',       icon: '⚔️', dmg: 20, impBonus: 10, range: 78,  cd: 0.37, color: '#C2CAD6', glow: 12, ability: null,             specName: 'قوس الحديد',    specCd: 3.0 },
-  { id: 'steel',   name: 'السيف الفولاذي',      icon: '🗡️', dmg: 28, impBonus: 10, range: 88,  cd: 0.30, color: '#FFFFFF', glow: 18, ability: 'fast',           specName: 'زوبعة 360°',    specCd: 3.2 },
-  { id: 'gold',    name: 'السيف الذهبي',        icon: '✨', dmg: 42, impBonus: 10, range: 102, cd: 0.27, color: '#FFD24A', glow: 24, ability: 'slashWave',      specName: 'ثلاثية الذهب',  specCd: 3.4 },
-  { id: 'diamond', name: 'السيف الماسي',        icon: '💎', dmg: 64, impBonus: 10, range: 118, cd: 0.23, color: '#7DE3FF', glow: 30, ability: 'shockwave',      specName: 'انفجار الماس',  specCd: 3.6 },
-  { id: 'blue',    name: 'السيف الأزرق العظيم', icon: '🔵', dmg: 98, impBonus: 20, range: 145, cd: 0.19, color: '#2E6BFF', glow: 38, ability: 'lightningChain', specName: 'عاصفة الرعد',   specCd: 3.8 }
+  {
+    id: 'wood',
+    name: 'السيف الخشبي',
+    icon: '🪵',
+    dmg: 10,
+    impBonus: 0,
+    range: 70,
+    cd: 0.42,
+    color: '#A66A38',
+    secondaryColor: '#D49B6A',
+    glow: 8,
+    bladeWidth: 6,
+    ability: null,
+    specName: 'طعنة الغاب المندفعة',
+    specCd: 2.8
+  },
+  {
+    id: 'iron',
+    name: 'السيف الحديدي',
+    icon: '⚔️',
+    dmg: 20,
+    impBonus: 12, // يضمن قتل العفريت (30 HP) بضربة واحدة فوراً!
+    range: 80,
+    cd: 0.37,
+    color: '#C2CAD6',
+    secondaryColor: '#FFFFFF',
+    glow: 14,
+    bladeWidth: 7,
+    ability: null,
+    specName: 'قوس الحديد القاطع',
+    specCd: 3.0
+  },
+  {
+    id: 'steel',
+    name: 'السيف الفولاذي',
+    icon: '🗡️',
+    dmg: 28,
+    impBonus: 12,
+    range: 92,
+    cd: 0.30,
+    color: '#E6ECF3',
+    secondaryColor: '#A3C9FF',
+    glow: 20,
+    bladeWidth: 8,
+    ability: 'fast',
+    specName: 'زوبعة الفولاذ 360°',
+    specCd: 3.2
+  },
+  {
+    id: 'gold',
+    name: 'السيف الذهبي',
+    icon: '✨',
+    dmg: 42,
+    impBonus: 15,
+    range: 106,
+    cd: 0.27,
+    color: '#FFD24A',
+    secondaryColor: '#FFF3B0',
+    glow: 26,
+    bladeWidth: 9,
+    ability: 'slashWave',
+    specName: 'الأمواج الذهبية الثلاثية',
+    specCd: 3.4
+  },
+  {
+    id: 'diamond',
+    name: 'السيف الماسي',
+    icon: '💎',
+    dmg: 64,
+    impBonus: 20,
+    range: 120,
+    cd: 0.23,
+    color: '#7DE3FF',
+    secondaryColor: '#E0FAFF',
+    glow: 32,
+    bladeWidth: 10,
+    ability: 'shockwave',
+    specName: 'انفجار الصدمة الماسي',
+    specCd: 3.6
+  },
+  {
+    id: 'blue',
+    name: 'السيف الأزرق العظيم',
+    icon: '🔵',
+    dmg: 98,
+    impBonus: 30,
+    range: 146,
+    cd: 0.19,
+    color: '#2E6BFF',
+    secondaryColor: '#7DE3FF',
+    glow: 40,
+    bladeWidth: 12,
+    ability: 'lightningChain',
+    specName: 'عاصفة الرعد المتسلسلة',
+    specCd: 3.8
+  }
 ];
 
 const UPGRADE_RULES = [
@@ -312,54 +662,136 @@ const UPGRADE_RULES = [
 ];
 
 const ENEMY_TYPES = {
-  imp:     { name: 'عفريت',         hp: 30,  speed: 72,  dmg: 8,  r: 14, score: 10,  color: '#E74C3C' },
-  flyer:   { name: 'شيطان طائر',    hp: 25,  speed: 125, dmg: 10, r: 12, score: 15,  color: '#9B59B6' },
-  armored: { name: 'مدرّع الجحيم',  hp: 90,  speed: 52,  dmg: 15, r: 20, score: 30,  color: '#7F8C8D' },
-  caster:  { name: 'ساحر الشياطين', hp: 50,  speed: 60,  dmg: 12, r: 15, score: 25,  color: '#2980B9', ranged: true },
-  boss:    { name: 'سيد الشياطين',  hp: 800, speed: 50,  dmg: 22, r: 42, score: 500, color: '#FF2A2A', isBoss: true }
+  imp: {
+    name: 'عفريت الرماد',
+    hp: 30,
+    speed: 74,
+    dmg: 8,
+    r: 14,
+    score: 10,
+    color: '#E74C3C',
+    secondary: '#922B21',
+    tier: 1
+  },
+  flyer: {
+    name: 'شيطان طائر',
+    hp: 25,
+    speed: 126,
+    dmg: 10,
+    r: 13,
+    score: 15,
+    color: '#9B59B6',
+    secondary: '#6C3483',
+    tier: 2
+  },
+  armored: {
+    name: 'مدرّع الجحيم',
+    hp: 90,
+    speed: 54,
+    dmg: 16,
+    r: 21,
+    score: 30,
+    color: '#7F8C8D',
+    secondary: '#BDC3C7',
+    tier: 3
+  },
+  caster: {
+    name: 'ساحر الشياطين',
+    hp: 50,
+    speed: 62,
+    dmg: 12,
+    r: 16,
+    score: 25,
+    color: '#2980B9',
+    secondary: '#7DE3FF',
+    ranged: true,
+    tier: 4
+  },
+  boss: {
+    name: 'سيد الشياطين',
+    hp: 800,
+    speed: 52,
+    dmg: 24,
+    r: 44,
+    score: 500,
+    color: '#FF2A2A',
+    secondary: '#FFD24A',
+    isBoss: true,
+    tier: 5
+  }
 };
 
 const LEVELS = [
   {
-    id: 1, name: 'بوابة الرماد', bg: '#160d18', accent: '#FF5B2E',
+    id: 1,
+    name: 'بوابة الرماد',
+    subtitle: 'أرضية متفحمة وشقوق نارية',
+    bgInner: '#1c0f1b',
+    bgOuter: '#07050a',
+    accent: '#FF5B2E',
+    theme: 'ash',
     waves: [
-      { spawn: [{ type: 'imp', count: 5 }], delay: 0.9 },
-      { spawn: [{ type: 'imp', count: 7 }], delay: 0.75 }
+      { spawn: [{ type: 'imp', count: 5 }], delay: 0.85 },
+      { spawn: [{ type: 'imp', count: 7 }], delay: 0.70 }
     ]
   },
   {
-    id: 2, name: 'كهوف العظام', bg: '#101020', accent: '#9B59B6',
+    id: 2,
+    name: 'كهوف العظام',
+    subtitle: 'ضباب بنفسجي وشياطين منقضّة',
+    bgInner: '#141128',
+    bgOuter: '#06060f',
+    accent: '#9B59B6',
+    theme: 'bones',
     waves: [
-      { spawn: [{ type: 'flyer', count: 6 }, { type: 'imp', count: 3 }], delay: 0.85 },
-      { spawn: [{ type: 'flyer', count: 6 }, { type: 'imp', count: 3 }], delay: 0.75 }
+      { spawn: [{ type: 'flyer', count: 6 }, { type: 'imp', count: 3 }], delay: 0.80 },
+      { spawn: [{ type: 'flyer', count: 6 }, { type: 'imp', count: 3 }], delay: 0.70 }
     ]
   },
   {
-    id: 3, name: 'قاعة الفولاذ', bg: '#121820', accent: '#F39C12',
+    id: 3,
+    name: 'قاعة الفولاذ',
+    subtitle: 'أعمدة حجرية وحراس مدرّعون',
+    bgInner: '#141c24',
+    bgOuter: '#06080c',
+    accent: '#F39C12',
+    theme: 'steel',
     waves: [
-      { spawn: [{ type: 'armored', count: 6 }, { type: 'flyer', count: 3 }], delay: 0.95 },
-      { spawn: [{ type: 'armored', count: 6 }, { type: 'flyer', count: 3 }], delay: 0.8 }
+      { spawn: [{ type: 'armored', count: 6 }, { type: 'flyer', count: 3 }], delay: 0.90 },
+      { spawn: [{ type: 'armored', count: 6 }, { type: 'flyer', count: 3 }], delay: 0.75 }
     ]
   },
   {
-    id: 4, name: 'برج السحرة', bg: '#180d28', accent: '#00D2FF',
+    id: 4,
+    name: 'برج السحرة',
+    subtitle: 'دوائر سحرية وكرات لهب',
+    bgInner: '#1b0e2e',
+    bgOuter: '#07040d',
+    accent: '#00D2FF',
+    theme: 'arcane',
     waves: [
-      { spawn: [{ type: 'caster', count: 6 }, { type: 'armored', count: 2 }, { type: 'flyer', count: 2 }], delay: 0.9 },
-      { spawn: [{ type: 'caster', count: 6 }, { type: 'armored', count: 2 }, { type: 'imp', count: 2 }], delay: 0.8 }
+      { spawn: [{ type: 'caster', count: 6 }, { type: 'armored', count: 2 }, { type: 'flyer', count: 2 }], delay: 0.85 },
+      { spawn: [{ type: 'caster', count: 6 }, { type: 'armored', count: 2 }, { type: 'imp', count: 2 }], delay: 0.75 }
     ]
   },
   {
-    id: 5, name: 'عرش الجحيم', bg: '#220808', accent: '#FF2A2A',
+    id: 5,
+    name: 'عرش الجحيم',
+    subtitle: 'معركة سيد الشياطين الكبرى',
+    bgInner: '#290909',
+    bgOuter: '#090303',
+    accent: '#FF2A2A',
+    theme: 'hell',
     waves: [
-      { spawn: [{ type: 'caster', count: 4 }, { type: 'armored', count: 4 }, { type: 'flyer', count: 4 }], delay: 0.8 },
-      { spawn: [{ type: 'imp', count: 2 }, { type: 'boss', count: 1 }], delay: 1.0 }
+      { spawn: [{ type: 'caster', count: 4 }, { type: 'armored', count: 4 }, { type: 'flyer', count: 4 }], delay: 0.75 },
+      { spawn: [{ type: 'imp', count: 2 }, { type: 'boss', count: 1 }], delay: 0.95 }
     ]
   }
 ];
 
 /**
  * ============================================================================
- * 4. حالة اللعبة واللاعب وعصا التحكم الافتراضية للهاتف
+ * القسم 5: حالة اللعبة، اللاعب، والمصفوفات الديناميكية
  * ============================================================================
  */
 const GAME = {
@@ -377,14 +809,18 @@ const GAME = {
   combo: 0,
   maxCombo: 0,
   comboTimer: 0,
-  bannerText: '',
+  autoAim: true,
+  bannerTitle: '',
+  bannerSub: '',
   bannerColor: '#ffffff',
-  bannerTimer: 0
+  bannerTimer: 0,
+  upgradeRingTimer: 0
 };
 
 const progress = {
   swordIndex: 0,
   killsByStage: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+  totalKills: 0,
   savedStage: 1,
   savedSword: 0
 };
@@ -395,9 +831,10 @@ const player = {
   r: 15,
   hp: 100,
   maxHp: 100,
-  speed: 220,
+  speed: 225,
   dmgMult: 1.0,
   facing: 0,
+  swordSwingSide: 1,
   attackCd: 0,
   specialCd: 0,
   maxSpecialCd: 3.0,
@@ -406,7 +843,8 @@ const player = {
   dashVx: 0,
   dashVy: 0,
   invuln: 0,
-  trail: []
+  trail: [],
+  auraTimer: 0
 };
 
 let enemies = [];
@@ -417,18 +855,2022 @@ let lightnings = [];
 let projectiles = [];
 let particles = [];
 let floatTexts = [];
-let stars = [];
+let groundDecals = [];
+let ambientEmbers = [];
 
 const waveMgr = {
   waveIdx: 0,
   queue: [],
   timer: 0,
-  delay: 0.9,
-  clearWait: 0,
-  clearing: false
+  delay: 0.85,
+  clearing: false,
+  clearWait: 0
 };
 
-// إعداد نجوم/جزيئات الخلفية
-for (let i = 0; i < 35; i++) {
-  stars.push({
-    x: Math
+window.toggleAutoAimMode = function() {
+  GAME.autoAim = !GAME.autoAim;
+  const btn = document.getElementById('btn-autoaim');
+  if (btn) {
+    btn.textContent = GAME.autoAim ? '🎯 توجيه تلقائي: مفعل' : '🎯 توجيه تلقائي: يدوي';
+  }
+};
+
+/**
+ * ============================================================================
+ * القسم 6: تهيئة عناصر البيئة والخلفية لكل مرحلة
+ * ============================================================================
+ */
+function buildStageEnvironment(theme) {
+  groundDecals = [];
+  ambientEmbers = [];
+
+  const decalCount = 16;
+  for (let i = 0; i < decalCount; i++) {
+    groundDecals.push({
+      x: 40 + Math.random() * Math.max(200, W - 80),
+      y: 80 + Math.random() * Math.max(200, H - 180),
+      size: 16 + Math.random() * 28,
+      angle: Math.random() * Math.PI * 2,
+      theme: theme
+    });
+  }
+
+  const emberCount = 36;
+  for (let i = 0; i < emberCount; i++) {
+    ambientEmbers.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 18,
+      vy: -14 - Math.random() * 26,
+      r: 1.4 + Math.random() * 2.8,
+      alpha: 0.2 + Math.random() * 0.55
+    });
+  }
+}
+
+buildStageEnvironment('ash');
+
+/**
+ * ============================================================================
+ * القسم 7: نظام اللمس المتعدد للهاتف (Virtual Joystick + 3 أزرار قتال)
+ * ============================================================================
+ */
+const touchState = {
+  joyTouchId: null,
+  joyOriginX: 95,
+  joyOriginY: H - 105,
+  joyKnobX: 95,
+  joyKnobY: H - 105,
+  joyRadius: 54,
+  moveX: 0,
+  moveY: 0,
+  atkHeld: false,
+  atkTouchId: null
+};
+
+function getMobileControlsLayout() {
+  const bottomY = H - 92;
+  const rightX = W - 72;
+  return {
+    joy: {
+      x: 92,
+      y: H - 96,
+      r: 52
+    },
+    atk: {
+      x: rightX,
+      y: bottomY,
+      r: 44,
+      icon: '⚔️',
+      label: 'ضرب'
+    },
+    spec: {
+      x: rightX - 92,
+      y: bottomY + 10,
+      r: 32,
+      icon: '⚡',
+      label: 'مهارة'
+    },
+    dash: {
+      x: rightX - 12,
+      y: bottomY - 92,
+      r: 32,
+      icon: '💨',
+      label: 'اندفاع'
+    }
+  };
+}
+
+canvas.addEventListener('touchstart', function(e) {
+  if (GAME.state !== 'playing' && GAME.state !== 'endless') return;
+  e.preventDefault();
+  SFX.unlock();
+
+  const layout = getMobileControlsLayout();
+
+  for (let i = 0; i < e.changedTouches.length; i++) {
+    const t = e.changedTouches[i];
+    const tx = t.clientX;
+    const ty = t.clientY;
+
+    // 1. فحص زر الضرب الأساسي
+    if (Math.hypot(tx - layout.atk.x, ty - layout.atk.y) <= layout.atk.r + 16) {
+      touchState.atkHeld = true;
+      touchState.atkTouchId = t.identifier;
+      performSwordAttack();
+      continue;
+    }
+
+    // 2. فحص زر المهارة الخاصة
+    if (Math.hypot(tx - layout.spec.x, ty - layout.spec.y) <= layout.spec.r + 14) {
+      performSpecialSkill();
+      continue;
+    }
+
+    // 3. فحص زر الاندفاع (Dash)
+    if (Math.hypot(tx - layout.dash.x, ty - layout.dash.y) <= layout.dash.r + 14) {
+      performDash();
+      continue;
+    }
+
+    // 4. عصا التحكم الافتراضية في النصف الأيسر من الشاشة
+    if (touchState.joyTouchId === null && tx < W * 0.65 && ty > 70) {
+      touchState.joyTouchId = t.identifier;
+      touchState.joyOriginX = tx;
+      touchState.joyOriginY = ty;
+      touchState.joyKnobX = tx;
+      touchState.joyKnobY = ty;
+      touchState.moveX = 0;
+      touchState.moveY = 0;
+    }
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', function(e) {
+  if (GAME.state !== 'playing' && GAME.state !== 'endless') return;
+  e.preventDefault();
+
+  for (let i = 0; i < e.changedTouches.length; i++) {
+    const t = e.changedTouches[i];
+    if (t.identifier === touchState.joyTouchId) {
+      const dx = t.clientX - touchState.joyOriginX;
+      const dy = t.clientY - touchState.joyOriginY;
+      const dist = Math.hypot(dx, dy);
+      const maxR = touchState.joyRadius;
+
+      if (dist > 0) {
+        const clamped = Math.min(dist, maxR);
+        touchState.joyKnobX = touchState.joyOriginX + (dx / dist) * clamped;
+        touchState.joyKnobY = touchState.joyOriginY + (dy / dist) * clamped;
+        touchState.moveX = (dx / dist) * (clamped / maxR);
+        touchState.moveY = (dy / dist) * (clamped / maxR);
+      }
+    }
+  }
+}, { passive: false });
+
+function handleTouchEnd(e) {
+  for (let i = 0; i < e.changedTouches.length; i++) {
+    const t = e.changedTouches[i];
+    if (t.identifier === touchState.joyTouchId) {
+      touchState.joyTouchId = null;
+      touchState.moveX = 0;
+      touchState.moveY = 0;
+    }
+    if (t.identifier === touchState.atkTouchId) {
+      touchState.atkHeld = false;
+      touchState.atkTouchId = null;
+    }
+  }
+}
+
+canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+
+// دعم الكيبورد والماوس الإضافي
+const keys = {};
+const mouseState = { x: W / 2, y: H / 2, down: false, active: false };
+
+window.addEventListener('keydown', function(e) {
+  keys[e.code] = true;
+  if (GAME.state !== 'playing' && GAME.state !== 'endless') return;
+  if (e.code === 'Space') { e.preventDefault(); performDash(); }
+  if (e.code === 'KeyJ') performSwordAttack();
+  if (e.code === 'KeyK') performSpecialSkill();
+});
+
+window.addEventListener('keyup', function(e) {
+  keys[e.code] = false;
+});
+
+canvas.addEventListener('mousemove', function(e) {
+  mouseState.x = e.clientX;
+  mouseState.y = e.clientY;
+  mouseState.active = true;
+});
+
+canvas.addEventListener('mousedown', function(e) {
+  if (GAME.state !== 'playing' && GAME.state !== 'endless') return;
+  SFX.unlock();
+  if (e.button === 0) {
+    mouseState.down = true;
+    performSwordAttack();
+  } else if (e.button === 2) {
+    performSpecialSkill();
+  }
+});
+
+canvas.addEventListener('mouseup', function(e) {
+  if (e.button === 0) mouseState.down = false;
+});
+
+canvas.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+});
+
+/**
+ * ============================================================================
+ * القسم 8: آليات القتال، الضربات، القدرات الخاصة، والترقية الدرامية
+ * ============================================================================
+ */
+function getCurrentSword() {
+  return SWORDS[progress.swordIndex] || SWORDS[0];
+}
+
+function normalizeAngleDiff(a) {
+  while (a > Math.PI) a -= Math.PI * 2;
+  while (a < -Math.PI) a += Math.PI * 2;
+  return a;
+}
+
+function updateAutoAimDirection() {
+  if (!GAME.autoAim) {
+    if (Math.hypot(touchState.moveX, touchState.moveY) > 0.15) {
+      player.facing = Math.atan2(touchState.moveY, touchState.moveX);
+    }
+    return;
+  }
+
+  let closestEnemy = null;
+  let minDistance = 280;
+
+  for (let i = 0; i < enemies.length; i++) {
+    const e = enemies[i];
+    if (e.dead) continue;
+    const d = Math.hypot(e.x - player.x, e.y - player.y);
+    if (d < minDistance) {
+      minDistance = d;
+      closestEnemy = e;
+    }
+  }
+
+  if (closestEnemy) {
+    player.facing = Math.atan2(closestEnemy.y - player.y, closestEnemy.x - player.x);
+  } else if (Math.hypot(touchState.moveX, touchState.moveY) > 0.15) {
+    player.facing = Math.atan2(touchState.moveY, touchState.moveX);
+  }
+}
+
+function performDash() {
+  if (player.dashCd > 0 || player.dashTime > 0) return;
+
+  let dx = touchState.moveX;
+  let dy = touchState.moveY;
+
+  if (Math.hypot(dx, dy) < 0.1) {
+    if (keys['KeyW'] || keys['ArrowUp']) dy -= 1;
+    if (keys['KeyS'] || keys['ArrowDown']) dy += 1;
+    if (keys['KeyA'] || keys['ArrowLeft']) dx -= 1;
+    if (keys['KeyD'] || keys['ArrowRight']) dx += 1;
+  }
+
+  if (Math.hypot(dx, dy) < 0.1) {
+    dx = Math.cos(player.facing);
+    dy = Math.sin(player.facing);
+  } else {
+    const len = Math.hypot(dx, dy);
+    dx /= len;
+    dy /= len;
+  }
+
+  player.dashVx = dx * 670;
+  player.dashVy = dy * 670;
+  player.dashTime = 0.16;
+  player.dashCd = 1.15;
+  player.invuln = Math.max(player.invuln, 0.26);
+
+  SFX.playDashSound();
+
+  const sw = getCurrentSword();
+  for (let i = 0; i < 10; i++) {
+    spawnSpark(
+      player.x,
+      player.y,
+      (Math.random() - 0.5) * 120,
+      (Math.random() - 0.5) * 120,
+      sw.color,
+      4,
+      0.32
+    );
+  }
+}
+
+function performSwordAttack() {
+  const s = getCurrentSword();
+  if (player.attackCd > 0) return;
+  player.attackCd = s.cd;
+
+  if (!mouseState.active) {
+    updateAutoAimDirection();
+  }
+
+  player.swordSwingSide *= -1;
+  SFX.playSwordSwing(progress.swordIndex);
+
+  swings.push({
+    angle: player.facing,
+    arc: Math.PI / 1.8,
+    t: 0,
+    dur: 0.18,
+    range: s.range,
+    color: s.color,
+    secondary: s.secondaryColor
+  });
+
+  let hitAny = false;
+  const hitEnemies = [];
+
+  for (let i = 0; i < enemies.length; i++) {
+    const e = enemies[i];
+    if (e.dead) continue;
+
+    const dist = Math.hypot(e.x - player.x, e.y - player.y);
+    if (dist > s.range + e.r) continue;
+
+    const angleToEnemy = Math.atan2(e.y - player.y, e.x - player.x);
+    const diff = Math.abs(normalizeAngleDiff(angleToEnemy - player.facing));
+    if (diff > Math.PI / 1.95) continue;
+
+    let dmg = Math.round(s.dmg * player.dmgMult);
+    if (e.type === 'imp' && s.impBonus) {
+      dmg += s.impBonus;
+    }
+
+    inflictDamageOnEnemy(e, dmg, player.x, player.y, 185);
+    hitAny = true;
+    hitEnemies.push(e);
+  }
+
+  // تفعيل القدرة الخاصة التلقائية للسيف
+  if (s.ability === 'slashWave') {
+    createSlashWave(
+      player.x,
+      player.y,
+      player.facing,
+      Math.round(s.dmg * 0.65 * player.dmgMult),
+      s.color,
+      460,
+      38
+    );
+  } else if (s.ability === 'shockwave' && hitAny) {
+    createExpandingShockwave(
+      player.x,
+      player.y,
+      125,
+      Math.round(s.dmg * 0.45 * player.dmgMult),
+      s.color,
+      false
+    );
+  } else if (s.ability === 'lightningChain' && hitEnemies.length > 0) {
+    triggerChainLightning(
+      hitEnemies[0],
+      3,
+      Math.round(s.dmg * 0.58 * player.dmgMult)
+    );
+  }
+
+  if (hitAny) {
+    GAME.hitStop = 0.048;
+    GAME.shake = Math.max(GAME.shake, 6.5);
+  }
+}
+
+function performSpecialSkill() {
+  const s = getCurrentSword();
+  if (player.specialCd > 0) return;
+
+  if (!mouseState.active) {
+    updateAutoAimDirection();
+  }
+
+  player.specialCd = s.specCd;
+  player.maxSpecialCd = s.specCd;
+
+  const skillDmg = Math.round(s.dmg * 1.55 * player.dmgMult);
+  SFX.playSpecialSkill(s.ability || 'slash');
+  GAME.shake = 15;
+
+  if (s.id === 'wood' || s.id === 'iron') {
+    // اندفاع طاعن قوي للأمام
+    player.dashVx = Math.cos(player.facing) * 600;
+    player.dashVy = Math.sin(player.facing) * 600;
+    player.dashTime = 0.15;
+    player.invuln = 0.28;
+
+    swings.push({
+      angle: player.facing,
+      arc: Math.PI * 1.1,
+      t: 0,
+      dur: 0.26,
+      range: s.range + 30,
+      color: s.color,
+      secondary: '#ffffff'
+    });
+
+    for (let i = 0; i < enemies.length; i++) {
+      const e = enemies[i];
+      if (!e.dead && Math.hypot(e.x - player.x, e.y - player.y) <= s.range + 32 + e.r) {
+        inflictDamageOnEnemy(e, skillDmg, player.x, player.y, 270);
+      }
+    }
+  } else if (s.id === 'steel') {
+    // زوبعة فولاذية 360 درجة
+    swings.push({
+      angle: 0,
+      arc: Math.PI * 2,
+      t: 0,
+      dur: 0.30,
+      range: s.range + 30,
+      color: '#ffffff',
+      secondary: '#7DE3FF'
+    });
+
+    for (let i = 0; i < enemies.length; i++) {
+      const e = enemies[i];
+      if (!e.dead && Math.hypot(e.x - player.x, e.y - player.y) <= s.range + 30 + e.r) {
+        inflictDamageOnEnemy(e, skillDmg, player.x, player.y, 290);
+      }
+    }
+  } else if (s.id === 'gold') {
+    // ثلاث موجات قاطعة ذهبية
+    const offsets = [-0.26, 0, 0.26];
+    for (let i = 0; i < offsets.length; i++) {
+      createSlashWave(
+        player.x,
+        player.y,
+        player.facing + offsets[i],
+        skillDmg,
+        '#FFD24A',
+        510,
+        48
+      );
+    }
+  } else if (s.id === 'diamond') {
+    // انفجار صدمة ماسي واسع النطاق
+    createExpandingShockwave(player.x, player.y, 210, skillDmg, '#7DE3FF', false);
+  } else if (s.id === 'blue') {
+    // عاصفة الرعد: موجة قاطعة + برق يتسلسل لـ 5 أعداء
+    createSlashWave(player.x, player.y, player.facing, skillDmg, '#2E6BFF', 550, 58);
+    const living = enemies
+      .filter(e => !e.dead)
+      .sort((a, b) => Math.hypot(a.x - player.x, a.y - player.y) - Math.hypot(b.x - player.x, b.y - player.y));
+    if (living.length > 0) {
+      triggerChainLightning(living[0], 5, skillDmg);
+    }
+  }
+}
+
+function createSlashWave(x, y, angle, dmg, color, speed, radius) {
+  slashWaves.push({
+    x: x + Math.cos(angle) * 20,
+    y: y + Math.sin(angle) * 20,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    angle: angle,
+    dmg: dmg,
+    color: color,
+    r: radius,
+    life: 0.62,
+    hitSet: new Set()
+  });
+}
+
+function createExpandingShockwave(x, y, maxRadius, dmg, color, isEnemyWave = false) {
+  shockwaves.push({
+    x: x,
+    y: y,
+    r: 10,
+    maxR: maxRadius,
+    t: 0,
+    dur: 0.35,
+    color: color
+  });
+
+  if (!isEnemyWave && dmg > 0) {
+    for (let i = 0; i < enemies.length; i++) {
+      const e = enemies[i];
+      if (!e.dead && Math.hypot(e.x - x, e.y - y) <= maxRadius + e.r) {
+        inflictDamageOnEnemy(e, dmg, x, y, 310);
+      }
+    }
+  }
+}
+
+function triggerChainLightning(firstTarget, maxChains, dmg) {
+  const visited = new Set([firstTarget]);
+  let current = firstTarget;
+
+  inflictDamageOnEnemy(current, dmg, player.x, player.y, 90);
+  lightnings.push({
+    x1: player.x,
+    y1: player.y,
+    x2: current.x,
+    y2: current.y,
+    t: 0,
+    dur: 0.25,
+    color: '#7DE3FF'
+  });
+
+  for (let c = 1; c < maxChains; c++) {
+    let nextTarget = null;
+    let bestDist = 260;
+
+    for (let i = 0; i < enemies.length; i++) {
+      const candidate = enemies[i];
+      if (candidate.dead || visited.has(candidate)) continue;
+      const d = Math.hypot(candidate.x - current.x, candidate.y - current.y);
+      if (d < bestDist) {
+        bestDist = d;
+        nextTarget = candidate;
+      }
+    }
+
+    if (!nextTarget) break;
+
+    visited.add(nextTarget);
+    lightnings.push({
+      x1: current.x,
+      y1: current.y,
+      x2: nextTarget.x,
+      y2: nextTarget.y,
+      t: 0,
+      dur: 0.25,
+      color: '#2E6BFF'
+    });
+
+    inflictDamageOnEnemy(nextTarget, Math.round(dmg * 0.85), current.x, current.y, 90);
+    current = nextTarget;
+  }
+}
+
+function inflictDamageOnEnemy(e, rawDmg, srcX, srcY, knockback = 150) {
+  if (e.dead) return;
+
+  const comboBonus = 1 + Math.min(0.35, GAME.combo * 0.015);
+  const finalDmg = Math.max(1, Math.round(rawDmg * comboBonus));
+
+  e.hp -= finalDmg;
+  e.flashTimer = 0.085;
+
+  const kbFactor = e.isBoss ? 0.1 : (e.type === 'armored' ? 0.35 : 1.0);
+  const pushAngle = Math.atan2(e.y - srcY, e.x - srcX);
+  e.kx = Math.cos(pushAngle) * knockback * kbFactor;
+  e.ky = Math.sin(pushAngle) * knockback * kbFactor;
+
+  SFX.playEnemyHit(finalDmg >= 45);
+
+  GAME.combo++;
+  if (GAME.combo > GAME.maxCombo) GAME.maxCombo = GAME.combo;
+  GAME.comboTimer = 3.2;
+
+  spawnFloatingText(
+    e.x + (Math.random() - 0.5) * 14,
+    e.y - e.r - 8,
+    `-${finalDmg}`,
+    finalDmg >= 45 ? '#FFD24A' : '#FFFFFF',
+    finalDmg >= 45 ? 19 : 15
+  );
+
+  const sColor = getCurrentSword().color;
+  for (let i = 0; i < 9; i++) {
+    const sparkAng = pushAngle + (Math.random() - 0.5) * 1.45;
+    const sparkSpd = 85 + Math.random() * 175;
+    spawnSpark(
+      e.x,
+      e.y,
+      Math.cos(sparkAng) * sparkSpd,
+      Math.sin(sparkAng) * sparkSpd,
+      sColor,
+      3.4,
+      0.27
+    );
+  }
+
+  // دخول سيد الشياطين في الطور الثاني عند نزول صحته تحت 50%
+  if (e.isBoss && !e.phase2 && e.hp > 0 && e.hp <= e.maxHp * 0.5) {
+    e.phase2 = true;
+    e.speed *= 1.4;
+    e.color = '#0088FF';
+    SFX.playBossRoar();
+    GAME.shake = 24;
+    GAME.flashAlpha = 0.55;
+    GAME.flashColor = '#2E6BFF';
+    spawnFloatingText(e.x, e.y - 55, '⚡ الطور الثاني: لهيب الجحيم الأزرق!', '#7DE3FF', 20);
+    createExpandingShockwave(e.x, e.y, 185, 0, '#0088FF', true);
+  }
+
+  if (e.hp <= 0) {
+    e.dead = true;
+    progress.totalKills++;
+    GAME.score += e.score * Math.max(1, Math.floor(GAME.combo / 5));
+
+    const burstCount = e.isBoss ? 55 : 15;
+    for (let i = 0; i < burstCount; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 45 + Math.random() * (e.isBoss ? 260 : 170);
+      spawnSpark(e.x, e.y, Math.cos(a) * sp, Math.sin(a) * sp, e.color, e.isBoss ? 5.5 : 4, 0.5);
+    }
+
+    handleDemonKilledInStage(GAME.stage);
+  }
+}
+
+function handleDemonKilledInStage(stageLevel) {
+  if (GAME.state === 'endless') return;
+
+  progress.killsByStage[stageLevel] = (progress.killsByStage[stageLevel] || 0) + 1;
+
+  const rule = UPGRADE_RULES[progress.swordIndex];
+  if (
+    rule &&
+    rule.stage === stageLevel &&
+    progress.killsByStage[stageLevel] >= rule.kills
+  ) {
+    progress.swordIndex++;
+    triggerDramaticSwordUpgrade();
+  }
+
+  // تباطؤ زمني (Slow-Motion) عند قتل آخر شيطان في المرحلة
+  const aliveRemaining = enemies.filter(en => !en.dead).length;
+  if (
+    aliveRemaining === 0 &&
+    waveMgr.queue.length === 0 &&
+    waveMgr.waveIdx >= LEVELS[GAME.stage - 1].waves.length
+  ) {
+    GAME.slowMo = 0.42;
+  }
+}
+
+function triggerDramaticSwordUpgrade() {
+  const newSword = getCurrentSword();
+  SFX.playUpgradeFanfare();
+
+  // 1. تجميد اللعبة 0.4 ثانية (Hit-Stop)
+  GAME.hitStop = 0.40;
+  // 2. وميض أبيض على الشاشة
+  GAME.flashAlpha = 0.92;
+  GAME.flashColor = '#FFFFFF';
+  // 3. اهتزاز الكاميرا بقوة 25px
+  GAME.shake = 25;
+  // 4. دائرة ضوئية تتوسع من اللاعب وتدفع الأعداء
+  createExpandingShockwave(player.x, player.y, 250, 0, newSword.color, true);
+
+  for (let i = 0; i < enemies.length; i++) {
+    const e = enemies[i];
+    if (!e.dead && Math.hypot(e.x - player.x, e.y - player.y) < 240) {
+      const a = Math.atan2(e.y - player.y, e.x - player.x);
+      e.kx = Math.cos(a) * 350;
+      e.ky = Math.sin(a) * 350;
+    }
+  }
+
+  player.hp = Math.min(player.maxHp, player.hp + 25);
+  player.invuln = 1.1;
+
+  // 5. نص عائم ولافتة احتفالية
+  spawnFloatingText(player.x, player.y - 48, `⚡ ${newSword.name}!`, newSword.color, 24);
+  GAME.bannerTitle = `⚡ ارتقاء السلاح: ${newSword.icon} ${newSword.name}!`;
+  GAME.bannerSub = `المهارة الخاصة: ${newSword.specName}`;
+  GAME.bannerColor = newSword.color;
+  GAME.bannerTimer = 2.8;
+
+  saveProgressToStorage(GAME.stage, progress.swordIndex);
+}
+
+/**
+ * ============================================================================
+ * القسم 9: إدارة المراحل، الموجات، وتوليد الأعداء والزعيم
+ * ============================================================================
+ */
+function initializeStage(stageNumber) {
+  updateCanvasDimensions();
+  GAME.stage = stageNumber;
+  GAME.state = 'playing';
+
+  enemies = [];
+  swings = [];
+  slashWaves = [];
+  shockwaves = [];
+  lightnings = [];
+  projectiles = [];
+  particles = [];
+
+  player.x = W / 2;
+  player.y = H / 2;
+  player.attackCd = 0;
+  player.specialCd = 0;
+  player.dashTime = 0;
+
+  const lvl = LEVELS[stageNumber - 1];
+  buildStageEnvironment(lvl.theme);
+
+  waveMgr.waveIdx = 0;
+  waveMgr.queue = [];
+  waveMgr.clearing = false;
+  waveMgr.clearWait = 0;
+
+  GAME.bannerTitle = `المرحلة ${stageNumber}: ${lvl.name}`;
+  GAME.bannerSub = lvl.subtitle;
+  GAME.bannerColor = lvl.accent;
+  GAME.bannerTimer = 2.4;
+
+  launchNextWave();
+}
+
+function launchNextWave() {
+  if (GAME.state === 'endless') {
+    GAME.endlessWave++;
+    waveMgr.queue = [];
+    const count = 6 + GAME.endlessWave * 2;
+    const pool = ['imp', 'flyer', 'armored', 'caster'];
+    for (let i = 0; i < count; i++) {
+      waveMgr.queue.push(pool[Math.floor(Math.random() * pool.length)]);
+    }
+    if (GAME.endlessWave % 5 === 0) {
+      waveMgr.queue.push('boss');
+    }
+    waveMgr.delay = Math.max(0.32, 0.88 - GAME.endlessWave * 0.04);
+    waveMgr.timer = 0.4;
+
+    GAME.bannerTitle = `👹 موجة التحدي ${GAME.endlessWave}`;
+    GAME.bannerSub = 'لا رحمة في الجحيم اللانهائي!';
+    GAME.bannerColor = '#FF5B2E';
+    GAME.bannerTimer = 2.0;
+    return;
+  }
+
+  const lvl = LEVELS[GAME.stage - 1];
+  if (waveMgr.waveIdx >= lvl.waves.length) return;
+
+  const waveDef = lvl.waves[waveMgr.waveIdx];
+  waveMgr.queue = [];
+  waveDef.spawn.forEach(group => {
+    for (let i = 0; i < group.count; i++) {
+      waveMgr.queue.push(group.type);
+    }
+  });
+
+  // خلط الأعداء مع إبقاء الزعيم في نهاية الموجة
+  const containsBoss = waveMgr.queue.includes('boss');
+  const regularEnemies = waveMgr.queue.filter(t => t !== 'boss');
+  for (let i = regularEnemies.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = regularEnemies[i];
+    regularEnemies[i] = regularEnemies[j];
+    regularEnemies[j] = temp;
+  }
+  if (containsBoss) regularEnemies.push('boss');
+  waveMgr.queue = regularEnemies;
+
+  waveMgr.delay = waveDef.delay || 0.85;
+  waveMgr.timer = 0.35;
+  waveMgr.waveIdx++;
+}
+
+function spawnDemonEntity(typeKey, customX = null, customY = null) {
+  const def = ENEMY_TYPES[typeKey];
+  if (!def) return;
+
+  let x = customX;
+  let y = customY;
+
+  if (x === null || y === null) {
+    const edge = Math.floor(Math.random() * 4);
+    const pad = 28;
+    if (edge === 0) {
+      x = pad + Math.random() * (W - pad * 2);
+      y = 70;
+    } else if (edge === 1) {
+      x = W - pad;
+      y = 70 + Math.random() * (H - 160);
+    } else if (edge === 2) {
+      x = pad + Math.random() * (W - pad * 2);
+      y = H - pad;
+    } else {
+      x = pad;
+      y = 70 + Math.random() * (H - 160);
+    }
+
+    if (Math.hypot(x - player.x, y - player.y) < 135) {
+      x = (player.x + W * 0.5) % Math.max(120, W - 60) + 30;
+    }
+  }
+
+  if (def.isBoss) {
+    SFX.playBossRoar();
+    GAME.bannerTitle = '👹 ظهر سيد الشياطين!';
+    GAME.bannerSub = 'احذر الضربة الأرضية وشعاع الجحيم';
+    GAME.bannerColor = '#FF2A2A';
+    GAME.bannerTimer = 2.6;
+  }
+
+  enemies.push({
+    type: typeKey,
+    name: def.name,
+    x: x,
+    y: y,
+    hp: def.hp,
+    maxHp: def.hp,
+    speed: def.speed,
+    dmg: def.dmg,
+    r: def.r,
+    score: def.score,
+    color: def.color,
+    secondary: def.secondary,
+    ranged: !!def.ranged,
+    isBoss: !!def.isBoss,
+    dead: false,
+    flashTimer: 0,
+    kx: 0,
+    ky: 0,
+    aiTime: Math.random() * 4,
+    shootCd: 1.7 + Math.random() * 1.1,
+    phase2: false,
+    bossAction: 'chase',
+    bossTimer: 2.8,
+    slamRadius: 155,
+    beamAngle: 0
+  });
+}
+
+/**
+ * ============================================================================
+ * القسم 10: حلقة التحديث الفيزيائي والذكاء الاصطناعي (Update Loop)
+ * ============================================================================
+ */
+function updateGameLogic(dt) {
+  if (GAME.state !== 'playing' && GAME.state !== 'endless') return;
+
+  GAME.runTime += dt;
+
+  if (GAME.bannerTimer > 0) GAME.bannerTimer -= dt;
+  if (GAME.comboTimer > 0) {
+    GAME.comboTimer -= dt;
+    if (GAME.comboTimer <= 0) GAME.combo = 0;
+  }
+
+  // تحديث مؤقتات اللاعب
+  if (player.attackCd > 0) player.attackCd -= dt;
+  if (player.specialCd > 0) player.specialCd = Math.max(0, player.specialCd - dt);
+  if (player.dashCd > 0) player.dashCd -= dt;
+  if (player.invuln > 0) player.invuln -= dt;
+
+  // توجيه السيف
+  if (mouseState.active) {
+    player.facing = Math.atan2(mouseState.y - player.y, mouseState.x - player.x);
+  } else if (GAME.autoAim) {
+    updateAutoAimDirection();
+  } else if (Math.hypot(touchState.moveX, touchState.moveY) > 0.15) {
+    player.facing = Math.atan2(touchState.moveY, touchState.moveX);
+  }
+
+  // الهجوم المستمر عند إبقاء الإصبع على زر الضرب
+  if ((touchState.atkHeld || mouseState.down) && player.attackCd <= 0) {
+    performSwordAttack();
+  }
+
+  // حركة اللاعب أو الاندفاع
+  if (player.dashTime > 0) {
+    player.dashTime -= dt;
+    player.x += player.dashVx * dt;
+    player.y += player.dashVy * dt;
+    player.trail.push({
+      x: player.x,
+      y: player.y,
+      alpha: 0.7,
+      color: getCurrentSword().color
+    });
+  } else {
+    let mx = touchState.moveX;
+    let my = touchState.moveY;
+
+    if (Math.hypot(mx, my) < 0.05) {
+      if (keys['KeyW'] || keys['ArrowUp']) my -= 1;
+      if (keys['KeyS'] || keys['ArrowDown']) my += 1;
+      if (keys['KeyA'] || keys['ArrowLeft']) mx -= 1;
+      if (keys['KeyD'] || keys['ArrowRight']) mx += 1;
+      const len = Math.hypot(mx, my);
+      if (len > 1) {
+        mx /= len;
+        my /= len;
+      }
+    }
+
+    player.x += mx * player.speed * dt;
+    player.y += my * player.speed * dt;
+
+    if (Math.hypot(mx, my) > 0.2 && Math.random() < 0.35) {
+      player.trail.push({
+        x: player.x,
+        y: player.y,
+        alpha: 0.32,
+        color: '#394b70'
+      });
+    }
+  }
+
+  // إبقاء اللاعب داخل حدود شاشة الهاتف
+  player.x = Math.max(player.r + 10, Math.min(W - player.r - 10, player.x));
+  player.y = Math.max(player.r + 62, Math.min(H - player.r - 16, player.y));
+
+  for (let i = player.trail.length - 1; i >= 0; i--) {
+    player.trail[i].alpha -= dt * 2.5;
+    if (player.trail[i].alpha <= 0) player.trail.splice(i, 1);
+  }
+
+  // إدارة ظهور الشياطين والموجات (بحد أقصى 12 شيطان على الشاشة)
+  const activeDemons = enemies.filter(e => !e.dead).length;
+  if (waveMgr.queue.length > 0 && activeDemons < 12) {
+    waveMgr.timer -= dt;
+    if (waveMgr.timer <= 0) {
+      const nextType = waveMgr.queue.shift();
+      spawnDemonEntity(nextType);
+      waveMgr.timer = waveMgr.delay;
+    }
+  } else if (waveMgr.queue.length === 0 && activeDemons === 0) {
+    if (GAME.state === 'endless') {
+      launchNextWave();
+    } else {
+      const lvl = LEVELS[GAME.stage - 1];
+      if (waveMgr.waveIdx < lvl.waves.length) {
+        launchNextWave();
+      } else if (!waveMgr.clearing) {
+        waveMgr.clearing = true;
+        waveMgr.clearWait = 1.05;
+      }
+    }
+  }
+
+  if (waveMgr.clearing) {
+    waveMgr.clearWait -= dt;
+    if (waveMgr.clearWait <= 0) {
+      waveMgr.clearing = false;
+      if (GAME.stage < 5) {
+        openChestRewardScreen();
+      } else {
+        openGameOverOrVictoryScreen(true);
+      }
+    }
+  }
+
+  // تحديث الشياطين
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    const e = enemies[i];
+    if (e.dead) {
+      enemies.splice(i, 1);
+      continue;
+    }
+
+    if (e.flashTimer > 0) e.flashTimer -= dt;
+    e.aiTime += dt;
+
+    e.x += e.kx * dt;
+    e.y += e.ky * dt;
+    e.kx *= Math.pow(0.05, dt);
+    e.ky *= Math.pow(0.05, dt);
+
+    const dx = player.x - e.x;
+    const dy = player.y - e.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const ux = dx / dist;
+    const uy = dy / dist;
+
+    if (e.type === 'imp' || e.type === 'armored') {
+      e.x += ux * e.speed * dt;
+      e.y += uy * e.speed * dt;
+    } else if (e.type === 'flyer') {
+      const zigzag = Math.sin(e.aiTime * 7.8) * 0.85;
+      e.x += (ux - uy * zigzag) * e.speed * dt;
+      e.y += (uy + ux * zigzag) * e.speed * dt;
+    } else if (e.type === 'caster') {
+      if (dist < 155) {
+        e.x -= ux * e.speed * 0.85 * dt;
+        e.y -= uy * e.speed * 0.85 * dt;
+      } else if (dist > 250) {
+        e.x += ux * e.speed * dt;
+        e.y += uy * e.speed * dt;
+      } else {
+        e.x += -uy * e.speed * 0.65 * dt;
+        e.y += ux * e.speed * 0.65 * dt;
+      }
+
+      e.shootCd -= dt;
+      if (e.shootCd <= 0) {
+        e.shootCd = 2.05;
+        const fireAng = Math.atan2(dy, dx);
+        projectiles.push({
+          x: e.x,
+          y: e.y,
+          vx: Math.cos(fireAng) * 215,
+          vy: Math.sin(fireAng) * 215,
+          r: 7,
+          dmg: e.dmg,
+          color: '#FF5B2E',
+          life: 3.3
+        });
+      }
+    } else if (e.isBoss) {
+      updateBossBehavior(e, dt, ux, uy, dist);
+    }
+
+    // منع تداخل الشياطين مع بعضهم
+    for (let j = i - 1; j >= 0; j--) {
+      const other = enemies[j];
+      if (other.dead) continue;
+      const odx = e.x - other.x;
+      const ody = e.y - other.y;
+      const odist = Math.hypot(odx, ody);
+      const minGap = e.r + other.r;
+      if (odist > 0 && odist < minGap) {
+        const push = (minGap - odist) * 0.5;
+        e.x += (odx / odist) * push;
+        e.y += (ody / odist) * push;
+        other.x -= (odx / odist) * push;
+        other.y -= (ody / odist) * push;
+      }
+    }
+
+    e.x = Math.max(e.r + 8, Math.min(W - e.r - 8, e.x));
+    e.y = Math.max(e.r + 62, Math.min(H - e.r - 12, e.y));
+
+    if (dist < e.r + player.r - 2) {
+      inflictDamageOnPlayer(e.dmg);
+    }
+  }
+
+  // تحديث الموجات القاطعة
+  for (let i = slashWaves.length - 1; i >= 0; i--) {
+    const w = slashWaves[i];
+    w.x += w.vx * dt;
+    w.y += w.vy * dt;
+    w.life -= dt;
+
+    for (let j = 0; j < enemies.length; j++) {
+      const e = enemies[j];
+      if (!e.dead && !w.hitSet.has(e) && Math.hypot(e.x - w.x, e.y - w.y) <= w.r + e.r) {
+        w.hitSet.add(e);
+        inflictDamageOnEnemy(e, w.dmg, w.x, w.y, 145);
+      }
+    }
+
+    if (w.life <= 0 || w.x < -60 || w.x > W + 60 || w.y < -60 || w.y > H + 60) {
+      slashWaves.splice(i, 1);
+    }
+  }
+
+  // تحديث مقذوفات السحرة
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    const p = projectiles[i];
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.life -= dt;
+
+    if (Math.hypot(p.x - player.x, p.y - player.y) < p.r + player.r) {
+      inflictDamageOnPlayer(p.dmg);
+      projectiles.splice(i, 1);
+      continue;
+    }
+
+    if (p.life <= 0 || p.x < 0 || p.x > W || p.y < 0 || p.y > H) {
+      projectiles.splice(i, 1);
+    }
+  }
+
+  // تحديث المؤثرات البصرية والجزيئات
+  for (let i = swings.length - 1; i >= 0; i--) {
+    swings[i].t += dt;
+    if (swings[i].t >= swings[i].dur) swings.splice(i, 1);
+  }
+
+  for (let i = shockwaves.length - 1; i >= 0; i--) {
+    const sw = shockwaves[i];
+    sw.t += dt;
+    sw.r = (sw.t / sw.dur) * sw.maxR;
+    if (sw.t >= sw.dur) shockwaves.splice(i, 1);
+  }
+
+  for (let i = lightnings.length - 1; i >= 0; i--) {
+    lightnings[i].t += dt;
+    if (lightnings[i].t >= lightnings[i].dur) lightnings.splice(i, 1);
+  }
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.vx *= 0.92;
+    p.vy *= 0.92;
+    p.life -= dt;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+
+  for (let i = floatTexts.length - 1; i >= 0; i--) {
+    const ft = floatTexts[i];
+    ft.y -= 36 * dt;
+    ft.life -= dt;
+    if (ft.life <= 0) floatTexts.splice(i, 1);
+  }
+
+  for (let i = 0; i < ambientEmbers.length; i++) {
+    const em = ambientEmbers[i];
+    em.x += em.vx * dt;
+    em.y += em.vy * dt;
+    if (em.y < -10) {
+      em.y = H + 10;
+      em.x = Math.random() * W;
+    }
+    if (em.x < -10) em.x = W + 10;
+    if (em.x > W + 10) em.x = -10;
+  }
+
+  if (GAME.flashAlpha > 0) {
+    GAME.flashAlpha = Math.max(0, GAME.flashAlpha - dt * 2.2);
+  }
+}
+
+function updateBossBehavior(boss, dt, ux, uy, distToPlayer) {
+  boss.bossTimer -= dt;
+
+  if (boss.bossAction === 'chase') {
+    boss.x += ux * boss.speed * dt;
+    boss.y += uy * boss.speed * dt;
+
+    if (boss.bossTimer <= 0) {
+      const roll = Math.random();
+      if (boss.phase2 && roll < 0.42) {
+        boss.bossAction = 'beam';
+        boss.bossTimer = 3.1;
+        boss.beamAngle = Math.atan2(player.y - boss.y, player.x - boss.x) - 1.05;
+        spawnFloatingText(boss.x, boss.y - 52, '🔥 شعاع الجحيم الدوّار!', '#00D2FF', 18);
+      } else if (roll < 0.74) {
+        boss.bossAction = 'slam';
+        boss.bossTimer = 1.0;
+        spawnFloatingText(boss.x, boss.y - 52, '⚠️ ضربة أرضية ساحقة!', '#FFD24A', 18);
+      } else {
+        boss.bossAction = 'summon';
+        boss.bossTimer = 0.75;
+      }
+    }
+  } else if (boss.bossAction === 'slam') {
+    if (boss.bossTimer <= 0) {
+      GAME.shake = 20;
+      SFX.playSpecialSkill('shockwave');
+      createExpandingShockwave(boss.x, boss.y, boss.slamRadius, 0, '#FF2A2A', true);
+      if (distToPlayer <= boss.slamRadius + player.r) {
+        inflictDamageOnPlayer(boss.dmg);
+      }
+      boss.bossAction = 'chase';
+      boss.bossTimer = boss.phase2 ? 2.1 : 3.0;
+    }
+  } else if (boss.bossAction === 'summon') {
+    if (boss.bossTimer <= 0) {
+      spawnFloatingText(boss.x, boss.y - 52, '👹 استدعاء عفاريت الجحيم!', '#9B59B6', 17);
+      for (let k = 0; k < 3; k++) {
+        const ang = (Math.PI * 2 * k) / 3;
+        const sx = Math.max(35, Math.min(W - 35, boss.x + Math.cos(ang) * 65));
+        const sy = Math.max(70, Math.min(H - 35, boss.y + Math.sin(ang) * 65));
+        spawnDemonEntity('imp', sx, sy);
+      }
+      boss.bossAction = 'chase';
+      boss.bossTimer = 3.2;
+    }
+  } else if (boss.bossAction === 'beam') {
+    boss.beamAngle += 1.38 * dt;
+    if (boss.bossTimer < 2.6) {
+      const angToPlayer = Math.atan2(player.y - boss.y, player.x - boss.x);
+      if (Math.abs(normalizeAngleDiff(angToPlayer - boss.beamAngle)) < 0.15 && distToPlayer < 520) {
+        inflictDamageOnPlayer(boss.dmg);
+      }
+    }
+    if (boss.bossTimer <= 0) {
+      boss.bossAction = 'chase';
+      boss.bossTimer = 2.4;
+    }
+  }
+}
+
+function inflictDamageOnPlayer(dmgAmount) {
+  if (player.invuln > 0) return;
+
+  player.hp = Math.max(0, player.hp - dmgAmount);
+  player.invuln = 0.82;
+  GAME.shake = 13;
+  GAME.flashAlpha = 0.36;
+  GAME.flashColor = '#E74C3C';
+  GAME.combo = 0;
+
+  SFX.playPlayerHurt();
+  spawnFloatingText(player.x, player.y - 26, `-${dmgAmount} ❤️`, '#FF4D4D', 18);
+
+  if (player.hp <= 0) {
+    openGameOverOrVictoryScreen(false);
+  }
+}
+
+function spawnSpark(x, y, vx, vy, color, size, life) {
+  particles.push({
+    x: x,
+    y: y,
+    vx: vx,
+    vy: vy,
+    color: color,
+    size: size,
+    life: life,
+    maxLife: life
+  });
+}
+
+function spawnFloatingText(x, y, text, color, size = 16) {
+  floatTexts.push({
+    x: x,
+    y: y,
+    text: text,
+    color: color,
+    size: size,
+    life: 0.85,
+    maxLife: 0.85
+  });
+}
+
+/**
+ * ============================================================================
+ * القسم 11: محرك الرسم البصري المتقدم (Canvas 2D Renderer)
+ * ============================================================================
+ */
+function renderGameFrame() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.save();
+
+  // اهتزاز الشاشة عند الضرب أو الترقية
+  if (GAME.shake > 0.3) {
+    ctx.translate(
+      (Math.random() - 0.5) * GAME.shake,
+      (Math.random() - 0.5) * GAME.shake
+    );
+    GAME.shake *= 0.88;
+  } else {
+    GAME.shake = 0;
+  }
+
+  const lvl = LEVELS[Math.min(LEVELS.length - 1, GAME.stage - 1)];
+
+  // 1. رسم تدرج خلفية المرحلة
+  const bgGrad = ctx.createRadialGradient(W / 2, H / 2, 40, W / 2, H / 2, Math.max(W, H) * 0.75);
+  bgGrad.addColorStop(0, lvl.bgInner);
+  bgGrad.addColorStop(1, lvl.bgOuter);
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 2. رسم شبكة البلاط الهندسية
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.028)';
+  ctx.lineWidth = 1;
+  const tile = 58;
+  for (let x = 0; x < W; x += tile) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, H);
+    ctx.stroke();
+  }
+  for (let y = 0; y < H; y += tile) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+  }
+
+  // 3. رسم معالم أرضية المرحلة
+  for (let i = 0; i < groundDecals.length; i++) {
+    const d = groundDecals[i];
+    ctx.save();
+    ctx.translate(d.x, d.y);
+    ctx.rotate(d.angle);
+
+    if (d.theme === 'ash' || d.theme === 'hell') {
+      ctx.strokeStyle = d.theme === 'hell' ? 'rgba(255, 42, 42, 0.32)' : 'rgba(255, 91, 46, 0.22)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(-d.size, 0);
+      ctx.lineTo(-d.size * 0.3, 6);
+      ctx.lineTo(d.size * 0.35, -5);
+      ctx.lineTo(d.size, 2);
+      ctx.stroke();
+    } else if (d.theme === 'bones') {
+      ctx.strokeStyle = 'rgba(220, 220, 240, 0.14)';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(-d.size * 0.5, 0);
+      ctx.lineTo(d.size * 0.5, 0);
+      ctx.stroke();
+    } else if (d.theme === 'steel') {
+      ctx.strokeStyle = 'rgba(180, 195, 210, 0.14)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(-d.size * 0.5, -d.size * 0.5, d.size, d.size);
+    } else if (d.theme === 'arcane') {
+      ctx.strokeStyle = 'rgba(0, 210, 255, 0.16)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, d.size * 0.7, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // 4. رسم الشرر والجزيئات العائمة في الخلفية
+  ctx.save();
+  for (let i = 0; i < ambientEmbers.length; i++) {
+    const em = ambientEmbers[i];
+    ctx.fillStyle = lvl.accent;
+    ctx.globalAlpha = em.alpha;
+    ctx.beginPath();
+    ctx.arc(em.x, em.y, em.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // 5. رسم موجات الصدمة الدائرية
+  for (let i = 0; i < shockwaves.length; i++) {
+    const sw = shockwaves[i];
+    const alpha = Math.max(0, 1 - sw.t / sw.dur);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = sw.color;
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = sw.color;
+    ctx.lineWidth = 6 * alpha + 1.5;
+    ctx.beginPath();
+    ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // 6. رسم الشياطين والزعيم
+  for (let i = 0; i < enemies.length; i++) {
+    const e = enemies[i];
+    if (e.dead) continue;
+
+    ctx.save();
+    ctx.translate(e.x, e.y);
+
+    // تحذير الضربة الأرضية للزعيم
+    if (e.isBoss && e.bossAction === 'slam') {
+      ctx.strokeStyle = 'rgba(255, 42, 42, 0.85)';
+      ctx.fillStyle = 'rgba(255, 42, 42, 0.22)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, e.slamRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // شعاع الجحيم الدوّار للزعيم
+    if (e.isBoss && e.bossAction === 'beam') {
+      ctx.save();
+      ctx.rotate(e.beamAngle);
+      const isHot = e.bossTimer < 2.6;
+      ctx.shadowBlur = isHot ? 22 : 0;
+      ctx.shadowColor = '#00F0FF';
+      ctx.strokeStyle = isHot ? '#00F0FF' : 'rgba(255, 90, 90, 0.45)';
+      ctx.lineWidth = isHot ? 18 : 3;
+      ctx.beginPath();
+      ctx.moveTo(e.r, 0);
+      ctx.lineTo(520, 0);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // جسم الشيطان
+    ctx.shadowBlur = e.isBoss ? 22 : 10;
+    ctx.shadowColor = e.color;
+    ctx.fillStyle = e.flashTimer > 0 ? '#FFFFFF' : e.color;
+    ctx.beginPath();
+    ctx.arc(0, 0, e.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // حلقة درع للمدرّع
+    if (e.type === 'armored') {
+      ctx.strokeStyle = e.secondary;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(0, 0, e.r - 2, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // قرون وأعين الشيطان
+    const lookAngle = Math.atan2(player.y - e.y, player.x - e.x);
+    ctx.rotate(lookAngle);
+
+    ctx.fillStyle = e.flashTimer > 0 ? '#FFFFFF' : '#1b0808';
+    const horn = e.isBoss ? 13 : 6;
+    ctx.beginPath();
+    ctx.moveTo(e.r * 0.2, -e.r * 0.75);
+    ctx.lineTo(e.r * 0.2 + horn, -e.r - horn * 0.65);
+    ctx.lineTo(-e.r * 0.2, -e.r * 0.6);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(e.r * 0.2, e.r * 0.75);
+    ctx.lineTo(e.r * 0.2 + horn, e.r + horn * 0.65);
+    ctx.lineTo(-e.r * 0.2, e.r * 0.6);
+    ctx.fill();
+
+    // العيون المتوهجة
+    ctx.fillStyle = e.phase2 ? '#7DE3FF' : '#FF2A2A';
+    ctx.beginPath();
+    ctx.arc(e.r * 0.36, -e.r * 0.28, e.isBoss ? 4.8 : 2.5, 0, Math.PI * 2);
+    ctx.arc(e.r * 0.36, e.r * 0.28, e.isBoss ? 4.8 : 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+
+    // شريط صحة فوق الشيطان العادي
+    if (!e.isBoss && e.hp < e.maxHp) {
+      const barW = e.r * 2;
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
+      ctx.fillRect(e.x - barW / 2, e.y - e.r - 11, barW, 4);
+      ctx.fillStyle = '#FF3B3B';
+      ctx.fillRect(e.x - barW / 2, e.y - e.r - 11, barW * (e.hp / e.maxHp), 4);
+    }
+  }
+
+  // 7. رسم كرات النار لساحر الشياطين
+  for (let i = 0; i < projectiles.length; i++) {
+    const p = projectiles[i];
+    ctx.save();
+    ctx.fillStyle = p.color;
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // 8. رسم أثر عباءة المحارب، والمحارب، والسيف المتوهج
+  const sword = getCurrentSword();
+  for (let i = 0; i < player.trail.length; i++) {
+    const tr = player.trail[i];
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, tr.alpha * 0.55);
+    ctx.fillStyle = tr.color;
+    ctx.beginPath();
+    ctx.arc(tr.x, tr.y, player.r * 0.85, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.translate(player.x, player.y);
+  if (player.invuln > 0 && Math.floor(GAME.time * 20) % 2 === 0) {
+    ctx.globalAlpha = 0.5;
+  }
+
+  ctx.rotate(player.facing);
+
+  // نصل السيف المتوهج
+  ctx.shadowBlur = sword.glow + 10;
+  ctx.shadowColor = sword.color;
+  ctx.strokeStyle = sword.color;
+  ctx.lineWidth = sword.bladeWidth;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(player.r * 0.5, 0);
+  ctx.lineTo(sword.range * 0.68, 0);
+  ctx.stroke();
+
+  // مقبض السيف الذهبي
+  ctx.strokeStyle = '#FFD24A';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(player.r * 0.8, -7);
+  ctx.lineTo(player.r * 0.8, 7);
+  ctx.stroke();
+
+  // دائرة المحارب
+  ctx.fillStyle = '#EEF4FA';
+  ctx.beginPath();
+  ctx.arc(0, 0, player.r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // سهم اتجاه المحارب
+  ctx.fillStyle = sword.color;
+  ctx.beginPath();
+  ctx.moveTo(player.r + 6, 0);
+  ctx.lineTo(player.r - 4, -6);
+  ctx.lineTo(player.r - 4, 6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // 9. رسم أقواس تلويح السيف والموجات القاطعة
+  for (let i = 0; i < swings.length; i++) {
+    const sw = swings[i];
+    const alpha = Math.max(0, 1 - sw.t / sw.dur);
+    ctx.save();
+    ctx.translate(player.x, player.y);
+    ctx.globalAlpha = alpha * 0.82;
+    ctx.strokeStyle = sw.color;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = sw.color;
+    ctx.lineWidth = 14 * alpha;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(0, 0, sw.range * 0.85, sw.angle - sw.arc / 2, sw.angle + sw.arc / 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  for (let i = 0; i < slashWaves.length; i++) {
+    const w = slashWaves[i];
+    ctx.save();
+    ctx.translate(w.x, w.y);
+    ctx.rotate(w.angle);
+    ctx.strokeStyle = w.color;
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = w.color;
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.arc(-8, 0, w.r, -Math.PI * 0.42, Math.PI * 0.42);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // 10. رسم صواعق البرق المتسلسلة
+  for (let i = 0; i < lightnings.length; i++) {
+    const l = lightnings[i];
+    const alpha = Math.max(0, 1 - l.t / l.dur);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.shadowBlur = 16;
+    ctx.shadowColor = l.color;
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(l.x1, l.y1);
+    const midX = (l.x1 + l.x2) / 2 + (Math.random() - 0.5) * 20;
+    const midY = (l.y1 + l.y2) / 2 + (Math.random() - 0.5) * 20;
+    ctx.lineTo(midX, midY);
+    ctx.lineTo(l.x2, l.y2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // 11. رسم الشرارات والنصوص العائمة
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
+    const alpha = Math.max(0, p.life / p.maxLife);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.textAlign = 'center';
+  for (let i = 0; i < floatTexts.length; i++) {
+    const ft = floatTexts[i];
+    ctx.globalAlpha = Math.max(0, ft.life / ft.maxLife);
+    ctx.font = `bold ${ft.size}px system-ui, sans-serif`;
+    ctx.fillStyle = ft.color;
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = '#000000';
+    ctx.fillText(ft.text, ft.x, ft.y);
+  }
+  ctx.restore();
+
+  ctx.restore();
+
+  // وميض الشاشة الكامل
+  if (GAME.flashAlpha > 0) {
+    ctx.save();
+    ctx.fillStyle = GAME.flashColor;
+    ctx.globalAlpha = GAME.flashAlpha;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+
+  // رسم واجهة المستخدم وأزرار اللمس
+  drawMobileHUDAndControls();
+}
+
+function drawMobileHUDAndControls() {
+  if (GAME.state !== 'playing' && GAME.state !== 'endless') return;
+
+  const sword = getCurrentSword();
+  const lvl = LEVELS[Math.min(LEVELS.length - 1, GAME.stage - 1)];
+
+  ctx.save();
+
+  // الشريط العلوي
+  ctx.fillStyle = 'rgba(8, 10, 18, 0.86)';
+  ctx.fillRect(0, 0, W, 56);
+  ctx.strokeStyle = 'rgba(125, 227, 255, 0.14)';
+  ctx.beginPath();
+  ctx.moveTo(0, 56);
+  ctx.lineTo(W, 56);
+  ctx.stroke();
+
+  // قلوب الصحة على اليمين
+  const totalHearts = Math.ceil(player.maxHp / 20);
+  const fullHearts = Math.ceil(player.hp / 20);
+  let heartsText = '';
+  for (let i = 0; i < totalHearts; i++) {
+    heartsText += i < fullHearts ? '❤️' : '🖤';
+  }
+  ctx.font = '15px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(heartsText, W - 10, 22);
+
+  // اسم السيف الحالي تحت القلوب
+  ctx.font = 'bold 13px system-ui, sans-serif';
+  ctx.fillStyle = sword.color;
+  ctx.fillText(`${sword.icon} ${sword.name}`, W - 10, 44);
+
+  // شريط تقدم الترقية على اليسار (10 قتلات)
+  const rule = UPGRADE_RULES[progress.swordIndex];
+  const barX = 10;
+  const barY = 9;
+  const barW = Math.min(180, W * 0.45);
+  const barH = 18;
+
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.fillRect(barX, barY, barW, barH);
+
+  if (rule && GAME.state !== 'endless') {
+    const kills = Math.min(rule.kills, progress.killsByStage[GAME.stage] || 0);
+    const nextSword = SWORDS[progress.swordIndex + 1];
+    ctx.fillStyle = nextSword ? nextSword.color : '#2E6BFF';
+    ctx.fillRect(barX, barY, barW * (kills / rule.kills), barH);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 11px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`ترقية السيف: ${kills} / ${rule.kills}`, barX + barW / 2, barY + 13);
+  } else {
+    ctx.fillStyle = '#2E6BFF';
+    ctx.fillRect(barX, barY, barW, barH);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 11px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🔵 السيف في أقصى تطور!', barX + barW / 2, barY + 13);
+  }
+
+  // اسم المرحلة ورقم الموجة
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#BAC8DC';
+  ctx.font = '12px system-ui, sans-serif';
+  ctx.fillText(
+    GAME.state === 'endless'
+      ? `تحدي لا نهائي: موجة ${GAME.endlessWave}`
+      : `مرحلة ${GAME.stage}: ${lvl.name} (${waveMgr.waveIdx}/${lvl.waves.length})`,
+    10,
+    44
+  );
+
+  // عداد الكومبو
+  if (GAME.combo > 1) {
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 17px system-ui, sans-serif';
+    ctx.fillStyle = '#FFD24A';
+    ctx.fillText(`🔥 ${GAME.combo}x COMBO`, W - 12, 80);
+  }
+
+  // شريط صحة الزعيم
+  const boss = enemies.find(e => e.isBoss && !e.dead);
+  if (boss) {
+    const bw = Math.min(310, W - 36);
+    const bx = (W - bw) / 2;
+    const by = 92;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.82)';
+    ctx.fillRect(bx - 2, by - 2, bw + 4, 16);
+    ctx.fillStyle = boss.phase2 ? '#0088FF' : '#FF2A2A';
+    ctx.fillRect(bx, by, bw * Math.max(0, boss.hp / boss.maxHp), 12);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 11px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`👹 ${boss.name}: ${Math.max(0, boss.hp)} / ${boss.maxHp}`, W / 2, by + 10);
+  }
+
+  // لافتة منتصف الشاشة عند بداية المرحلة أو ترقية السيف
+  if (GAME.bannerTimer > 0) {
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, GAME.bannerTimer);
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 21px system-ui, sans-serif';
+    ctx.fillStyle = GAME.bannerColor;
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = '#000000';
+    ctx.fillText(GAME.bannerTitle, W / 2, 128);
+    if (GAME.bannerSub) {
+      ctx.font = '13px system-ui, sans-serif';
+      ctx.fillStyle = '#E2ECF7';
+      ctx.fillText(GAME.bannerSub, W / 2, 148);
+    }
+    ctx.restore();
+  }
+
+  // رسم عصا التحكم الافتراضية وأزرار القتال على شاشة الهاتف
+  const layout = getMobileControlsLayout();
+
+  const jx = touchState.joyTouchId !== null ? touchState.joyOriginX : layout.joy.x;
+  const jy = touchState.joyTouchId !== null ? touchState.joyOriginY : layout.joy.y;
+  const kx = touchState.joyTouchId !== null ? touchState.joyKnobX : layout.joy.x;
+  const ky = touchState.joyTouchId !== null ? touchState.joyKnobY : layout.joy.y;
+
+  ctx.globalAlpha = 0.55;
+  ctx.fillStyle = '#14192B';
+  ctx.strokeStyle = '#7DE3FF';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(jx, jy, layout.joy.r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.globalAlpha = 0.88;
+  ctx.fillStyle = sword.color;
+  ctx.beginPath();
+  ctx.arc(kx, ky, 23, 0, Math.PI * 2);
+  ctx.fill();
+
+  // أزرار اللمس الثلاثة على اليمين
+  drawTouchActionCircle(layout.atk.x, layout.atk.y, layout.atk.r, layout.atk.icon, layout.atk.label, sword.color, 0);
+
+  const specWaitRatio = player.specialCd > 0 ? player.specialCd / player.maxSpecialCd : 0;
+  drawTouchActionCircle(layout.spec.x, layout.spec.y, layout.spec.r, layout.spec.icon, layout.spec.label, '#FFD24A', specWaitRatio);
+
+  const dashWaitRatio = player.dashCd > 0 ? player.dashCd / 1.15 : 0;
+  drawTouchActionCircle(layout.dash.x, layout.dash.y, layout.dash.r, layout.dash.icon, layout.dash.label, '#7DE3FF', dashWaitRatio);
+
+  ctx.restore();
+}
+
+function drawTouchActionCircle(x, y, r, emoji, textLabel, strokeCol, cooldownRatio) {
+  ctx.save();
+  ctx.globalAlpha = cooldownRatio > 0 ? 0.42 : 0.85;
+  ctx.fillStyle = '#14192B';
+  ctx.strokeStyle = strokeCol;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'center';
+  ctx.font = `${Math.round(r * 0.62)}px sans-serif`;
+  ctx.fillText(emoji, x, y + 4);
+
+  ctx.font = 'bold 10px system-ui, sans-serif';
+  ctx.fillStyle = '#E0EAF8';
+  ctx.fillText(
+    cooldownRatio > 0 ? `${(cooldownRatio * 3).toFixed(1)}s` : textLabel,
+    x,
+    y + r - 6
+  );
+  ctx.restore();
+}
+
+/**
+ * ============================================================================
+ * القسم 12: شاشات الغنيمة، الفوز/الخسارة، الحفظ، والتشغيل المباشر
+ * ============================================================================
+ */
+const STAGE_PERKS = [
+  {
+    icon: '🩸',
+    title: 'قلب العنقاء الخالد',
+    desc: '+20 صحة قصوى واستعادة 50 نقطة صحة فوراً',
+    apply: function() {
+      player.maxHp += 20;
+      player.hp = Math.min(player.maxHp, player.hp + 50);
+    }
+  },
+  {
+    icon: '⚡',
+    title: 'خطوة البرق الخاطفة',
+    desc: '+15% سرعة حركة لمراوغة الشياطين والزعيم',
+    apply: function() {
+      player.speed = Math.round(player.speed * 1.15);
+    }
+  },
+  {
+    icon: '🔥',
+    title: 'قبضة الجحيم الحارقة',
+    desc: '+20% ضرر إضافي لجميع ضربات السيف والمهارات الخاصة',
+    apply: function() {
+      player.dmgMult *= 1.20;
+    }
+  }
+];
+
+function openChestRewardScreen() {
+  GAME.state = 'chest';
+  touchState.atkHeld = false;
+  touchState.joyTouchId = null;
+  touchState.moveX = 0;
+  touchState.moveY = 0;
+
+  const listEl = document.getElementById('perks-list');
+  if (listEl) {
+    listEl.innerHTML = '';
+    STAGE_PERKS.forEach(perk => {
+      const item = document.createElement('div');
+      item.className = 'perk-item';
+      item.innerHTML = `
+        <div class="perk-emoji">${perk.icon}</div>
+        <div class="perk-text">
+          <h3>${perk.title}</h3>
+          <p>${perk.desc}</p>
+        </div>
+      `;
+      const pickPerk = function(ev) {
+        if (ev) ev.preventDefault();
+        SFX.unlock();
+        perk.apply();
+        hideScreen('chest-screen');
+        saveProgressToStorage(GAME.stage + 1, progress.swordIndex);
+        initializeStage(GAME.stage + 1);
+      };
+      item.onclick = pickPerk;
+      item.ontouchend = pickPerk;
+      listEl.appendChild(item);
+    });
+  }
+
+  showScreen('chest-screen');
+}
+
+function openGameOverOrVictoryScreen(isVictory) {
+  GAME.state = isVictory ? 'victory' : 'gameover';
+  touchState.atkHeld = false;
+  touchState.joyTouchId = null;
+  touchState.moveX = 0;
+  touchState.moveY = 0;
+
+  const titleEl = document.getElementById('end-title');
+  const rankEl = document.getElementById('end-rank');
+  const statsEl = document.getElementById('end-stats');
+  const endlessBtn = document.getElementById('endless-btn');
+
+  if (titleEl) {
+    titleEl.textContent = isVictory ? '🏆 انتصار أسطوري!' : '💀 سقط المحارب في المعركة';
+  }
+
+  const rank = !isVictory ? 'C' : (player.hp >= 70 ? 'S' : (player.hp >= 40 ? 'A' : 'B'));
+  if (rankEl) {
+    rankEl.textContent = `التقييم: ${rank}`;
+  }
+
+  const sw = getCurrentSword();
+  if (statsEl) {
+    statsEl.innerHTML = `
+      <div class="stat-row"><span>السيف الحالي:</span><b>${sw.icon} ${sw.name}</b></div>
+      <div class="stat-row"><span>المرحلة:</span><b>${GAME.stage} / 5</b></div>
+      <div class="stat-row"><span>إجمالي القتلى:</span><b>${progress.totalKills} شيطان</b></div>
+      <div class="stat-row"><span>النقاط:</span><b>${GAME.score}</b></div>
+      <div class="stat-row"><span>أعلى كومبو:</span><b>${GAME.maxCombo}x</b></div>
+    `;
+  }
+
+  if (endlessBtn) {
+    if (isVictory) {
+      endlessBtn.classList.remove('hidden');
+      endlessBtn.style.display = 'flex';
+    } else {
+      endlessBtn.classList.add('hidden');
+      endlessBtn.style.display = 'none';
+    }
+  }
+
+  showScreen('end-screen');
+}
+
+function saveProgressToStorage(stageNum, swordIdx) {
+  try {
+    localStorage.setItem('demon_slayer_mobile_save_v3', JSON.stringify({
+      stage: stageNum,
+      sword: swordIdx
+    }));
+  } catch (err) {}
+}
+
+function loadProgressFromStorage() {
+  try {
+    const raw = localStorage.getItem('demon_slayer_mobile_save_v3');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data && data.stage > 1) {
+      progress.savedStage = Math.min(5, data.stage);
+      progress.savedSword = Math.min(5, data.sword || 0);
+      const contBtn = document.getElementById('continue-btn');
+      if (contBtn) {
+        contBtn.classList.remove('hidden');
+        contBtn.style.display = 'flex';
+        contBtn.textContent = `استكمال المرحلة ${progress.savedStage} (${SWORDS[progress.savedSword].name}) 💾`;
+      }
+    }
+  } catch (err) {}
+}
+
+// الدوال العامة المربوطة مباشرة بأزرار الشاشة (تعمل فوراً عند اللمس)
+window.forceStartGame = function(startStage = 1, startSword = 0) {
+  SFX.unlock();
+  hideScreen('menu-screen');
+  hideScreen('chest-screen');
+  hideScreen('end-screen');
+
+  const quickBar = document.getElementById('top-quick-bar');
+  if (quickBar) {
+    quickBar.classList.remove('hidden');
+  }
+
+  progress.swordIndex = startSword;
+  progress.killsByStage = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  progress.totalKills = 0;
+
+  player.maxHp = 100;
+  player.hp = 100;
+  player.speed = 225;
+  player.dmgMult = 1.0;
+
+  GAME.score = 0;
+  GAME.combo = 0;
+  GAME.maxCombo = 0;
+  GAME.runTime = 0;
+
+  initializeStage(startStage);
+};
+
+window.continueSavedGame = function() {
+  window.forceStartGame(progress.savedStage || 1, progress.savedSword || 0);
+};
+
+window.retryCurrentStage = function() {
+  SFX.unlock();
+  hideScreen('end-screen');
+  player.hp = player.maxHp;
+  progress.killsByStage[GAME.stage] = 0;
+  progress.swordIndex = Math.min(progress.swordIndex, GAME.stage - 1);
+  initializeStage(GAME.stage);
+};
+
+window.startEndlessMode = function() {
+  SFX.unlock();
+  hideScreen('end-screen');
+  player.hp = player.maxHp;
+  GAME.state = 'endless';
+  GAME.endlessWave = 0;
+  launchNextWave();
+};
+
+/**
+ * ============================================================================
+ * القسم 13: الحلقة الرئيسية للعبة (Main Game Loop)
+ * ============================================================================
+ */
+let lastFrameTime = performance.now();
+
+function mainLoop(now) {
+  let dt = Math.min((now - lastFrameTime) / 1000, 0.05);
+  lastFrameTime = now;
+  GAME.time += dt;
+
+  if (GAME.hitStop > 0) {
+    GAME.hitStop -= dt;
+    dt = 0;
+  } else if (GAME.slowMo > 0) {
+    GAME.slowMo -= dt;
+    dt *= 0.28;
+  }
+
+  updateGameLogic(dt);
+  renderGameFrame();
+  requestAnimationFrame(mainLoop);
+}
+
+loadProgressFromStorage();
+requestAnimationFrame(mainLoop);
+</script>
+</body>
+</html>
