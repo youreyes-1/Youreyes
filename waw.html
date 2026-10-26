@@ -2,436 +2,433 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>سيف الساحر | Demon Slayer Sword</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>سيف الساحر | نسخة الموبايل الكاملة</title>
   <style>
-    :root {
-      --bg-dark: #07070b;
-      --accent-blue: #2E6BFF;
-      --accent-gold: #FFD24A;
-      --accent-red: #E74C3C;
-      --panel-bg: rgba(14, 14, 24, 0.88);
-    }
-
     * {
       box-sizing: border-box;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(circle at center, #141224 0%, #050508 100%);
-      color: #f0f4f8;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: none;
     }
 
-    #game-wrapper {
-      position: relative;
-      width: 1024px;
-      height: 600px;
-      border-radius: 14px;
-      box-shadow: 0 0 70px rgba(46, 107, 255, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.08);
-      overflow: hidden;
-      background: #0a0a0f;
-    }
-
-    canvas {
-      display: block;
+    html, body {
       width: 100%;
       height: 100%;
-      cursor: crosshair;
+      overflow: hidden;
+      background: #06060b;
+      color: #ffffff;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      position: fixed;
+      inset: 0;
     }
 
+    #game {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background: #090812;
+    }
+
+    /* الشاشات التفاعلية المتجاوبة مع شاشة الهاتف */
     .overlay {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      background: rgba(8, 8, 14, 0.86);
-      backdrop-filter: blur(6px);
+      background: rgba(7, 7, 14, 0.92);
+      backdrop-filter: blur(8px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 20;
-      padding: 28px;
+      z-index: 50;
+      padding: 18px;
       text-align: center;
-      transition: opacity 0.25s ease;
+      overflow-y: auto;
     }
 
     .hidden {
       display: none !important;
     }
 
-    h1.game-title {
-      font-size: 3.4rem;
-      margin: 0 0 8px 0;
-      background: linear-gradient(135deg, #fff 0%, #7DE3FF 45%, #2E6BFF 100%);
+    .title {
+      font-size: clamp(2rem, 7vw, 3.2rem);
+      font-weight: 900;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #7DE3FF 50%, #2E6BFF 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 35px rgba(46, 107, 255, 0.45);
-      letter-spacing: 1px;
+      text-shadow: 0 0 25px rgba(46, 107, 255, 0.5);
     }
 
-    .subtitle {
-      font-size: 1.15rem;
-      color: #a5b2c6;
-      max-width: 620px;
-      line-height: 1.6;
-      margin-bottom: 24px;
+    .desc {
+      font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+      color: #b4c2d8;
+      max-width: 480px;
+      line-height: 1.5;
+      margin-bottom: 16px;
     }
 
-    .controls-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px 24px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 16px 24px;
+    .features-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(125, 227, 255, 0.2);
       border-radius: 12px;
-      margin-bottom: 26px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 420px;
       text-align: right;
-      font-size: 0.95rem;
-    }
-
-    .control-item span.key {
-      display: inline-block;
-      background: #1f2437;
-      color: #7DE3FF;
-      border: 1px solid #3b4668;
-      border-radius: 6px;
-      padding: 2px 8px;
-      font-weight: bold;
-      font-size: 0.85rem;
-      margin-left: 8px;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      justify-content: center;
+      font-size: clamp(0.82rem, 3.2vw, 0.95rem);
+      line-height: 1.7;
+      color: #d8e3f0;
     }
 
     .btn {
-      background: linear-gradient(135deg, #2E6BFF, #1b44b8);
-      color: #fff;
-      border: 1px solid #679bff;
-      padding: 13px 32px;
-      font-size: 1.15rem;
-      font-weight: bold;
-      border-radius: 10px;
+      background: linear-gradient(135deg, #2E6BFF, #163ca8);
+      color: #ffffff;
+      border: 2px solid #7DE3FF;
+      border-radius: 14px;
+      padding: 14px 28px;
+      font-size: clamp(1.05rem, 4.5vw, 1.25rem);
+      font-weight: 800;
+      width: 100%;
+      max-width: 320px;
+      margin: 6px 0;
       cursor: pointer;
-      box-shadow: 0 0 25px rgba(46, 107, 255, 0.4);
-      transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
-      font-family: inherit;
+      box-shadow: 0 0 25px rgba(46, 107, 255, 0.55);
+      transition: transform 0.1s;
     }
 
-    .btn:hover {
-      transform: translateY(-2px) scale(1.03);
-      box-shadow: 0 0 35px rgba(125, 227, 255, 0.7);
-      filter: brightness(1.12);
+    .btn:active {
+      transform: scale(0.96);
     }
 
     .btn.secondary {
-      background: linear-gradient(135deg, #2d3246, #1b1e2b);
-      border-color: #525c7a;
+      background: linear-gradient(135deg, #2b3147, #181c29);
+      border-color: #5c698a;
       box-shadow: none;
     }
 
-    .cards-container {
+    .cards-wrap {
       display: flex;
-      gap: 18px;
-      margin-top: 18px;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 360px;
+      margin-top: 10px;
     }
 
     .perk-card {
-      background: linear-gradient(180deg, rgba(32, 38, 62, 0.95), rgba(16, 19, 32, 0.95));
-      border: 2px solid rgba(125, 227, 255, 0.25);
+      background: linear-gradient(135deg, #1b2238, #101422);
+      border: 2px solid rgba(255, 210, 74, 0.45);
       border-radius: 12px;
-      width: 230px;
-      padding: 20px 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: right;
       cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: center;
     }
 
-    .perk-card:hover {
-      transform: translateY(-6px);
-      border-color: #FFD24A;
-      box-shadow: 0 10px 30px rgba(255, 210, 74, 0.25);
+    .perk-card:active {
+      transform: scale(0.97);
+      border-color: #7DE3FF;
     }
 
     .perk-icon {
-      font-size: 2.6rem;
-      margin-bottom: 10px;
+      font-size: 2.2rem;
+      flex-shrink: 0;
     }
 
-    .perk-title {
-      font-size: 1.2rem;
-      font-weight: bold;
+    .perk-info h3 {
       color: #FFD24A;
-      margin-bottom: 8px;
+      font-size: 1.05rem;
+      margin-bottom: 3px;
     }
 
-    .perk-desc {
-      font-size: 0.92rem;
-      color: #c3cfe2;
-      line-height: 1.45;
+    .perk-info p {
+      color: #c2cee0;
+      font-size: 0.85rem;
+      line-height: 1.35;
     }
 
-    .stats-box {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+    .stats-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 12px;
-      padding: 18px 32px;
-      margin: 16px 0 24px 0;
-      min-width: 340px;
+      padding: 14px 18px;
+      width: 100%;
+      max-width: 340px;
+      margin: 10px 0 18px 0;
     }
 
-    .stat-line {
+    .stat-row {
       display: flex;
       justify-content: space-between;
-      margin: 8px 0;
-      font-size: 1.05rem;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      font-size: 0.95rem;
     }
 
-    .rank-badge {
-      font-size: 3.5rem;
+    .rank-big {
+      font-size: 3rem;
       font-weight: 900;
       color: #FFD24A;
-      text-shadow: 0 0 25px rgba(255, 210, 74, 0.8);
-      margin: 4px 0 10px 0;
-    }
-
-    #top-bar-hint {
-      margin-top: 8px;
-      font-size: 0.85rem;
-      color: #7c889e;
-      display: flex;
-      gap: 20px;
+      text-shadow: 0 0 20px rgba(255, 210, 74, 0.8);
+      margin: 4px 0;
     }
   </style>
 </head>
 <body>
 
-  <div id="game-wrapper">
-    <canvas id="game" width="1024" height="600"></canvas>
+  <canvas id="game"></canvas>
 
-    <!-- شاشة البداية -->
-    <div id="menu-overlay" class="overlay">
-      <h1 class="game-title">🗡️ سيف الساحر</h1>
-      <p class="subtitle">
-        خمس مراحل في أعماق الجحيم، وستة تطورات لسيفك السحري. اقتل 10 شياطين في كل مرحلة ليترقّى سيفك في قلب المعركة وتختبر قوته فوراً على من تبقّى!
-      </p>
-
-      <div class="controls-grid">
-        <div class="control-item"><span class="key">WASD / الأسهم</span> الحركة في الساحة</div>
-        <div class="control-item"><span class="key">الماوس</span> توجيه السيف حول المحارب</div>
-        <div class="control-item"><span class="key">كليك يسار / J</span> ضربة السيف الأساسية</div>
-        <div class="control-item"><span class="key">كليك يمين / K</span> الضربة الخاصة للسيف</div>
-        <div class="control-item"><span class="key">Space</span> اندفاع سريع (مناعة 0.2 ثانية)</div>
-        <div class="control-item"><span class="key">M</span> كتم / تشغيل الصوت</div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn" id="btn-start">ابدأ المعركة 🔥</button>
-        <button class="btn secondary hidden" id="btn-continue">استكمال التقدم المحفوظ 💾</button>
-      </div>
+  <!-- شاشة البداية -->
+  <div id="menu-screen" class="overlay">
+    <div class="title">🗡️ سيف الساحر</div>
+    <p class="desc">
+      نسخة الموبايل الكاملة! اقتل 10 شياطين في كل مرحلة ليترقّى سيفك في قلب المعركة من الخشبي حتى السيف الأزرق العظيم.
+    </p>
+    <div class="features-box">
+      <div>🕹️ <b>الجانب الأيسر:</b> عصا تحكم لمس للحركة والمراوغة</div>
+      <div>⚔️ <b>زر الضرب (الأكبر):</b> اضغط أو خليك ضاغط للهجوم والتوجيه التلقائي</div>
+      <div>⚡ <b>زر المهارة:</b> الضربة القاضية الخاصة بكل سيف</div>
+      <div>💨 <b>زر الاندفاع:</b> هروب سريع مع مناعة ضد الضربات</div>
     </div>
-
-    <!-- شاشة صندوق المكافأة بين المراحل -->
-    <div id="chest-overlay" class="overlay hidden">
-      <h1 class="game-title" style="font-size:2.4rem;">🎁 غنيمة نهاية المرحلة</h1>
-      <p class="subtitle" id="chest-subtitle">اختر بركة واحدة لتعزيز محاربك قبل دخول المرحلة التالية:</p>
-      <div class="cards-container" id="perk-cards"></div>
-    </div>
-
-    <!-- شاشة النهاية / الفوز أو الخسارة -->
-    <div id="end-overlay" class="overlay hidden">
-      <h1 class="game-title" id="end-title">انتهت المعركة</h1>
-      <div class="rank-badge" id="end-rank">S</div>
-      <div class="stats-box" id="end-stats"></div>
-      <div class="btn-row">
-        <button class="btn" id="btn-restart">إعادة اللعب من البداية 🔄</button>
-        <button class="btn secondary hidden" id="btn-retry-stage">إعادة هذه المرحلة ⚔️</button>
-        <button class="btn secondary hidden" id="btn-endless">طور التحدي اللانهائي 👹</button>
-      </div>
-    </div>
+    <button class="btn" id="start-btn">ابدأ المعركة الآن 🔥</button>
+    <button class="btn secondary hidden" id="continue-btn">استكمال المرحلة المحفوظة 💾</button>
   </div>
 
-  <div id="top-bar-hint">
-    <span>💡 نصيحة: الترقية تحدث عند القتلة العاشرة داخل المرحلة — راقب شريط الترقية أعلى الشاشة!</span>
+  <!-- شاشة صندوق المكافآت بين المراحل -->
+  <div id="chest-screen" class="overlay hidden">
+    <div class="title" style="font-size:1.9rem;">🎁 غنيمة المرحلة</div>
+    <p class="desc">اختر قوّة إضافية لمحاربك قبل المرحلة التالية:</p>
+    <div class="cards-wrap" id="perks-list"></div>
+  </div>
+
+  <!-- شاشة النهاية -->
+  <div id="end-screen" class="overlay hidden">
+    <div class="title" id="end-title">انتهت المعركة</div>
+    <div class="rank-big" id="end-rank">S</div>
+    <div class="stats-card" id="end-stats"></div>
+    <button class="btn" id="retry-stage-btn">إعادة هذه المرحلة ⚔️</button>
+    <button class="btn secondary" id="restart-all-btn">اللعب من المرحلة الأولى 🔄</button>
+    <button class="btn secondary hidden" id="endless-btn">طور التحدي اللانهائي 👹</button>
   </div>
 
 <script>
 /**
  * ============================================================================
- * 1. مولد الصوت التوليدي (Web Audio API Synthesizer)
- * يصنع كافة المؤثرات الصوتية والنبضات الموسيقية برمجياً بدون أي ملفات خارجية
+ * 1. إعداد الشاشة المتجاوبة مع جميع الهواتف (Responsive Fullscreen Canvas)
  * ============================================================================
  */
-class SoundEngine {
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+let W = window.innerWidth;
+let H = window.innerHeight;
+
+function resizeCanvas() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W;
+  canvas.height = H;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+/**
+ * ============================================================================
+ * 2. محرك الصوت التوليدي (Web Audio API) - يشتغل فور لمس الشاشة
+ * ============================================================================
+ */
+class SoundSystem {
   constructor() {
     this.ctx = null;
     this.muted = false;
   }
-
-  init() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      this.ctx = new AudioCtx();
-    }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
+  unlock() {
+    try {
+      if (!this.ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AC();
+      }
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+    } catch (e) {}
   }
-
-  toggleMute() {
-    this.muted = !this.muted;
-    return this.muted;
-  }
-
-  playSwing(swordIdx) {
+  tone(freqStart, freqEnd, dur, type = 'triangle', vol = 0.18) {
     if (this.muted || !this.ctx) return;
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = swordIdx >= 3 ? 'sawtooth' : 'triangle';
-    const baseFreq = 180 + swordIdx * 55;
-    osc.frequency.setValueAtTime(baseFreq, now);
-    osc.frequency.exponentialRampToValueAtTime(60, now + 0.14);
-
-    gain.gain.setValueAtTime(0.16, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.15);
-  }
-
-  playHit(isCrit = false) {
-    if (this.muted || !this.ctx) return;
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(isCrit ? 150 : 110, now);
-    osc.frequency.exponentialRampToValueAtTime(35, now + 0.1);
-
-    gain.gain.setValueAtTime(0.22, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.1);
-  }
-
-  playDash() {
-    if (this.muted || !this.ctx) return;
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(320, now);
-    osc.frequency.exponentialRampToValueAtTime(90, now + 0.16);
-    gain.gain.setValueAtTime(0.15, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.16);
-  }
-
-  playSpecial(type) {
-    if (this.muted || !this.ctx) return;
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    if (type === 'lightningChain') {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(620, now);
-      osc.frequency.linearRampToValueAtTime(180, now + 0.08);
-      osc.frequency.linearRampToValueAtTime(520, now + 0.16);
-      osc.frequency.exponentialRampToValueAtTime(80, now + 0.32);
-      gain.gain.setValueAtTime(0.25, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.33);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.33);
-    } else if (type === 'shockwave') {
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(220, now);
-      osc.frequency.exponentialRampToValueAtTime(38, now + 0.35);
-      gain.gain.setValueAtTime(0.28, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.36);
-    } else {
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, now);
-      osc.frequency.exponentialRampToValueAtTime(160, now + 0.22);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.23);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.23);
-    }
-  }
-
-  playUpgradeFanfare() {
-    if (this.muted || !this.ctx) return;
-    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
-    notes.forEach((freq, idx) => {
-      const now = this.ctx.currentTime + idx * 0.075;
+    try {
+      const now = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, now);
-      gain.gain.setValueAtTime(0.22, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freqStart, now);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(20, freqEnd), now + dur);
+      gain.gain.setValueAtTime(vol, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start(now);
-      osc.stop(now + 0.45);
+      osc.stop(now + dur);
+    } catch (e) {}
+  }
+  swing(idx) { this.tone(200 + idx * 55, 65, 0.13, idx >= 3 ? 'sawtooth' : 'triangle', 0.15); }
+  hit() { this.tone(130, 38, 0.09, 'square', 0.2); }
+  dash() { this.tone(330, 95, 0.15, 'sine', 0.15); }
+  hurt() { this.tone(150, 45, 0.25, 'sawtooth', 0.25); }
+  special() { this.tone(520, 120, 0.28, 'sawtooth', 0.22); }
+  upgrade() {
+    if (this.muted || !this.ctx) return;
+    [261, 329, 392, 523, 659, 784].forEach((f, i) => {
+      setTimeout(() => this.tone(f, f * 1.02, 0.32, 'triangle', 0.22), i * 65);
     });
   }
-
-  playPlayerHurt() {
-    if (this.muted || !this.ctx) return;
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(140, now);
-    osc.frequency.linearRampToValueAtTime(55, now + 0.25);
-    gain.gain.setValueAtTime(0.26, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.26);
-  }
 }
-
-const SFX = new SoundEngine();
+const SFX = new SoundSystem();
 
 /**
  * ============================================================================
- * 2. جداول البيانات الأساسية (Data-Driven Architecture)
- * السيوف الستة، قواعد الترقية، الشياطين الخمسة، والم
+ * 3. بيانات السيوف الستة، قواعد الترقية، الشياطين، والمراحل الخمس
+ * ============================================================================
+ */
+const SWORDS = [
+  { id: 'wood',    name: 'السيف الخشبي',        icon: '🪵', dmg: 10, impBonus: 0,  range: 68,  cd: 0.42, color: '#A66A38', glow: 6,  ability: null,             specName: 'طعنة مندفعة',   specCd: 3.0 },
+  { id: 'iron',    name: 'السيف الحديدي',       icon: '⚔️', dmg: 20, impBonus: 10, range: 78,  cd: 0.37, color: '#C2CAD6', glow: 12, ability: null,             specName: 'قوس الحديد',    specCd: 3.0 },
+  { id: 'steel',   name: 'السيف الفولاذي',      icon: '🗡️', dmg: 28, impBonus: 10, range: 88,  cd: 0.30, color: '#FFFFFF', glow: 18, ability: 'fast',           specName: 'زوبعة 360°',    specCd: 3.2 },
+  { id: 'gold',    name: 'السيف الذهبي',        icon: '✨', dmg: 42, impBonus: 10, range: 102, cd: 0.27, color: '#FFD24A', glow: 24, ability: 'slashWave',      specName: 'ثلاثية الذهب',  specCd: 3.4 },
+  { id: 'diamond', name: 'السيف الماسي',        icon: '💎', dmg: 64, impBonus: 10, range: 118, cd: 0.23, color: '#7DE3FF', glow: 30, ability: 'shockwave',      specName: 'انفجار الماس',  specCd: 3.6 },
+  { id: 'blue',    name: 'السيف الأزرق العظيم', icon: '🔵', dmg: 98, impBonus: 20, range: 145, cd: 0.19, color: '#2E6BFF', glow: 38, ability: 'lightningChain', specName: 'عاصفة الرعد',   specCd: 3.8 }
+];
+
+const UPGRADE_RULES = [
+  { stage: 1, kills: 10, from: 'wood',    to: 'iron'    },
+  { stage: 2, kills: 10, from: 'iron',    to: 'steel'   },
+  { stage: 3, kills: 10, from: 'steel',   to: 'gold'    },
+  { stage: 4, kills: 10, from: 'gold',    to: 'diamond' },
+  { stage: 5, kills: 10, from: 'diamond', to: 'blue'    }
+];
+
+const ENEMY_TYPES = {
+  imp:     { name: 'عفريت',         hp: 30,  speed: 72,  dmg: 8,  r: 14, score: 10,  color: '#E74C3C' },
+  flyer:   { name: 'شيطان طائر',    hp: 25,  speed: 125, dmg: 10, r: 12, score: 15,  color: '#9B59B6' },
+  armored: { name: 'مدرّع الجحيم',  hp: 90,  speed: 52,  dmg: 15, r: 20, score: 30,  color: '#7F8C8D' },
+  caster:  { name: 'ساحر الشياطين', hp: 50,  speed: 60,  dmg: 12, r: 15, score: 25,  color: '#2980B9', ranged: true },
+  boss:    { name: 'سيد الشياطين',  hp: 800, speed: 50,  dmg: 22, r: 42, score: 500, color: '#FF2A2A', isBoss: true }
+};
+
+const LEVELS = [
+  {
+    id: 1, name: 'بوابة الرماد', bg: '#160d18', accent: '#FF5B2E',
+    waves: [
+      { spawn: [{ type: 'imp', count: 5 }], delay: 0.9 },
+      { spawn: [{ type: 'imp', count: 7 }], delay: 0.75 }
+    ]
+  },
+  {
+    id: 2, name: 'كهوف العظام', bg: '#101020', accent: '#9B59B6',
+    waves: [
+      { spawn: [{ type: 'flyer', count: 6 }, { type: 'imp', count: 3 }], delay: 0.85 },
+      { spawn: [{ type: 'flyer', count: 6 }, { type: 'imp', count: 3 }], delay: 0.75 }
+    ]
+  },
+  {
+    id: 3, name: 'قاعة الفولاذ', bg: '#121820', accent: '#F39C12',
+    waves: [
+      { spawn: [{ type: 'armored', count: 6 }, { type: 'flyer', count: 3 }], delay: 0.95 },
+      { spawn: [{ type: 'armored', count: 6 }, { type: 'flyer', count: 3 }], delay: 0.8 }
+    ]
+  },
+  {
+    id: 4, name: 'برج السحرة', bg: '#180d28', accent: '#00D2FF',
+    waves: [
+      { spawn: [{ type: 'caster', count: 6 }, { type: 'armored', count: 2 }, { type: 'flyer', count: 2 }], delay: 0.9 },
+      { spawn: [{ type: 'caster', count: 6 }, { type: 'armored', count: 2 }, { type: 'imp', count: 2 }], delay: 0.8 }
+    ]
+  },
+  {
+    id: 5, name: 'عرش الجحيم', bg: '#220808', accent: '#FF2A2A',
+    waves: [
+      { spawn: [{ type: 'caster', count: 4 }, { type: 'armored', count: 4 }, { type: 'flyer', count: 4 }], delay: 0.8 },
+      { spawn: [{ type: 'imp', count: 2 }, { type: 'boss', count: 1 }], delay: 1.0 }
+    ]
+  }
+];
+
+/**
+ * ============================================================================
+ * 4. حالة اللعبة واللاعب وعصا التحكم الافتراضية للهاتف
+ * ============================================================================
+ */
+const GAME = {
+  state: 'menu', // menu | playing | chest | gameover | victory | endless
+  stage: 1,
+  endlessWave: 0,
+  hitStop: 0,
+  slowMo: 0,
+  shake: 0,
+  flashAlpha: 0,
+  flashColor: '#ffffff',
+  time: 0,
+  runTime: 0,
+  score: 0,
+  combo: 0,
+  maxCombo: 0,
+  comboTimer: 0,
+  bannerText: '',
+  bannerColor: '#ffffff',
+  bannerTimer: 0
+};
+
+const progress = {
+  swordIndex: 0,
+  killsByStage: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+  savedStage: 1,
+  savedSword: 0
+};
+
+const player = {
+  x: W / 2,
+  y: H / 2,
+  r: 15,
+  hp: 100,
+  maxHp: 100,
+  speed: 220,
+  dmgMult: 1.0,
+  facing: 0,
+  attackCd: 0,
+  specialCd: 0,
+  maxSpecialCd: 3.0,
+  dashTime: 0,
+  dashCd: 0,
+  dashVx: 0,
+  dashVy: 0,
+  invuln: 0,
+  trail: []
+};
+
+let enemies = [];
+let swings = [];
+let slashWaves = [];
+let shockwaves = [];
+let lightnings = [];
+let projectiles = [];
+let particles = [];
+let floatTexts = [];
+let stars = [];
+
+const waveMgr = {
+  waveIdx: 0,
+  queue: [],
+  timer: 0,
+  delay: 0.9,
+  clearWait: 0,
+  clearing: false
+};
+
+// إعداد نجوم/جزيئات الخلفية
+for (let i = 0; i < 35; i++) {
+  stars.push({
+    x: Math
