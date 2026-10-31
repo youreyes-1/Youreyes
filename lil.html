@@ -1,0 +1,994 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مشغل واستوديو المحاضرة الصوتية: الخدمة المدنية في السودان</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Cairo', 'Tajawal', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    .segment-card {
+      transition: all 0.25s ease;
+    }
+    .segment-active {
+      border-color: #38bdf8 !important;
+      background: linear-gradient(135deg, rgba(14, 116, 144, 0.35), rgba(15, 23, 42, 0.9)) !important;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.18);
+    }
+    .cue-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 9999px;
+      margin: 0 0.2rem;
+      font-weight: 600;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-30 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500 to-teal-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+          </svg>
+        </div>
+        <div>
+          <span class="text-xs font-semibold text-sky-400 tracking-wide block">محاضرة صوتية تفاعلية</span>
+          <h1 class="text-base sm:text-lg font-bold text-white leading-snug">تحولات الخدمة المدنية في السودان: من الجدارة إلى المحاصصة</h1>
+        </div>
+      </div>
+
+      <!-- Mode Switcher Tabs -->
+      <div class="flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700/70">
+        <button id="tabPlayerBtn" type="button" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition bg-sky-500 text-white shadow">
+          🎧 المشغل الصوتي الآلي
+        </button>
+        <button id="tabStudioBtn" type="button" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition text-slate-300 hover:text-white">
+          🎙️ الملقّن وتسجيل بصوتك
+        </button>
+        <button id="tabScriptBtn" type="button" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition text-slate-300 hover:text-white">
+          📄 نص الإلقاء المشكّل
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="fixed bottom-5 left-5 z-50 hidden bg-sky-600 text-white px-4 py-2.5 rounded-xl shadow-xl border border-sky-400/40 text-sm font-semibold flex items-center gap-2">
+    <span id="toastText">تم التنفيذ بنجاح</span>
+  </div>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+
+    <!-- Top Audio Deck (Always Visible in Player Mode) -->
+    <section id="playerDeckSection" class="bg-gradient-to-b from-slate-800/90 to-slate-900/95 border border-slate-700/80 rounded-2xl p-5 shadow-2xl">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+
+        <!-- Left/Right Info & Waveform -->
+        <div class="lg:col-span-7 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span id="statusBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-700 text-slate-300">
+                جاهز للتشغيل
+              </span>
+              <span id="currentSectionBadge" class="text-xs font-semibold text-sky-400">
+                المقدمة: إرث ويستمنستر والتحول الكبير
+              </span>
+            </div>
+            <div class="text-xs text-slate-400 font-mono">
+              الفقرة <span id="currentSegIndex" class="text-white font-bold">1</span> من <span id="totalSegCount" class="text-white font-bold">18</span>
+            </div>
+          </div>
+
+          <!-- Currently Spoken Text Highlight Box -->
+          <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 min-h-[96px] flex flex-col justify-center relative overflow-hidden">
+            <p id="liveCaptionText" class="text-base sm:text-lg leading-relaxed text-slate-100 font-medium">
+              بعد استقلال 1956 ورث السودان نموذج "ويستمنستر" الإداري، وقوامه ثلاث ركائز: حياد سياسي للموظف، اختيار بالجدارة، وتدرج وظيفي منضبط.
+            </p>
+          </div>
+
+          <!-- Waveform Canvas + Progress Bar -->
+          <div class="space-y-2">
+            <div class="relative h-14 bg-slate-950/60 rounded-xl border border-slate-800/80 overflow-hidden flex items-center px-3">
+              <canvas id="waveformCanvas" class="w-full h-10"></canvas>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="elapsedTimeLabel" class="text-xs font-mono text-slate-400 w-12 text-left">00:00</span>
+              <input id="progressSlider" type="range" min="0" max="17" value="0" step="1" class="w-full accent-sky-500 h-2 bg-slate-700 rounded-lg cursor-pointer" />
+              <span id="totalTimeLabel" class="text-xs font-mono text-slate-400 w-12">~05:30</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls & Voice Settings -->
+        <div class="lg:col-span-5 bg-slate-950/60 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
+          <!-- Primary Transport Buttons -->
+          <div class="flex items-center justify-center gap-3">
+            <button id="prevBtn" type="button" title="الفقرة السابقة" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition border border-slate-700">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <button id="playPauseBtn" type="button" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-500 to-teal-500 hover:from-sky-400 hover:to-teal-400 text-white font-bold shadow-lg shadow-sky-500/25 flex items-center gap-2.5 transition transform active:scale-95">
+              <span id="playPauseIcon">▶</span>
+              <span id="playPauseLabel">تشغيل المحاضرة</span>
+            </button>
+
+            <button id="stopBtn" type="button" title="إيقاف وإعادة للبداية" class="p-2.5 rounded-xl bg-slate-800 hover:bg-rose-950/70 hover:text-rose-300 text-slate-300 transition border border-slate-700">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6h12v12H6z" />
+              </svg>
+            </button>
+
+            <button id="nextBtn" type="button" title="الفقرة التالية" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition border border-slate-700">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Speed, Pitch & Voice Selection -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800/80 text-xs">
+            <div>
+              <label for="voiceSelect" class="block text-slate-400 mb-1 font-semibold">القارئ الصوتي (عربي):</label>
+              <select id="voiceSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
+                <option value="auto">تلقائي (الصوت العربي الافتراضي)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="speedSelect" class="block text-slate-400 mb-1 font-semibold">سرعة الإلقاء:</label>
+              <select id="speedSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
+                <option value="0.85">0.85x (هادئ ورزين)</option>
+                <option value="0.95" selected>0.95x (سرعة محاضرة طبيعية)</option>
+                <option value="1.05">1.05x (متوسط الحيوية)</option>
+                <option value="1.2">1.20x (سريع)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="pitchSelect" class="block text-slate-400 mb-1 font-semibold">طبقة الصوت (Pitch):</label>
+              <select id="pitchSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-sky-500">
+                <option value="0.9">عميقة (طابع أكاديمي)</option>
+                <option value="1.0" selected>طبيعية متوازنة</option>
+                <option value="1.1">واضحة ومشرقة</option>
+              </select>
+            </div>
+
+            <div class="flex items-end">
+              <button id="bgToneToggleBtn" type="button" class="w-full py-1.5 px-3 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold transition flex items-center justify-center gap-1.5">
+                <span id="bgToneIndicator" class="w-2 h-2 rounded-full bg-slate-500"></span>
+                <span>جرس فواصل المحاور: مفعل</span>
+              </button>
+            </div>
+          </div>
+
+          <p id="ttsSupportNote" class="text-[11px] text-slate-400 leading-normal text-center">
+            يعمل المشغل عبر محرك النطق العربي المدمج في متصفحك. انقر على أي فقرة بالأسفل للاستماع إليها مباشرة.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 1: Interactive Segmented Lecture Player -->
+    <section id="viewPlayer" class="space-y-4">
+      <!-- Quick Section Jump Pills -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2">
+        <button type="button" data-jump="0" class="section-jump-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40 hover:bg-sky-500/30 transition">
+          المقدمة (1956 - 1989)
+        </button>
+        <button type="button" data-jump="2" class="section-jump-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">
+          أولاً: التشخيص والتمكين
+        </button>
+        <button type="button" data-jump="5" class="section-jump-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">
+          ثانياً: النتائج على أرض الواقع
+        </button>
+        <button type="button" data-jump="9" class="section-jump-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">
+          ثالثاً: الإطار القانوني (قانون 2007)
+        </button>
+        <button type="button" data-jump="11" class="section-jump-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">
+          رابعاً: حزمة الحلول الرباعية
+        </button>
+        <button type="button" data-jump="15" class="section-jump-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">
+          خامساً: أسئلة النقاش والخاتمة
+        </button>
+      </div>
+
+      <!-- Segments Container -->
+      <div id="segmentsContainer" class="space-y-3"></div>
+    </section>
+
+    <!-- VIEW 2: Teleprompter & Microphone Studio Recorder -->
+    <section id="viewStudio" class="hidden space-y-5">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <h2 class="text-lg font-bold text-white">🎙️ استوديو التسجيل الصوتي والملقّن (Teleprompter)</h2>
+            <p class="text-xs text-slate-400 mt-0.5">
+              سجّل المحاضرة بصوتك مع شاشة قراءة تلقائية التمرير وعلامات التنغيم والوقفات، ثم حمّل المقطع الصوتي جاهزاً للإرسال.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button id="recordToggleBtn" type="button" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow-lg shadow-rose-600/25 transition">
+              <span id="recordDot" class="w-2.5 h-2.5 rounded-full bg-white"></span>
+              <span id="recordBtnLabel">بدء التسجيل من الميكروفون</span>
+            </button>
+
+            <button id="prompterToggleBtn" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-bold border border-slate-700 transition">
+              📜 تشغيل التمرير التلقائي
+            </button>
+
+            <select id="prompterSpeedSelect" aria-label="سرعة التمرير" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200">
+              <option value="1">سرعة تمرير: هادئة</option>
+              <option value="2" selected>سرعة تمرير: متوسطة</option>
+              <option value="3">سرعة تمرير: سريعة</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Recorded Audio Download Box -->
+        <div id="recordedAudioPanel" class="hidden bg-emerald-950/40 border border-emerald-500/40 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-emerald-400 block">✅ تم تجهيز المقطع الصوتي المسجّل!</span>
+            <p class="text-xs text-slate-300">يمكنك الاستماع للمراجعة أو تحميل الملف الصوتي مباشرة لإرساله.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <audio id="recordedAudioPlayer" controls class="h-9 rounded-lg"></audio>
+            <a id="downloadAudioLink" href="#" download="محاضرة_الخدمة_المدنية_في_السودان.webm" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow">
+              ⬇️ تحميل المقطع الصوتي
+            </a>
+          </div>
+        </div>
+
+        <!-- Teleprompter Scroll Box -->
+        <div id="teleprompterBox" class="bg-slate-950 border border-slate-800 rounded-2xl p-6 max-h-[460px] overflow-y-auto space-y-6 text-lg sm:text-xl leading-loose">
+          <!-- Populated dynamically with vocal cues -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: Full Formatted Voice-Over Script -->
+    <section id="viewScript" class="hidden space-y-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-white">📄 النص الإلقائي المشكّل (جاهز لبرامج التعليق الصوتي)</h2>
+            <p class="text-xs text-slate-400">
+              نص المحاضرة مضبوطاً بعلامات الترقيم والوقفات الصوتية لنسخه إلى أي منصة تعليق صوتي احترافية أو قراءته مباشرة.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="copyScriptBtn" type="button" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition">
+              📋 نسخ النص الكامل
+            </button>
+            <button id="downloadScriptBtn" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition">
+              💾 تحميل كملف نصي (.txt)
+            </button>
+          </div>
+        </div>
+        <textarea id="rawScriptTextarea" readonly class="w-full h-[460px] bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm sm:text-base text-slate-200 leading-relaxed focus:outline-none font-normal"></textarea>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Structured Lecture Data with Vocal Delivery Cues & Timing
+    const LECTURE_SEGMENTS = [
+      {
+        section: "المقدمة: إرث ويستمنستر والتحول الكبير",
+        cue: "نبرة استهلالية هادئة وممهدة",
+        durationSec: 18,
+        text: "بَعْدَ اسْتِقْلَالِ عَامِ أَلْفٍ وَتِسْعِمِائَةٍ وَسِتَّةٍ وَخَمْسِينَ، وَرِثَ السُّودَانُ نَمُوذَجَ «وِيسْتْمِنْسْتَر» الإِدَارِيَّ، وَقِوَامُهُ ثَلَاثُ رَكَائِزَ: حِيَادٌ سِيَاسِيٌّ لِلْمُوَظَّفِ، اخْتِيَارٌ بِالْجَدَارَةِ، وَتَدَرُّجٌ وَظِيفِيٌّ مُنْضَبِطٌ.",
+        cleanText: "بعد استقلال عام 1956، ورث السودان نموذج ويستمنستر الإداري، وقوامه ثلاث ركائز: حياد سياسي للموظف، اختيار بالجدارة، وتدرج وظيفي منضبط."
+      },
+      {
+        section: "المقدمة: إرث ويستمنستر والتحول الكبير",
+        cue: "تشديد على الفرضية المركزية",
+        durationSec: 19,
+        text: "هَذَا النَّمُوذَجُ اشْتَغَلَ عُقُوداً، لَكِنَّهُ تَعَرَّضَ لِتَحَوُّلٍ عَمِيقٍ بَلَغَ ذُرْوَتَهُ بَعْدَ عَامِ أَلْفٍ وَتِسْعِمِائَةٍ وَتِسْعَةٍ وَثَمَانِينَ. الفَرَضِيَّةُ المَرْكَزِيَّةُ هُنَا: انْتَقَلَ الجِهَازُ مِنَ الوَظِيفَةِ كَأَمَانَةٍ مِهْنِيَّةٍ، إِلَى الوَظِيفَةِ كَمَوْرِدِ مُحَاصَصَةٍ سِيَاسِيَّةٍ وَاجْتِمَاعِيَّةٍ.",
+        cleanText: "هذا النموذج اشتغل عقوداً، لكنه تعرض لتحول عميق بلغ ذروته بعد عام 1989. الفرضية المركزية: انتقل الجهاز من الوظيفة كأمانة مهنية إلى الوظيفة كمورد محاصصة سياسية واجتماعية."
+      },
+      {
+        section: "أولاً: التشخيص — كيف دخلت المحسوبية؟",
+        cue: "نبرة تحليلية دقيقة",
+        durationSec: 22,
+        text: "أَوَّلاً: التَّشْخِيصُ — كَيْفَ دَخَلَتِ المَحْسُوبِيَّةُ؟ البِدَايَةُ كَانَتْ سِيَاسَةَ «التَّمْكِينِ». وَهُنَا لَا بُدَّ مِنَ الدِّقَّةِ: المُشْكِلَةُ لَيْسَتْ فِي تَوْظِيفِ نَاسٍ جُدُدٍ، بَلْ فِي تَغْيِيرِ مِعْيَارِ الاخْتِيَارِ نَفْسِهِ. فُصِلَ آلَافُ الكَفَاءَاتِ بِحُجَّةِ «الصَّالِحِ العَامِّ»، وَأُحِلَّتْ كَوَادِرُ عَلَى أَسَاسِ الوَلَاءِ السِّيَاسِيِّ وَالأَيْدِيُولُوجِيِّ. بِهَذَا انْكَسَرَ عَمُودُ المِهْنِيَّةِ وَالتَّقَالِيدِ البِيرُوقْرَاطِيَّةِ.",
+        cleanText: "أولاً: التشخيص، كيف دخلت المحسوبية؟ البداية كانت سياسة التمكين. هنا لا بد من الدقة: المشكلة ليست في توظيف ناس جدد، بل في تغيير معيار الاختيار نفسه. فصل آلاف الكفاءات بحجة الصالح العام، وأحلت كوادر على أساس الولاء السياسي والأيديولوجي. بهذا انكسر عمود المهنية والتقاليد البيروقراطية."
+      },
+      {
+        section: "أولاً: التشخيص — كيف دخلت المحسوبية؟",
+        cue: "تقسيم ثلاثي واضح مع وقفة قصيرة بين الطبقات",
+        durationSec: 26,
+        text: "ثُمَّ تَمَدَّدَتِ المَحْسُوبِيَّةُ إِلَى ثَلَاثِ طَبَقَاتٍ: الطَّبَقَةُ الأُولَى سِيَاسِيَّةٌ؛ تَعْيِينُ المُوَالِينَ. الثَّانِيَةُ جِهَوِيَّةٌ وَقَبَلِيَّةٌ؛ الوَزِيرُ يَجْلِبُ مِنْ مِنْطَقَتِهِ أَوْ قَبِيلَتِهِ، وَهَذِهِ هِيَ «المُحَاصَصَةُ غَيْرُ الرَّسْمِيَّةِ». الثَّالِثَةُ وَسَاطَةٌ شَخْصِيَّةٌ؛ «الوَاسِطَةُ» تَنْقُلُ الأَوْرَاقَ وَتَخْتَصِرُ الإِجْرَاءَاتِ. النَّتِيجَةُ أَنَّ مَبْدَأَ قَوْمِيَّةِ الخِدْمَةِ المَدَنِيَّةِ — أَيْ خِدْمَةَ كُلِّ السُّودَانِيِّينَ بِالتَّسَاوِي — انْتُهِكَ، وَتَحَوَّلَ الجِهَازُ إِلَى شَبَكَاتٍ تَخْدِمُ بَعْضَهَا.",
+        cleanText: "ثم تمددت المحسوبية إلى ثلاث طبقات. الطبقة الأولى سياسية: تعيين الموالين. الثانية جهوية وقبلية: الوزير يجلب من منطقته أو قبيلته، وهذه هي المحاصصة غير الرسمية. الثالثة وساطة شخصية: الواسطة تنقل الأوراق وتختصر الإجراءات. النتيجة أن مبدأ قومية الخدمة المدنية، أي خدمة كل السودانيين بالتساوي، انتهك، وتحول الجهاز إلى شبكات تخدم بعضها."
+      },
+      {
+        section: "أولاً: التشخيص — كيف دخلت المحسوبية؟",
+        cue: "نبرة تساؤل يتبعها تفصيل الآليات",
+        durationSec: 24,
+        text: "وَهُنَا سُؤَالٌ: إِذَا كَانَ القَانُونُ مَوْجُوداً، فَكَيْفَ يَتَحَايَلُونَ عَلَيْهِ؟ عَبْرَ ثَلَاثِ آلِيَّاتٍ: الاسْتِثْنَاءَاتِ الوَزَارِيَّةِ، وَعُقُودِ الاسْتِخْدَامِ الخَاصَّةِ، وَالمَنَاصِبِ الاسْتِشَارِيَّةِ. الوَزِيرُ يَسْتَخْدِمُ صَلَاحِيَةَ «الاسْتِثْنَاءِ» بَدَلَ المُنَافَسَةِ، أَوْ يَعْقِدُ تَعْيِيناً مُبَاشِراً خَارِجَ المُفَوَّضِيَّةِ، أَوْ يُوَظِّفُ «مُسْتَشَاراً» لَا يَخْضَعُ لِإِجْرَاءَاتِ الاخْتِيَارِ. القَانُونُ مَوْجُودٌ، لَكِنَّ أَبْوَابَ التَّحَايُلِ مَفْتُوحَةٌ.",
+        cleanText: "وهنا سؤال: إذا كان القانون موجوداً، فكيف يتحايلون عليه؟ عبر ثلاث آليات: الاستثناءات الوزارية، وعقود الاستخدام الخاصة، والمناصب الاستشارية. الوزير يستخدم صلاحية الاستثناء بدل المنافسة، أو يعقد تعييناً مباشراً خارج المفوضية، أو يوظف مستشاراً لا يخضع لإجراءات الاختيار. القانون موجود، لكن أبواب التحايل مفتوحة."
+      },
+      {
+        section: "ثانياً: النتائج على أرض الواقع",
+        cue: "انتقال إلى المحور الثاني - نبرة جادة",
+        durationSec: 18,
+        text: "ثَانِياً: النَّتَائِجُ عَلَى أَرْضِ الوَاقِعِ. النَّتِيجَةُ الأُولَى: الهَيَاكِلُ المَقْلُوبَةُ. مُوَظَّفٌ بِلَا خِبْرَةٍ يَقْفِزُ إِلَى الدَّرَجَةِ الأُولَى أَوْ مُدِيرٍ عَامٍّ بِفِعْلِ الوَاسِطَةِ، بَيْنَمَا الكُفْءُ صَاحِبُ الخِبْرَةِ يَجِدُ نَفْسَهُ تَحْتَ رِئَاسَتِهِ. القِمَّةُ غَيْرُ مُؤَهَّلَةٍ، فَتَتَعَطَّلُ القَاعِدَةُ كُلُّهَا.",
+        cleanText: "ثانياً: النتائج على أرض الواقع. أولاً: الهياكل المقلوبة. موظف بلا خبرة يقفز إلى الدرجة الأولى أو مدير عام بفعل الواسطة، بينما الكفؤ صاحب الخبرة يجد نفسه تحت رئاسته. القمة غير مؤهلة، فتتعطل القاعدة كلها."
+      },
+      {
+        section: "ثانياً: النتائج على أرض الواقع",
+        cue: "نبرة أسف وتركيز على الخسارة الوطنية",
+        durationSec: 12,
+        text: "النَّتِيجَةُ الثَّانِيَةُ: نَزِيفُ الكَفَاءَاتِ. الكَوَادِرُ المُحْبَطَةُ تُهَاجِرُ إِلَى دُوَلِ الخَلِيجِ وَغَيْرِهَا. البَلَدُ يَخْسَرُ أَغْلَى مَا عِنْدَهُ: العُقُولَ.",
+        cleanText: "ثانياً: نزيف الكفاءات. الكوادر المحبطة تهاجر إلى دول الخليج وغيرها. البلد يخسر أغلى ما عنده: العقول."
+      },
+      {
+        section: "ثانياً: النتائج على أرض الواقع",
+        cue: "توضيح أثر غياب الكفاءة على التنمية",
+        durationSec: 16,
+        text: "النَّتِيجَةُ الثَّالِثَةُ: تَعَطُّلُ التَّخْطِيطِ المُؤَسَّسِيِّ. الوِزَارَاتُ الفَنِّيَّةُ — المَالِيَّةُ، الزِّرَاعَةُ، الرَّيُّ — تَفْقِدُ قُدْرَتَهَا عَلَى إِنْتَاجِ سِيَاسَاتٍ رَشِيدَةٍ وَإِدَارَةِ مَشَارِيعَ تَنْمَوِيَّةٍ. المَشَارِيعُ تَفْشَلُ لَا لِأَنَّ الفِكْرَةَ غَلَطٌ، بَلْ لِأَنَّ التَّنْفِيذَ ضَعِيفٌ.",
+        cleanText: "ثالثاً: تعطل التخطيط المؤسسي. الوزارات الفنية، المالية، الزراعة، الري، تفقد قدرتها على إنتاج سياسات رشيدة وإدارة مشاريع تنموية. المشاريع تفشل لا لأن الفكرة غلط، بل لأن التنفيذ ضعيف."
+      },
+      {
+        section: "ثانياً: النتائج على أرض الواقع",
+        cue: "تحذير حاسم عند عبارة الإفلات من العقاب",
+        durationSec: 19,
+        text: "النَّتِيجَةُ الرَّابِعَةُ: الإِفْلَاتُ مِنَ العِقَابِ. قَانُونُ مُحَاسَبَةِ العَامِلِينَ لِسَنَةِ أَلْفَيْنِ وَسَبْعَةٍ أَنْشَأَ مَجَالِسَ مُحَاسَبَةٍ، لَكِنَّ المَحْسُوبِيَّةَ عَطَّلَتْهَا عَمَلِيّاً. المُوَالِي يُحْمَى، وَالمُخَالَفَةُ تَمُرُّ. تَتَخَلَّقُ ثَقَافَةُ «الإِفْلَاتِ مِنَ العِقَابِ»، وَهِيَ أَخْطَرُ مِنَ المُخَالَفَةِ نَفْسِهَا.",
+        cleanText: "رابعاً: الإفلات من العقاب. قانون محاسبة العاملين لسنة 2007 أنشأ مجالس محاسبة، لكن المحسوبية عطلتها عملياً. الموالي يحمى، والمخالفة تمر. تتخلق ثقافة الإفلات من العقاب، وهي أخطر من المخالفة نفسها."
+      },
+      {
+        section: "ثالثاً: الإطار القانوني — النص ممتاز والتطبيق ضعيف",
+        cue: "استشهاد قانوني واضح ومباشر",
+        durationSec: 20,
+        text: "ثَالِثاً: الإِطَارُ القَانُونِيُّ — النَّصُّ مُمْتَازٌ وَالتَّطْبِيقُ ضَعِيفٌ. قَانُونُ الخِدْمَةِ المَدَنِيَّةِ القَوْمِيَّةِ لِسَنَةِ أَلْفَيْنِ وَسَبْعَةٍ، فِي المَادَّةِ الثَّانِيَةِ وَالعِشْرِينَ، نَصَّ صَرَاحَةً عَلَى أَنَّ الاخْتِيَارَ يَكُونُ عَلَى أَسَاسِ «المُنَافَسَةِ الحُرَّةِ وَمَعَايِيرِ الجَدَارَةِ وَالقُدُرَاتِ عَبْرَ الامْتِحَانِ أَوِ المُقَابَلَاتِ». إِذَنِ المُشْكِلَةُ لَيْسَتْ فِي غِيَابِ النَّصِّ، بَلْ فِي فَجْوَةِ التَّطْبِيقِ.",
+        cleanText: "ثالثاً: الإطار القانوني، النص ممتاز والتطبيق ضعيف. قانون الخدمة المدنية القومية لسنة 2007، في المادة 22، نص صراحة على أن الاختيار يكون على أساس المنافسة الحرة ومعايير الجدارة والقدرات عبر الامتحان أو المقابلات. إذن المشكلة ليست في غياب النص، بل في فجوة التطبيق."
+      },
+      {
+        section: "ثالثاً: الإطار القانوني — النص ممتاز والتطبيق ضعيف",
+        cue: "تلخيص مركز لآليات الفجوة الثلاث",
+        durationSec: 22,
+        text: "وَلَدَيْنَا مُفَوَّضِيَّةُ الاخْتِيَارِ لِلْخِدْمَةِ المَدَنِيَّةِ، وَدَوْرُهَا اخْتِبَارُ وَتَعْيِينُ مَدْخَلِ الخِدْمَةِ وَالمُنَافَسَاتِ العَامَّةِ. لَكِنَّ قُصُورَهَا الوَاقِعِيَّ فِي ضَعْفِ الاسْتِقْلَالِيَّةِ عَنِ الجِهَازِ التَّنْفِيذِيِّ، وَتَأَثُّرِ المُعَايَنَاتِ وَالمُقَابَلَاتِ بِالتَّدَخُّلَاتِ وَالضُّغُوطِ غَيْرِ المِهْنِيَّةِ. الخُلَاصَةُ: فَجْوَةُ التَّطْبِيقِ تُنْتِجُهَا ثَلَاثُ آلِيَّاتٍ: الاسْتِثْنَاءُ الوَزَارِيُّ، وَضَعْفُ اسْتِقْلَالِيَّةِ المُفَوَّضِيَّةِ، وَتَعْطِيلُ مَجَالِسِ المُحَاسَبَةِ.",
+        cleanText: "ولدينا مفوضية الاختيار للخدمة المدنية، ودورها اختبار وتعيين مدخل الخدمة والمنافسات العامة. لكن قصورها الواقعي في ضعف الاستقلالية عن الجهاز التنفيذي، وتأثر المعاينات والمقابلات بالتدخلات والضغوط غير المهنية. الخلاصة: فجوة التطبيق تنتجها ثلاث آليات: الاستثناء الوزاري، وضعف استقلالية المفوضية، وتعطيل مجالس المحاسبة."
+      },
+      {
+        section: "رابعاً: الحل — حزمة متكاملة لا تتجزأ",
+        cue: "نبرة حازمة وبنّاءة - الحزمة الأولى",
+        durationSec: 25,
+        text: "رَابِعاً: الحَلُّ — حُزْمَةٌ مُتَكَامِلَةٌ لَا تَتَجَزَّأُ. الحُزْمَةُ الأُولَى: إِصْلَاحٌ تَشْرِيعِيٌّ. إِلْغَاءُ سُلْطَةِ «الاسْتِثْنَاءَاتِ» الوَزَارِيَّةِ، وَتَعْدِيلُ لَوَائِحِ أَلْفَيْنِ وَسَبْعَةٍ بِحَيْثُ لَا يَمْلِكُ الوُزَرَاءُ وَالوُكَلَاءُ وَالوُلَاةُ صَلَاحِيَّاتٍ تَقْدِيرِيَّةً فِي التَّعْيِينِ دُونَ مُنَافَسَةٍ. وَأَيُّ تَعْيِينٍ خَارِجَ المُفَوَّضِيَّةِ يُعَدُّ بَاطِلاً قَانُونِيّاً وَمُوجِباً لِلْمُسَاءَلَةِ الجِنَائِيَّةِ. مَعَ إِعَادَةِ تَشْكِيلِ المُفَوَّضِيَّةِ كَهَيْئَةٍ دُسْتُورِيَّةٍ مُسْتَقِلَّةٍ تَتْبَعُ البَرْلَمَانَ أَوْ مَجْلِسَ السِّيَادَةِ، وَتُدَارُ بِخُبَرَاءِ إِدَارَةٍ وَقُضَاةٍ مُتَقَاعِدِينَ، وَبِمِيزَانِيَّةٍ مُسْتَقِلَّةٍ.",
+        cleanText: "رابعاً: الحل، حزمة متكاملة لا تتجزأ. الحزمة الأولى: إصلاح تشريعي. إلغاء سلطة الاستثناءات الوزارية، وتعديل لوائح 2007 بحيث لا يملك الوزراء والوكلاء والولاة صلاحيات تقديرية في التعيين دون منافسة. وأي تعيين خارج المفوضية يعد باطلاً قانونياً وموجباً للمساءلة الجنائية. مع إعادة تشكيل المفوضية كهيئة دستورية مستقلة تتبع البرلمان أو مجلس السيادة، وتدار بخبراء إدارة وقضاة متقاعدين، وبميزانية مستقلة."
+      },
+      {
+        section: "رابعاً: الحل — حزمة متكاملة لا تتجزأ",
+        cue: "نبرة استشرافية حديثة - الحزمة الثانية",
+        durationSec: 23,
+        text: "الحُزْمَةُ الثَّانِيَةُ: رَقْمَنَةٌ شَامِلَةٌ. مِنَصَّةُ «جَدَارَةٍ سُودَانِيَّةٍ» مُوَحَّدَةٌ تَرْبِطُ الوَظَائِفَ الشَّاغِرَةَ بِالرَّقْمِ الوَطَنِيِّ وَالشَّهَادَاتِ المُوَثَّقَةِ إِلِكْتُرُونِيّاً مِنْ وِزَارَةِ التَّعْلِيمِ العَالِي، مَعَ فَرْزٍ وَتَصْحِيحٍ إِلِكْتُرُونِيٍّ لِاخْتِبَارَاتِ القُدُرَاتِ دُونَ تَدَخُّلٍ بَشَرِيٍّ. وَاسْتِبْدَالِ المُقَابَلَاتِ التَّقْلِيدِيَّةِ بِمَرَاكِزِ تَقْيِيمٍ مُوَحَّدَةٍ وَاخْتِبَارَاتِ مُحَاكَاةٍ مُسَجَّلَةٍ، لِقَطْعِ طَرِيقِ المُحَابَاةِ الشَّفَهِيَّةِ.",
+        cleanText: "الحزمة الثانية: رقمنة شاملة. منصة جدارة سودانية موحدة تربط الوظائف الشاغرة بالرقم الوطني والشهادات الموثقة إلكترونياً من وزارة التعليم العالي، مع فرز وتصحيح إلكتروني لاختبارات القدرات دون تدخل بشري. واستبدال المقابلات التقليدية بمراكز تقييم موحدة واختبارات محاكاة مسجلة، لقطع طريق المحاباة الشفهية."
+      },
+      {
+        section: "رابعاً: الحل — حزمة متكاملة لا تتجزأ",
+        cue: "نبرة عملية تنظيمية - الحزمة الثالثة",
+        durationSec: 21,
+        text: "الحُزْمَةُ الثَّالِثَةُ: تَدْقِيقُ السِّجِلَّاتِ. مُطَابَقَةٌ بِيُومِتْرِيَّةٌ وَرْبْطُ المُرَتَّبَاتِ بِالرَّقْمِ الوَطَنِيِّ بِالتَّنْسِيقِ مَعَ دِيوَانِ الحِسَابَاتِ وَدِيوَانِ المُرَاجِعِ، لِلْقَضَاءِ عَلَى المُوَظَّفِينَ الوَهْمِيِّينَ. وَإِلْزَامُ وِزَارَتَيِ التَّنْمِيَةِ الإِدَارِيَّةِ وَالعَمَلِ بِتَحْدِيثِ بِطَاقَاتِ الوَصْفِ الوَظِيفِيِّ: الدَّرَجَاتِ، المُؤَهِّلَاتِ، مَعَايِيرِ التَّرْقِيَةِ، وَمَنْعِ شَغْلِ أَيِّ مَنْصِبٍ لَا يُطَابِقُ مُؤَهِّلَ صَاحِبِهِ.",
+        cleanText: "الحزمة الثالثة: تدقيق السجلات. مطابقة بيومترية وربط المرتبات بالرقم الوطني بالتنسيق مع ديوان الحسابات وديوان المراجع، للقضاء على الموظفين الوهميين. وإلزام وزارتي التنمية الإدارية والعمل بتحديث بطاقات الوصف الوظيفي: الدرجات، المؤهلات، معايير الترقية، ومنع شغل أي منصب لا يطابق مؤهل صاحبه."
+      },
+      {
+        section: "رابعاً: الحل — حزمة متكاملة لا تتجزأ",
+        cue: "نبرة رقابية حاسمة - الحزمة الرابعة",
+        durationSec: 19,
+        text: "الحُزْمَةُ الرَّابِعَةُ: قَضَاءٌ إِدَارِيٌّ فَعَّالٌ. إِتَاحَةُ طَعْنٍ عَاجِلٍ أَمَامَ مَحْكَمَةِ العَمَلِ وَالقَضَاءِ الإِدَارِيِّ ضِدَّ قَرَارَاتِ التَّعْيِينِ أَوِ التَّرْقِيَةِ المُخَالِفَةِ، مَعَ إِلْغَاءٍ فَوْرِيٍّ وَتَعْوِيضٍ. وَإِنْشَاءُ وَحْدَةِ تَفْتِيشٍ إِدَارِيٍّ مُسْتَقِلَّةٍ تَابِعَةٍ لِلْمُرَاجِعِ القَوْمِيِّ تَرْصُدُ مُخَالَفَاتِ التَّعْيِينِ وَالتَّرْقِيَاتِ وَتُدَقِّقُ سِجِلَّاتِ الأَدَاءِ.",
+        cleanText: "الحزمة الرابعة: قضاء إداري فعال. إتاحة طعن عاجل أمام محكمة العمل والقضاء الإداري ضد قرارات التعيين أو الترقية المخالفة، مع إلغاء فوري وتعويض. وإنشاء وحدة تفتيش إداري مستقلة تابعة للمراجع القومي ترصد مخالفات التعيين والترقيات وتدقق سجلات الأداء."
+      },
+      {
+        section: "خامساً: أسئلة للنقاش",
+        cue: "نبرة تفاعلية مفتوحة للحوار مع وقفة بين كل سؤال",
+        durationSec: 25,
+        text: "خَامِساً: أَسْئِلَةٌ لِلنِّقَاشِ. السُّؤَالُ الأَوَّلُ: هَلْ يُمْكِنُ اسْتِعَادَةُ الجَدَارَةِ فِي غِيَابِ اسْتِقْرَارٍ سِيَاسِيٍّ مُؤَسَّسِيٍّ، أَمْ أَنَّ الإِصْلَاحَ الإِدَارِيَّ مَشْرُوطٌ بِإِصْلَاحٍ سِيَاسِيٍّ أَعْمَقَ؟ السُّؤَالُ الثَّانِي: هَلِ الرَّقْمَنَةُ وَحْدَهَا كَافِيَةٌ، أَمْ قَدْ تُنْتِجُ «مَحْسُوبِيَّةً رَقْمِيَّةً» عَبْرَ التَّحَكُّمِ فِي البَيَانَاتِ وَالخَوَارِزْمِيَّاتِ؟ السُّؤَالُ الثَّالِثُ: لِمَاذَا تَسْتَمِرُّ المَحْسُوبِيَّةُ الجِهَوِيَّةُ رَغْمَ وُضُوحِ القَانُونِ؟ هَلِ المُشْكِلَةُ قَانُونِيَّةٌ أَمْ ثَقَافِيَّةٌ مُؤَسَّسِيَّةٌ؟ السُّؤَالُ الرَّابِعُ: مَا دَوْرُ المُجْتَمَعِ المَدَنِيِّ وَالنِّقَابَاتِ المِهْنِيَّةِ فِي الرَّقَابَةِ عَلَى التَّعْيِينَاتِ؟",
+        cleanText: "خامساً: أسئلة للنقاش. أولاً: هل يمكن استعادة الجدارة في غياب استقرار سياسي مؤسسي، أم أن الإصلاح الإداري مشروط بإصلاح سياسي أعمق؟ ثانياً: هل الرقمنة وحدها كافية، أم قد تنتج محسوبية رقمية عبر التحكم في البيانات والخوارزميات؟ ثالثاً: لماذا تستمر المحسوبية الجهوية رغم وضوح القانون؟ هل المشكلة قانونية أم ثقافية مؤسسية؟ رابعاً: ما دور المجتمع المدني والنقابات المهنية في الرقابة على التعيينات؟"
+      },
+      {
+        section: "خاتمة المحاضرة",
+        cue: "نبرة ختامية جامعة وقوية",
+        durationSec: 24,
+        text: "خَاتِمَةٌ: أَزْمَةُ الخِدْمَةِ المَدَنِيَّةِ فِي السُّودَانِ لَيْسَتْ أَزْمَةَ نُصُوصٍ قَانُونِيَّةٍ، بَلْ أَزْمَةُ إِرَادَةِ تَطْبِيقٍ وَبِنْيَةِ حَوَافِزَ. المَادَّةُ الثَّانِيَةُ وَالعِشْرُونَ وَاضِحَةٌ، لَكِنَّ الاسْتِثْنَاءَاتِ وَالتَّعْيِينَ التَّعَاقُدِيَّ وَضَعْفَ اسْتِقْلَالِيَّةِ المُفَوَّضِيَّةِ وَتَعْطِيلَ مَجَالِسِ المُحَاسَبَةِ حَوَّلَتِ النَّصَّ إِلَى حِبْرٍ عَلَى وَرَقٍ. لِذَلِكَ أَيُّ إِصْلَاحٍ جَادٍّ لَازِمٌ يَكُونُ حُزْمَةً مُتَكَامِلَةً: تَشْرِيعٌ يُلْغِي التَّقْدِيرَ الوَزَارِيَّ، مُؤَسَّسَةٌ مُسْتَقِلَّةٌ تُدِيرُ الاخْتِيَارَ، رَقْمَنَةٌ تُغْلِقُ أَبْوَابَ الوَسَاطَةِ، قَضَاءٌ إِدَارِيٌّ يُعِيدُ الثِّقَةَ، وَتَفْتِيشٌ مُسْتَقِلٌّ يُرَاقِبُ.",
+        cleanText: "خاتمة: أزمة الخدمة المدنية في السودان ليست أزمة نصوص قانونية، بل أزمة إرادة تطبيق وبنية حوافز. المادة 22 واضحة، لكن الاستثناءات والتعيين التعاقدي وضعف استقلالية المفوضية وتعطيل مجالس المحاسبة حولت النص إلى حبر على ورق. لذلك أي إصلاح جاد لازم يكون حزمة متكاملة: تشريع يلغي التقدير الوزاري، مؤسسة مستقلة تدير الاختيار، رقمنة تغلق أبواب الوساطة، قضاء إداري يعيد الثقة، وتفتيش مستقل يراقب."
+      },
+      {
+        section: "خاتمة المحاضرة",
+        cue: "إبطاء وتشديد على الجملة المفتاحية ثم تحية الختام",
+        durationSec: 17,
+        text: "وَالجُمْلَةُ الَّتِي أُرِيدُكُمْ أَنْ تَحْفَظُوهَا: اسْتِعَادَةُ الجَدَارَةِ لَيْسَتْ مَشْرُوعاً تِقْنِيّاً فَحَسْبُ، بَلْ مَشْرُوعُ إِعَادَةِ تَعْرِيفِ العَلَاقَةِ بَيْنَ الدَّوْلَةِ وَالوَظِيفَةِ العَامَّةِ: مِنَ الوَظِيفَةِ كَمُكَافَأَةِ وَلَاءٍ، إِلَى الوَظِيفَةِ كَأَمَانَةِ كَفَاءَةٍ. شُكْراً لَكُمْ، وَأَنَا جَاهِزٌ لِأَسْئِلَتِكُمْ.",
+        cleanText: "والجملة التي أريدكم أن تحفظوها: استعادة الجدارة ليست مشروعاً تقنياً فحسب، بل مشروع إعادة تعريف العلاقة بين الدولة والوظيفة العامة: من الوظيفة كمكافأة ولاء إلى الوظيفة كأمانة كفاءة. شكراً لكم، وأنا جاهز لأسئلتكم."
+      }
+    ];
+
+    // State
+    let currentIndex = 0;
+    let isPlaying = false;
+    let isPaused = false;
+    let chimeEnabled = true;
+    let availableVoices = [];
+    let activeUtterance = null;
+    let audioCtx = null;
+    let animFrameId = null;
+    let prompterInterval = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+
+    // DOM Elements
+    const tabPlayerBtn = document.getElementById('tabPlayerBtn');
+    const tabStudioBtn = document.getElementById('tabStudioBtn');
+    const tabScriptBtn = document.getElementById('tabScriptBtn');
+    const viewPlayer = document.getElementById('viewPlayer');
+    const viewStudio = document.getElementById('viewStudio');
+    const viewScript = document.getElementById('viewScript');
+
+    const statusBadge = document.getElementById('statusBadge');
+    const currentSectionBadge = document.getElementById('currentSectionBadge');
+    const currentSegIndex = document.getElementById('currentSegIndex');
+    const totalSegCount = document.getElementById('totalSegCount');
+    const liveCaptionText = document.getElementById('liveCaptionText');
+    const progressSlider = document.getElementById('progressSlider');
+    const elapsedTimeLabel = document.getElementById('elapsedTimeLabel');
+    const totalTimeLabel = document.getElementById('totalTimeLabel');
+
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+    const playPauseLabel = document.getElementById('playPauseLabel');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const stopBtn = document.getElementById('stopBtn');
+
+    const voiceSelect = document.getElementById('voiceSelect');
+    const speedSelect = document.getElementById('speedSelect');
+    const pitchSelect = document.getElementById('pitchSelect');
+    const bgToneToggleBtn = document.getElementById('bgToneToggleBtn');
+    const bgToneIndicator = document.getElementById('bgToneIndicator');
+    const ttsSupportNote = document.getElementById('ttsSupportNote');
+
+    const segmentsContainer = document.getElementById('segmentsContainer');
+    const teleprompterBox = document.getElementById('teleprompterBox');
+    const rawScriptTextarea = document.getElementById('rawScriptTextarea');
+    const waveformCanvas = document.getElementById('waveformCanvas');
+
+    const recordToggleBtn = document.getElementById('recordToggleBtn');
+    const recordBtnLabel = document.getElementById('recordBtnLabel');
+    const recordDot = document.getElementById('recordDot');
+    const prompterToggleBtn = document.getElementById('prompterToggleBtn');
+    const prompterSpeedSelect = document.getElementById('prompterSpeedSelect');
+    const recordedAudioPanel = document.getElementById('recordedAudioPanel');
+    const recordedAudioPlayer = document.getElementById('recordedAudioPlayer');
+    const downloadAudioLink = document.getElementById('downloadAudioLink');
+
+    const copyScriptBtn = document.getElementById('copyScriptBtn');
+    const downloadScriptBtn = document.getElementById('downloadScriptBtn');
+    const toastBox = document.getElementById('toastBox');
+    const toastText = document.getElementById('toastText');
+
+    function showToast(msg) {
+      toastText.textContent = msg;
+      toastBox.classList.remove('hidden');
+      setTimeout(() => {
+        toastBox.classList.add('hidden');
+      }, 3000);
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+
+    function computeTimings() {
+      const rate = parseFloat(speedSelect.value) || 1;
+      let total = 0;
+      let elapsed = 0;
+      LECTURE_SEGMENTS.forEach((seg, idx) => {
+        const d = seg.durationSec / rate;
+        total += d;
+        if (idx < currentIndex) elapsed += d;
+      });
+      elapsedTimeLabel.textContent = formatTime(elapsed);
+      totalTimeLabel.textContent = '~' + formatTime(total);
+    }
+
+    // Web Audio API subtle transition chime between major lecture sections
+    function playSectionChime() {
+      if (!chimeEnabled) return;
+      try {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) audioCtx = new AudioContextClass();
+        }
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(528, now);
+        osc.frequency.exponentialRampToValueAtTime(660, now + 0.18);
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.36);
+      } catch (e) {
+        // Ignore audio context errors if blocked
+      }
+    }
+
+    // Load voices from Web Speech API
+    function populateVoices() {
+      if (!('speechSynthesis' in window)) {
+        ttsSupportNote.textContent = 'تنبيه: متصفحك الحالي لا يدعم محرك النطق المدمج. يمكنك استخدام تبويب "الملقّن وتسجيل بصوتك" أو "نص الإلقاء المشكّل".';
+        return;
+      }
+      const voices = window.speechSynthesis.getVoices() || [];
+      availableVoices = voices;
+      const arabicVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('ar'));
+      voiceSelect.innerHTML = '<option value="auto">تلقائي (أفضل صوت عربي متاح)</option>';
+      arabicVoices.forEach((v, i) => {
+        const opt = document.createElement('option');
+        opt.value = String(i);
+        opt.textContent = `${v.name} (${v.lang})`;
+        voiceSelect.appendChild(opt);
+      });
+      if (arabicVoices.length > 0) {
+        ttsSupportNote.textContent = `تم العثور على ${arabicVoices.length} صوت عربي في جهازك. اضغط "تشغيل المحاضرة" للاستماع الفوري.`;
+      }
+    }
+
+    if ('speechSynthesis' in window) {
+      populateVoices();
+      window.speechSynthesis.onvoiceschanged = populateVoices;
+    }
+
+    // Render segment cards, teleprompter, and full script
+    function renderAllContent() {
+      totalSegCount.textContent = String(LECTURE_SEGMENTS.length);
+      progressSlider.max = String(LECTURE_SEGMENTS.length - 1);
+
+      segmentsContainer.innerHTML = '';
+      teleprompterBox.innerHTML = '';
+      let lastSection = '';
+      let scriptLines = [];
+
+      LECTURE_SEGMENTS.forEach((seg, idx) => {
+        const isNewSection = seg.section !== lastSection;
+        if (isNewSection) {
+          lastSection = seg.section;
+          scriptLines.push(`\n=== ${seg.section} ===\n`);
+
+          const headerEl = document.createElement('div');
+          headerEl.className = 'pt-3 pb-1 flex items-center gap-2';
+          headerEl.innerHTML = `
+            <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+            <h3 class="text-sm sm:text-base font-extrabold text-sky-400">${seg.section}</h3>
+          `;
+          segmentsContainer.appendChild(headerEl);
+
+          const prompterSecEl = document.createElement('div');
+          prompterSecEl.className = 'text-sky-400 font-bold text-base border-b border-slate-800 pb-1 pt-2';
+          prompterSecEl.textContent = `◆ ${seg.section}`;
+          teleprompterBox.appendChild(prompterSecEl);
+        }
+
+        scriptLines.push(`[إرشاد صوتي: ${seg.cue}]`);
+        scriptLines.push(seg.text + '\n');
+
+        // Segment Card
+        const card = document.createElement('div');
+        card.id = `seg-card-${idx}`;
+        card.className = `segment-card cursor-pointer rounded-xl border border-slate-800 bg-slate-900/75 hover:bg-slate-800/80 p-4 flex items-start justify-between gap-4 ${idx === currentIndex ? 'segment-active' : ''}`;
+        card.innerHTML = `
+          <div class="space-y-1.5 flex-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-xs font-mono">#${idx + 1}</span>
+              <span class="cue-badge bg-teal-950 text-teal-300 border border-teal-700/50">🎙️ ${seg.cue}</span>
+            </div>
+            <p class="text-sm sm:text-base text-slate-100 leading-relaxed">${seg.text}</p>
+          </div>
+          <button type="button" data-play-idx="${idx}" class="shrink-0 w-9 h-9 rounded-lg bg-slate-800 hover:bg-sky-500 text-slate-300 hover:text-white flex items-center justify-center transition border border-slate-700" title="تشغيل من هذه الفقرة">
+            ▶
+          </button>
+        `;
+        card.addEventListener('click', () => {
+          selectAndPlaySegment(idx);
+        });
+        segmentsContainer.appendChild(card);
+
+        // Teleprompter Paragraph
+        const pBlock = document.createElement('div');
+        pBlock.className = 'bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 space-y-2';
+        pBlock.innerHTML = `
+          <div class="text-xs text-amber-300 font-semibold">💡 توجيه الإلقاء: ${seg.cue} — [وقفة تنفس في نهاية الفقرة]</div>
+          <p class="text-slate-100 leading-loose">${seg.text}</p>
+        `;
+        teleprompterBox.appendChild(pBlock);
+      });
+
+      rawScriptTextarea.value = scriptLines.join('\n').trim();
+      updateActiveUI();
+    }
+
+    function updateActiveUI() {
+      const seg = LECTURE_SEGMENTS[currentIndex];
+      currentSegIndex.textContent = String(currentIndex + 1);
+      currentSectionBadge.textContent = seg.section;
+      liveCaptionText.textContent = seg.text;
+      progressSlider.value = String(currentIndex);
+      computeTimings();
+
+      LECTURE_SEGMENTS.forEach((_, idx) => {
+        const card = document.getElementById(`seg-card-${idx}`);
+        if (!card) return;
+        if (idx === currentIndex) {
+          card.classList.add('segment-active');
+        } else {
+          card.classList.remove('segment-active');
+        }
+      });
+
+      if (isPlaying && !isPaused) {
+        statusBadge.textContent = '🔊 جاري الإلقاء الصوتي...';
+        statusBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40';
+        playPauseIcon.textContent = '⏸';
+        playPauseLabel.textContent = 'إيقاف مؤقت';
+      } else if (isPaused) {
+        statusBadge.textContent = '⏸ متوقف مؤقتاً';
+        statusBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        playPauseIcon.textContent = '▶';
+        playPauseLabel.textContent = 'استئناف المحاضرة';
+      } else {
+        statusBadge.textContent = 'جاهز للتشغيل';
+        statusBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-700 text-slate-300';
+        playPauseIcon.textContent = '▶';
+        playPauseLabel.textContent = 'تشغيل المحاضرة';
+      }
+    }
+
+    function speakCurrentSegment() {
+      if (!('speechSynthesis' in window)) {
+        showToast('متصفحك لا يدعم النطق الآلي، استخدم وضع الملقّن أو انسخ النص');
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      const seg = LECTURE_SEGMENTS[currentIndex];
+      if (currentIndex === 0 || LECTURE_SEGMENTS[currentIndex - 1].section !== seg.section) {
+        playSectionChime();
+      }
+
+      const utter = new SpeechSynthesisUtterance(seg.cleanText);
+      utter.lang = 'ar-SA';
+      utter.rate = parseFloat(speedSelect.value) || 0.95;
+      utter.pitch = parseFloat(pitchSelect.value) || 1.0;
+
+      const voices = window.speechSynthesis.getVoices() || [];
+      const arabicVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('ar'));
+      if (voiceSelect.value !== 'auto') {
+        const chosen = arabicVoices[parseInt(voiceSelect.value, 10)];
+        if (chosen) utter.voice = chosen;
+      } else if (arabicVoices.length > 0) {
+        utter.voice = arabicVoices[0];
+      }
+
+      utter.onend = () => {
+        if (isPlaying && !isPaused) {
+          if (currentIndex < LECTURE_SEGMENTS.length - 1) {
+            currentIndex++;
+            updateActiveUI();
+            const activeCard = document.getElementById(`seg-card-${currentIndex}`);
+            if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            speakCurrentSegment();
+          } else {
+            isPlaying = false;
+            isPaused = false;
+            updateActiveUI();
+            showToast('اكتمل إلقاء المحاضرة الصوتية بنجاح');
+          }
+        }
+      };
+
+      utter.onerror = () => {
+        // Handle interruption gracefully
+      };
+
+      activeUtterance = utter;
+      isPlaying = true;
+      isPaused = false;
+      updateActiveUI();
+      window.speechSynthesis.speak(utter);
+    }
+
+    function selectAndPlaySegment(idx) {
+      currentIndex = Math.max(0, Math.min(LECTURE_SEGMENTS.length - 1, idx));
+      isPlaying = true;
+      isPaused = false;
+      speakCurrentSegment();
+    }
+
+    playPauseBtn.addEventListener('click', () => {
+      if (!('speechSynthesis' in window)) {
+        showToast('متصفحك لا يدعم النطق الآلي المباشر');
+        return;
+      }
+      if (!isPlaying) {
+        speakCurrentSegment();
+      } else if (!isPaused) {
+        window.speechSynthesis.pause();
+        isPaused = true;
+        updateActiveUI();
+      } else {
+        window.speechSynthesis.resume();
+        isPaused = false;
+        updateActiveUI();
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      isPlaying = false;
+      isPaused = false;
+      currentIndex = 0;
+      updateActiveUI();
+    });
+
+    prevBtn.addEventListener('click', () => {
+      currentIndex = Math.max(0, currentIndex - 1);
+      if (isPlaying) {
+        speakCurrentSegment();
+      } else {
+        updateActiveUI();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentIndex = Math.min(LECTURE_SEGMENTS.length - 1, currentIndex + 1);
+      if (isPlaying) {
+        speakCurrentSegment();
+      } else {
+        updateActiveUI();
+      }
+    });
+
+    progressSlider.addEventListener('input', (e) => {
+      currentIndex = parseInt(e.target.value, 10) || 0;
+      if (isPlaying) {
+        speakCurrentSegment();
+      } else {
+        updateActiveUI();
+      }
+    });
+
+    speedSelect.addEventListener('change', () => {
+      computeTimings();
+      if (isPlaying && !isPaused) speakCurrentSegment();
+    });
+
+    pitchSelect.addEventListener('change', () => {
+      if (isPlaying && !isPaused) speakCurrentSegment();
+    });
+
+    voiceSelect.addEventListener('change', () => {
+      if (isPlaying && !isPaused) speakCurrentSegment();
+    });
+
+    bgToneToggleBtn.addEventListener('click', () => {
+      chimeEnabled = !chimeEnabled;
+      bgToneToggleBtn.querySelector('span:last-child').textContent =
+        chimeEnabled ? 'جرس فواصل المحاور: مفعل' : 'جرس فواصل المحاور: متوقف';
+      bgToneIndicator.className = chimeEnabled
+        ? 'w-2 h-2 rounded-full bg-emerald-400'
+        : 'w-2 h-2 rounded-full bg-slate-500';
+      if (chimeEnabled) playSectionChime();
+    });
+
+    document.querySelectorAll('.section-jump-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetIdx = parseInt(btn.getAttribute('data-jump'), 10) || 0;
+        selectAndPlaySegment(targetIdx);
+        const card = document.getElementById(`seg-card-${targetIdx}`);
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
+
+    // Tab Navigation
+    function switchTab(mode) {
+      viewPlayer.classList.add('hidden');
+      viewStudio.classList.add('hidden');
+      viewScript.classList.add('hidden');
+
+      tabPlayerBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition text-slate-300 hover:text-white';
+      tabStudioBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition text-slate-300 hover:text-white';
+      tabScriptBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition text-slate-300 hover:text-white';
+
+      if (mode === 'player') {
+        viewPlayer.classList.remove('hidden');
+        tabPlayerBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition bg-sky-500 text-white shadow';
+      } else if (mode === 'studio') {
+        viewStudio.classList.remove('hidden');
+        tabStudioBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition bg-sky-500 text-white shadow';
+      } else {
+        viewScript.classList.remove('hidden');
+        tabScriptBtn.className = 'px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition bg-sky-500 text-white shadow';
+      }
+    }
+
+    tabPlayerBtn.addEventListener('click', () => switchTab('player'));
+    tabStudioBtn.addEventListener('click', () => switchTab('studio'));
+    tabScriptBtn.addEventListener('click', () => switchTab('script'));
+
+    // Teleprompter Auto-Scroll
+    prompterToggleBtn.addEventListener('click', () => {
+      if (prompterInterval) {
+        clearInterval(prompterInterval);
+        prompterInterval = null;
+        prompterToggleBtn.textContent = '📜 تشغيل التمرير التلقائي';
+      } else {
+        const speed = parseInt(prompterSpeedSelect.value, 10) || 2;
+        prompterInterval = setInterval(() => {
+          teleprompterBox.scrollTop += speed;
+        }, 50);
+        prompterToggleBtn.textContent = '⏸ إيقاف التمرير التلقائي';
+      }
+    });
+
+    // Studio Microphone Recording
+    recordToggleBtn.addEventListener('click', async () => {
+      if (!isRecording) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          showToast('المتصفح لا يدعم التسجيل الصوتي المباشر في هذه النافذة');
+          return;
+        }
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          recordedChunks = [];
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+          };
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+            const url = URL.createObjectURL(blob);
+            recordedAudioPlayer.src = url;
+            downloadAudioLink.href = url;
+            recordedAudioPanel.classList.remove('hidden');
+            stream.getTracks().forEach(t => t.stop());
+            showToast('تم حفظ المقطع الصوتي! يمكنك تحميله الآن');
+          };
+          mediaRecorder.start();
+          isRecording = true;
+          recordBtnLabel.textContent = 'إيقاف التسجيل وحفظ المقطع';
+          recordDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-300 animate-ping';
+          showToast('بدأ التسجيل الصوتي... اقرأ من الملقّن الآن');
+        } catch (err) {
+          showToast('تعذر الوصول للميكروفون: تأكد من منح صلاحية الميكروفون');
+        }
+      } else {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+        isRecording = false;
+        recordBtnLabel.textContent = 'بدء التسجيل من الميكروفون';
+        recordDot.className = 'w-2.5 h-2.5 rounded-full bg-white';
+      }
+    });
+
+    // Copy & Download Script
+    copyScriptBtn.addEventListener('click', () => {
+      rawScriptTextarea.select();
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(rawScriptTextarea.value);
+        } else {
+          document.execCommand('copy');
+        }
+        showToast('تم نسخ نص المحاضرة المشكّل إلى الحافظة');
+      } catch (e) {
+        document.execCommand('copy');
+        showToast('تم نسخ النص');
+      }
+    });
+
+    downloadScriptBtn.addEventListener('click', () => {
+      const blob = new Blob([rawScriptTextarea.value], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'نص_محاضرة_الخدمة_المدنية_في_السودان.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('تم تحميل الملف النصي للمحاضرة');
+    });
+
+    // Waveform Canvas Animation
+    function initWaveform() {
+      const ctx = waveformCanvas.getContext('2d');
+      let phase = 0;
+
+      function resizeCanvas() {
+        const rect = waveformCanvas.parentElement.getBoundingClientRect();
+        waveformCanvas.width = Math.max(280, rect.width - 24);
+        waveformCanvas.height = 40;
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      function draw() {
+        const w = waveformCanvas.width;
+        const h = waveformCanvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const bars = 48;
+        const gap = 4;
+        const barWidth = Math.max(2, (w - (bars - 1) * gap) / bars);
+
+        for (let i = 0; i < bars; i++) {
+          let amp = 4;
+          if (isPlaying && !isPaused) {
+            amp = 6 + Math.abs(Math.sin(phase + i * 0.35)) * 22 + Math.abs(Math.cos(phase * 1.3 - i * 0.2)) * 8;
+          } else {
+            amp = 4 + Math.sin(i * 0.4) * 2;
+          }
+          const x = i * (barWidth + gap);
+          const y = (h - amp) / 2;
+
+          const grad = ctx.createLinearGradient(0, 0, 0, h);
+          grad.addColorStop(0, '#38bdf8');
+          grad.addColorStop(1, '#14b8a6');
+          ctx.fillStyle = (isPlaying && !isPaused) ? grad : '#334155';
+          ctx.beginPath();
+          ctx.roundRect(x, y, barWidth, amp, 2);
+          ctx.fill();
+        }
+        phase += 0.12;
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+        animFrameId = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    window.addEventListener('load', () => {
+      renderAllContent();
+      initWaveform();
+      bgToneIndicator.className = 'w-2 h-2 rounded-full bg-emerald-400';
+    });
+  </script>
+</body>
+</html>
+```
